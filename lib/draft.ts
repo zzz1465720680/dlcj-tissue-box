@@ -1,0 +1,4 @@
+import {Design} from './design';
+function open(){return new Promise<IDBDatabase>((resolve,reject)=>{const r=indexedDB.open('dlcj-drafts',1);r.onupgradeneeded=()=>r.result.createObjectStore('drafts');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});}
+export async function loadDraft(){const db=await open();return new Promise<unknown>((resolve,reject)=>{const t=db.transaction('drafts'),r=t.objectStore('drafts').get('current');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);t.oncomplete=()=>db.close();});}
+export async function saveDraft(design:Design){const db=await open();return new Promise<void>((resolve,reject)=>{const t=db.transaction('drafts','readwrite');t.objectStore('drafts').put(design,'current');t.oncomplete=()=>{db.close();resolve()};t.onerror=()=>{db.close();reject(t.error)};t.onabort=()=>{db.close();reject(t.error)};});}

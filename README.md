@@ -2,7 +2,7 @@
 
 A brand website for a leather car tissue box, with a 3D customizer where a customer picks the material, colour, perforation and artwork for each part.
 
-**This is an early demo of a product website I'm experimenting with for a leather car tissue box, featuring an interactive 3D customization experience. Every page is shown below on desktop and mobile, so nothing needs to be installed or run.
+This is an early demo of a product website I'm experimenting with for a leather car tissue box, featuring an interactive 3D customization experience. Every page is shown below on desktop and mobile, so nothing needs to be installed or run.
 
 Chinese notes: [README.zh.md](README.zh.md)
 

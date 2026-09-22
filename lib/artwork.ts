@@ -1,8 +1,10 @@
 import {Artwork} from './design';
 const images=new Map<string,HTMLImageElement>();
+const pending=new Map<string,Promise<HTMLImageElement>>();
 export function loadArt(src:string):Promise<HTMLImageElement>{
   if(images.has(src))return Promise.resolve(images.get(src)!);
-  return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>{images.set(src,im);resolve(im)};im.onerror=()=>reject(new Error('图片无法读取'));im.src=src;});
+  if(pending.has(src))return pending.get(src)!;
+  const promise=new Promise<HTMLImageElement>((resolve,reject)=>{const im=new Image();im.onload=()=>{images.set(src,im);pending.delete(src);resolve(im)};im.onerror=()=>{pending.delete(src);reject(new Error('图片无法读取'))};im.src=src;});pending.set(src,promise);return promise;
 }
 export function paintArtwork(ctx:CanvasRenderingContext2D,art:Artwork[],size=1024){
   for(const a of art){ctx.save();ctx.globalCompositeOperation=a.erase?'destination-out':'source-over';

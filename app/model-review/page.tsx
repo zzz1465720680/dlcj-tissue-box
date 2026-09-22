@@ -1,6 +1,4 @@
 import type {Metadata} from 'next';
-export const metadata:Metadata={title:'模型与实物校对 · 鼎立车眷',description:'纸巾盒的多角度结构与皮革细节校对。'};
-const views=[['hero','整体形态','稍饱满的皮料形态，保留自然折边。'],['top','顶部','两片唇边形成抽纸口，四个包角各露出圆叶。'],['bottom','底部','同一张主体皮连续包到底面。'],['long','长侧面','两端的包角腰部跨过侧高。'],['short','窄侧面','下折片在外侧覆盖上折片和口沿饰条。'],['corner','包角与缝线','包角自身收口，封边油沿裁边分布。'],['grain','皮革近景 · 侧窗光','在同一模型上用侧光观察细密浅沟纹，纹理按物理尺度平铺。']];
-export default function ModelReview(){return <main className="model-review"><header><a className="brand" href="/"><span className="brand-mark">D</span><span>鼎立车眷<small>DINGLI CHEJUAN</small></span></a><a href="/" className="button dark">返回定制工坊</a></header><div className="review-intro"><p className="eyebrow">MODEL / MATERIAL STUDY</p><h1>从一张皮，到一个纸巾盒。</h1><p>长 16 cm · 宽 10.5 cm · 高约 6 cm</p><span>主体按单张裁片折合，四个包角独立包覆。搭接深度与皮料厚度为实拍拟合，仍可继续校准。</span></div><div className="review-grid">{views.map(([file,name,caption])=><figure key={file}><a href={'/model-review/'+file+'.png'} target="_blank" rel="noreferrer"><img src={'/model-review/'+file+'.png'} alt={name} loading={file==='hero'?'eager':'lazy'}/></a><figcaption><strong>{name}</strong><span>{caption}</span></figcaption></figure>)}</div><div className="review-reference"><h2>实物与展开裁片</h2><div>{[['detail-reference.jpg','实物包角'],['end-reference.jpg','实物窄端搭接'],['pattern.jpg','一张主体皮与四个包角']].map(([file,alt])=><figure key={file}><img src={'/references/'+file} alt={alt} loading="lazy"/><figcaption>{alt}</figcaption></figure>)}</div><p>皮纹依据实拍近照近似重建，原料色泽和手感以实物为准。</p></div></main>}
-
-
+import ModelReview from '@/components/model-review';
+export const metadata:Metadata={title:'revision7 模型校对 · 鼎立车眷',description:'当前网页模型的窄端、包角、油边、顶部搭接和布标端头检查。'};
+export default function Page(){return <ModelReview/>;}

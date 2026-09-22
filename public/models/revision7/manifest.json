@@ -1,0 +1,17 @@
+{
+  "source_sha256": "b5c38bf3a5f79476582856d7842d4a507b64b21107c1fcfbde9738711f9e88f9",
+  "asset": "/models/revision7/tissuebox-r7.glb",
+  "asset_bytes": 18231240,
+  "asset_sha256": "5d4ea839d591c541be6fd064750b16188f5da94161d25aecd083330867c711f1",
+  "protected_files_unchanged": true,
+  "perforation": {
+    "method": "saved tangent metric evaluated by web GLSL; no UV re-unwrap",
+    "diameter_mm": 0.86,
+    "pitch_x_mm": 2.4,
+    "row_pitch_mm": 2.1,
+    "rim_width_mm": 0.13
+  },
+  "no_geometry_simplification": true,
+  "no_blend_saved": true,
+  "compression": "EXT_meshopt_compression, lossless, NONE filter; decoded bytes verified"
+}

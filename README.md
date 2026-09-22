@@ -1,83 +1,85 @@
-# 鼎立车眷 (DINGLI CHEJUAN) — Car Tissue Box Configurator
+# 鼎立车眷 (DINGLI CHEJUAN) — Car Tissue Box Website
 
-A brand showcase site plus a real-time 3D customizer for a leather car tissue box. The model was rebuilt in Blender from the original flat leather pattern, so the body, the four corner wraps and the trim can each be re-materialed, re-coloured, perforated and printed with custom artwork, with edge paint, stitching and a narrow side label as separate controls.
+A brand website for a leather car tissue box, with a 3D customizer where a customer picks the material, colour, perforation and artwork for each part.
 
-Chinese notes and the full validation log: [README.zh.md](README.zh.md)
+**I'm looking for feedback on the visual design** — the style, the aesthetics, and where it could be improved. Every page is shown below on desktop and mobile, so nothing needs to be installed or run.
 
-## Screenshots
+Chinese notes: [README.zh.md](README.zh.md)
 
-Taken from the running build. No setup needed to look at these.
+---
 
-| Home · Chinese | Home · English |
-| --- | --- |
-| ![Home page in Chinese](docs/screenshots/home-zh.webp) | ![Home page in English](docs/screenshots/home-en.webp) |
+## Desktop
 
-| Customization studio | Model review |
-| --- | --- |
-| ![Customization studio](docs/screenshots/studio.webp) | ![Model review page](docs/screenshots/model-review.webp) |
+### Home — Chinese
 
-The language switch sits in the home page header. The choice lives in the URL (`/?lang=en`) and switching is a plain link, so it works without JavaScript and the English page is shareable:
+![Home page, Chinese](docs/screenshots/desktop-home-zh.webp)
 
-![Language toggle](docs/screenshots/language-toggle.webp)
+### Home — English
 
-## Pages
+The site has a Chinese / English switch in the header. The choice lives in the URL, so the English page is directly shareable.
 
-| Route | What it is |
-| --- | --- |
-| `/` | Brand showcase. Server-rendered, art-directed WebP, no 3D loaded on this route. |
-| `/customize` | The 3D studio. Drag to orbit, click a part to edit it. |
-| `/model-review` | Checks the web model against the saved Blender reference renders. |
-| `/api/designs` | Reads and writes saved designs. Requires sign-in, stores per user in R2. |
+![Home page, English](docs/screenshots/desktop-home-en.webp)
 
-## What it does
+### Customization studio
 
-- **Parts** — body, four corner wraps (linked by default, separable), trim, side label.
-- **Per part** — material (grained / smooth / suede), colour, edge paint colour, thread colour, perforation on/off, artwork.
-- **Artwork** — image upload (PNG/JPG/WebP), text, brush, eraser, layer removal. Drawn on the unfolded leather piece and folded back onto the model live.
-- **Perforation** — fixed 0.86 mm holes on a 2.4 mm × 2.1 mm pitch, evaluated in the shader from the saved tangent metric instead of being baked into geometry.
-- **Draft and export** — drafts autosave to IndexedDB and survive a reload; export a multi-view PNG sheet or a JSON file that keeps the original artwork bitmaps and brush strokes.
+![Customization studio](docs/screenshots/desktop-studio.webp)
 
-## Run it locally
+### Model review
 
-Node.js 22.13+. Roughly 500 MB of dependencies.
+An internal page used to check the web model against the Blender reference renders.
+
+![Model review page](docs/screenshots/desktop-model-review.webp)
+
+---
+
+## Mobile
+
+| Home · Chinese | Home · English | Home · customization poster |
+| --- | --- | --- |
+| ![Mobile home, Chinese](docs/screenshots/mobile-home-hero-zh.webp) | ![Mobile home, English](docs/screenshots/mobile-home-hero-en.webp) | ![Mobile home, poster](docs/screenshots/mobile-home-poster-zh.webp) |
+
+| Home · detail cards | Studio · 3D stage | Studio · editing panel |
+| --- | --- | --- |
+| ![Mobile home, details](docs/screenshots/mobile-home-details-zh.webp) | ![Mobile studio, stage](docs/screenshots/mobile-studio-stage.webp) | ![Mobile studio, panel](docs/screenshots/mobile-studio-panel.webp) |
+
+![Mobile model review](docs/screenshots/mobile-model-review.webp)
+
+---
+
+## Design notes
+
+Written down so the intent is clear and can be judged against the result.
+
+- **Palette** — near-black ink `#1d1d1f` on white, a warm neutral `#f5f5f7` for the soft sections, and one deep green `#315d43` used only for actions. The product's own colours (green, sky blue, warm apricot) are left to carry the colour.
+- **Type** — system sans throughout, tight negative tracking on display sizes, small letterspaced eyebrows above the headings for an editorial feel.
+- **Layout** — 1440 px max width, 30 px radius on the large cards, a two-column detail grid, generous section padding.
+- **Art direction** — studio-lit product photography on light grey. The customization poster is the single dark, high-contrast moment on the page, and the whole poster is one clickable target.
+- **Language switch** — a quiet outlined pill sitting next to the primary button. Deliberately subordinate: visible at a glance, but it must not compete with "Start Customizing".
+- **Mobile** — the desktop composition is not simply stacked; the hero, poster and detail cards each get their own mobile arrangement and image cropping.
+
+## What feedback would help most
+
+1. **Hierarchy** — does the eye land on the hero product first and then move to the customization poster, or does something else pull attention?
+2. **The dark poster** — it's the only heavy, high-contrast block in an otherwise light page. Does it earn that weight, or is it too loud?
+3. **Typography** — are the display sizes and the letter-spacing comfortable, or is anything cramped or loose? This is the part I'm least sure about.
+4. **The language switch** — is it visible enough without taking attention from the main button? Is the pill the right treatment?
+5. **Colour** — the green accent `#315d43` is close in hue to the green edging on the product itself. Does that read as intentional, or does it muddy both?
+6. **Mobile rhythm** — does the vertical spacing between sections hold up, or does the page drag on a phone?
+7. **Detail cards** — the two cards under "Look closer, love it more" are the weakest composition on the page in my own view. Any direction here would be welcome.
+
+## Where I already know it's weak
+
+- The **"grain" close-up** inside the studio zooms in so far that the leather texture is hard to read, and the model overlaps the section heading. The model review page renders the same texture correctly, so it is a camera and lighting problem rather than a texture one.
+- The studio's **first load is about 26 MB**, and the loading state is a single static line with no progress indication.
+- The **car interior shot** is a composite rather than real photography, and is labelled "illustrative scene" on the page.
+
+## Running it (optional)
+
+Nothing above needs this — the screenshots cover the visual review.
 
 ```bash
 npm install
 npm run dev      # http://localhost:5173
 ```
 
-`npm run build` produces the Cloudflare Worker bundle, `npx tsc --noEmit` type-checks.
-
-The web model is ~18 MB, so the first visit to `/customize` waits on it. Saving a design and "My designs" need sign-in; without it the UI says so and drafts still persist in the browser.
-
-## Structure
-
-| Path | Contents |
-| --- | --- |
-| `app/page.tsx` | Showcase home page — server component, no 3D |
-| `lib/showcase-copy.ts` | Home page copy, Chinese and English |
-| `app/showcase.css` | Showcase styles, `sc-` prefixed and isolated from the studio |
-| `components/studio.tsx` | Studio UI and state |
-| `components/product-view.tsx` | Three.js scene, camera presets, materials, export |
-| `lib/perforation.ts` | Web-equivalent perforation shader |
-| `components/model-review.tsx` | Model review page |
-| `app/api/designs/route.ts` | Saved-design read/write against R2 |
-| `public/models/revision7/` | Web GLB and its manifest |
-
-## Model notes
-
-- Folded in Blender from a single notched leather piece; the four corner wraps are separate connected meshes. Three independent UV sets for artwork, grain and perforation holes.
-- 38 product objects, 765,740 triangles. No rebuild, no decimation, no vertex quantization. Lossless Meshopt compression to ~18.2 MB, byte-identical after decode.
-- Grain is a 2048 normal/roughness map on a 40 mm physical period; hole size and pitch use a fixed display scale.
-- Baseline size is 16 × 10.5 × ~6 cm. Overlap depth, thickness and micro-texture are still fitted from photos.
-
-## Known limitations
-
-Being blunt about these, since the point of publishing is to get outside eyes on it.
-
-- **Not deployed.** Local only. Sign-in and remote R2 storage have not been exercised against a live environment.
-- **The model is not production-calibrated.** Real measurements, paper patterns, a physical colour card and label sizes still need to be taken before any cutting file can be produced, and the web export is not a cutting file.
-- **~26 MB first load** on `/customize` (18 MB GLB + 7 MB normal map + 1.4 MB roughness map), with a static loading line and no progress indicator.
-- **The "grain" camera preset is weak.** It zooms in far enough that the grain is hard to read and the model overlaps the stage heading. The model review page shows the same texture correctly, so this is camera and lighting rather than a texture problem.
-- Verified on desktop (1366×768, 1440×960) and for mobile layout, but touch 3D interaction and low-end device performance are untested.
-- The repo is currently all local commits on `main`; nothing has been published.
+Node.js 22.13+.

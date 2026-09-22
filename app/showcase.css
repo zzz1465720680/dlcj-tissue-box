@@ -114,7 +114,7 @@ html:has(.sc-showcase) { scroll-behavior: smooth; }
 }
 /* English display copy runs wider than the Chinese original; step the poster headline
    down in the tablet band so it keeps its two intended lines instead of breaking to three. */
-@media (max-width: 900px) {
+@media (min-width: 601px) and (max-width: 900px) {
   .sc-showcase[lang="en"] .sc-customCopy { width: 64%; }
   .sc-showcase[lang="en"] .sc-customCopy h2 { font-size: 34px; }
 }
@@ -150,6 +150,7 @@ html:has(.sc-showcase) { scroll-behavior: smooth; }
   .sc-customPoster::after { background: linear-gradient(0deg, #161618, transparent 21%); }
   .sc-customCopy { width: 100%; padding: 35px 28px; }
   .sc-customCopy h2 { font-size: 42px; }
+  .sc-showcase[lang="en"] .sc-customCopy h2 { font-size: 34px; }
   .sc-customCopy .sc-eyebrow { margin-bottom: 17px; }
   .sc-customDescription { margin: 18px 0 23px; font-size: 15px; }
   .sc-customFooter { bottom: 24px; left: 28px; right: 28px; font-size: 12px; gap: 12px; }

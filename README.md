@@ -57,21 +57,6 @@ Written down so the intent is clear and can be judged against the result.
 - **Language switch** — a quiet outlined pill sitting next to the primary button. Deliberately subordinate: visible at a glance, but it must not compete with "Start Customizing".
 - **Mobile** — the desktop composition is not simply stacked; the hero, poster and detail cards each get their own mobile arrangement and image cropping.
 
-## What feedback would help most
-
-1. **Hierarchy** — does the eye land on the hero product first and then move to the customization poster, or does something else pull attention?
-2. **The dark poster** — it's the only heavy, high-contrast block in an otherwise light page. Does it earn that weight, or is it too loud?
-3. **Typography** — are the display sizes and the letter-spacing comfortable, or is anything cramped or loose? This is the part I'm least sure about.
-4. **The language switch** — is it visible enough without taking attention from the main button? Is the pill the right treatment?
-5. **Colour** — the green accent `#315d43` is close in hue to the green edging on the product itself. Does that read as intentional, or does it muddy both?
-6. **Mobile rhythm** — does the vertical spacing between sections hold up, or does the page drag on a phone?
-7. **Detail cards** — the two cards under "Look closer, love it more" are the weakest composition on the page in my own view. Any direction here would be welcome.
-
-## Where I already know it's weak
-
-- The **"grain" close-up** inside the studio zooms in so far that the leather texture is hard to read, and the model overlaps the section heading. The model review page renders the same texture correctly, so it is a camera and lighting problem rather than a texture one.
-- The studio's **first load is about 26 MB**, and the loading state is a single static line with no progress indication.
-- The **car interior shot** is a composite rather than real photography, and is labelled "illustrative scene" on the page.
 
 ## Running it (optional)
 

@@ -70,7 +70,7 @@ Written down so the intent is clear and can be judged against the result.
 ## Where I already know it's weak
 
 - The **"grain" close-up** inside the studio zooms in so far that the leather texture is hard to read, and the model overlaps the section heading. The model review page renders the same texture correctly, so it is a camera and lighting problem rather than a texture one.
-- The studio's **first load is about 26 MB**, and the loading state is a single static line with no progress indication.
+- The studio's **first load is about 26 MB**. The loading state now shows a clearly labelled still preview plus the real stage it is in (no invented percentage), and the studio stays usable without 3D — you can still pick colours and export the plan text and JSON. The download itself is still heavy.
 - The **car interior shot** is a composite rather than real photography, and is labelled "illustrative scene" on the page.
 
 ## Running it (optional)

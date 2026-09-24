@@ -11,18 +11,20 @@ export {loadArt,paintArtwork} from '@/lib/artwork';
 
 type CaptureOptions={views?:string[];width?:number;height?:number;format?:'image/png'|'image/webp'};
 export type ProductHandle={view:(name:string)=>void;zoom:(n:number)=>void;capture:()=>string;captureViews:(design?:Design,options?:CaptureOptions)=>Promise<string[]>};
-type Props={design:Design;selected:Part|string;onSelect:(p:Part|string)=>void;onReady?:(h:ProductHandle)=>void;showTissue:boolean;rotating:boolean};
+type Props={design:Design;selected:Part|string;onSelect:(p:Part|string)=>void;onReady?:(h:ProductHandle)=>void;onUnavailable?:()=>void;showTissue:boolean;rotating:boolean;previewSrc?:string;previewAlt?:string};
 type SceneState={
   scene:THREE.Scene;camera:THREE.PerspectiveCamera;renderer:THREE.WebGLRenderer;controls:OrbitControls;
   product:ProductRuntime;assets:ProductAssets;generation:number;dirty:boolean;exporting:boolean;
   profiler:ReturnType<typeof createRenderProfiler>;invalidate:()=>void;pixelOverride:number|null;
 };
 
-export default function ProductView({design,selected,onSelect,onReady,showTissue,rotating}:Props){
+export default function ProductView({design,selected,onSelect,onReady,onUnavailable,showTissue,rotating,previewSrc='/showcase/hero-studio-840.webp',previewAlt='纸巾盒静态参考图（3D 预览尚未载入）'}:Props){
   const host=useRef<HTMLDivElement>(null),state=useRef<SceneState|null>(null),api=useRef<ProductHandle|null>(null);
-  const latest=useRef({design,selected,showTissue,rotating,onSelect,onReady});
-  latest.current={design,selected,showTissue,rotating,onSelect,onReady};
+  const latest=useRef({design,selected,showTissue,rotating,onSelect,onReady,onUnavailable});
+  latest.current={design,selected,showTissue,rotating,onSelect,onReady,onUnavailable};
   const [error,setError]=useState(''),[loading,setLoading]=useState(true),[retry,setRetry]=useState(0);
+  // 只报告真实阶段，不显示百分比。
+  const [stage,setStage]=useState('正在准备 3D 预览');
   const [debug,setDebug]=useState(false),[measuring,setMeasuring]=useState(false),[report,setReport]=useState<RenderReport|null>(null);
   const [thumbnails,setThumbnails]=useState<string[]>([]),[generating,setGenerating]=useState(false);
   const [resources,setResources]=useState<unknown>(null);
@@ -30,12 +32,13 @@ export default function ProductView({design,selected,onSelect,onReady,showTissue
 
   useEffect(()=>{
     if(!host.current)return;
+    latest.current.onUnavailable?.();
     let cancelled=false,cleaned=false,raf=0,dragging=false,lastFrame=0,lastQualityChange=0,motionCeiling=Math.min(window.devicePixelRatio,1.25),frameAverage=16.7;
     let own:SceneState|null=null,cleanup=()=>{};
     (async()=>{
       let renderer:THREE.WebGLRenderer;
       try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:false,powerPreference:'high-performance'});}
-      catch{setError('3D 显示无法启动，请开启浏览器硬件加速后重试。');setLoading(false);return;}
+      catch{setError('当前浏览器暂时无法显示 3D 预览。');setLoading(false);return;}
       renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
       renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;renderer.shadowMap.autoUpdate=false;renderer.shadowMap.needsUpdate=true;
       renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.90;
@@ -110,7 +113,9 @@ export default function ProductView({design,selected,onSelect,onReady,showTissue
         renderer.dispose();renderer.domElement.remove();if(state.current===own){state.current=null;api.current=null;}
       };
       try{
+        setStage('正在载入 3D 模型文件（约 18 MB，首次较慢）');
         const assets=await loadProductAssets();if(cancelled){cleanup();return;}
+        setStage('正在应用你的材质与配色');
         const product=createProduct(assets);
         let shown=latest.current,images=await prepareDesignImages(shown.design);
         while(!cancelled&&(shown.design!==latest.current.design||shown.showTissue!==latest.current.showTissue)){shown=latest.current;images=await prepareDesignImages(shown.design);}
@@ -188,8 +193,9 @@ export default function ProductView({design,selected,onSelect,onReady,showTissue
   useEffect(()=>{const s=state.current;if(s){highlightProduct(s.product,selected);s.invalidate();}},[selected]);
   useEffect(()=>{state.current?.invalidate();},[rotating]);
   return <div ref={host} className="product-canvas" data-model-revision="7" aria-label="revision7 纸巾盒 3D 模型" aria-busy={loading}>
-    {loading&&<div className="model-loading">正在载入皮革模型…</div>}
-    {error&&<div className="model-error">{error}<button className="button" onClick={()=>{setError('');setLoading(true);setRetry(v=>v+1);}}>重新载入</button></div>}
+    {(loading||error)&&<figure className="model-preview"><img src={previewSrc} alt={previewAlt} width="840" height="473" decoding="async"/><figcaption>{error?'静态参考图 · 3D 未载入':'静态参考图 · 3D 加载中'}</figcaption></figure>}
+    {loading&&<div className="model-loading" role="status">{stage}</div>}
+    {error&&<div className="model-error"><p>{error}</p><p className="model-error-note">你仍可调整配色、复制需求或下载方案。</p><button className="button" onClick={()=>{setError('');setLoading(true);setStage('正在准备 3D 预览');setRetry(v=>v+1);}}>重新载入</button></div>}
     {debug&&<div style={{position:'fixed',left:10,bottom:10,zIndex:90,maxWidth:440,maxHeight:300,overflow:'auto',background:'#fff',padding:12,border:'1px solid #999',fontSize:12}}>
       <button disabled={loading||measuring||generating} onClick={async()=>{
         const s=state.current;if(!s)return;setMeasuring(true);const old=s.camera.position.clone();const pending=s.profiler.start();s.invalidate();

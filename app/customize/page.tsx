@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   description: '从材质到配色，从图案到细节，设计你的专属车载纸巾盒，实时查看 3D 效果。',
 };
 
-export default function CustomizePage() {
-  return <Studio />;
+export default async function CustomizePage({searchParams}: {searchParams: Promise<{preview?: string}>}) {
+  const params = await searchParams;
+  return <Studio lightPreview={params.preview === 'light'} />;
 }

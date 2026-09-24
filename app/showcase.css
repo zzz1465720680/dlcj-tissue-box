@@ -175,3 +175,71 @@ html:has(.sc-showcase) { scroll-behavior: smooth; }
   .sc-showcase *, .sc-showcase *::before, .sc-showcase *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
 
+/* 推荐配色：卡片把预设带进工坊（/customize?preset=…），图中效果为预设示例，不是用户当前设计的实时结果。 */
+.sc-colorwaySection { padding: 92px 0 20px; }
+.sc-colorwayGrid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.sc-colorwayCard { display: flex; flex-direction: column; height: 100%; border-radius: 26px; background: var(--surface); overflow: hidden; transition: transform .25s, box-shadow .25s; }
+.sc-colorwayCard:hover { transform: translateY(-3px); box-shadow: 0 22px 44px -30px #1d1d1f59; }
+.sc-colorwayMedia { display: block; aspect-ratio: 4 / 3; background: #fff; }
+.sc-colorwayMedia img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.sc-colorwayCopy { display: flex; flex-direction: column; gap: 9px; padding: 22px 26px 26px; }
+.sc-colorwayCopy strong { font-size: 21px; font-weight: 600; letter-spacing: -.02em; }
+.sc-colorwayText { font-size: 14px; line-height: 1.7; color: var(--muted); }
+.sc-colorwayCta { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 14px; font-weight: 550; color: var(--green); }
+.sc-colorwayFooter { display: flex; align-items: center; justify-content: space-between; gap: 28px; margin-top: 26px; }
+.sc-colorwayFooter .sc-textLink { flex-shrink: 0; }
+.sc-colorwayFooter p { margin: 0; max-width: 660px; font-size: 13px; line-height: 1.7; color: var(--muted); }
+.sc-customEntryLinks { display: flex; flex-wrap: wrap; gap: 18px 26px; align-items: center; }
+.sc-dcLogo { width: 40px; height: 36px; object-fit: contain; flex-shrink: 0; }
+.sc-contactSection { padding-top: 90px; }
+.sc-footer a { margin-left: 16px; color: var(--green); }
+.sc-presetNote { margin: 16px 0 0; font-size: 12px; line-height: 1.6; color: #8a8a90; }
+
+/* 产品信息：把“已确认”与“待商家确认”分开写，避免把建模参考当成销售规格。 */
+.sc-infoSection { padding: 100px 0 0; }
+.sc-infoGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+.sc-infoCard { border: 1px solid #e7e7ea; border-radius: 22px; padding: 30px 32px; background: #fff; }
+.sc-infoCard h3 { font-size: 20px; font-weight: 600; letter-spacing: -.02em; margin: 0 0 18px; }
+.sc-infoCard ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 13px; }
+.sc-infoCard li { display: flex; gap: 10px; font-size: 15px; line-height: 1.72; color: #4b4b50; }
+.sc-infoCard li svg { flex-shrink: 0; margin-top: 5px; color: var(--green); }
+.sc-infoConfirmed { background: #fafbf6; border-color: #e1e8dc; }
+.sc-infoPending { background: #fdfbf6; border-color: #efe5d6; }
+.sc-infoPending h3 { color: #6d5c3d; }
+.sc-infoPending li { color: #6b6457; }
+
+/* 购买流程四步与 FAQ。 */
+.sc-stepsSection { padding: 100px 0 0; }
+.sc-stepGrid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+.sc-stepGrid li { background: var(--surface); border-radius: 22px; padding: 28px 26px; }
+.sc-stepNumber { font-size: 13px; font-weight: 600; letter-spacing: .14em; color: var(--green); }
+.sc-stepGrid h3 { font-size: 19px; font-weight: 600; letter-spacing: -.02em; margin: 14px 0 12px; }
+.sc-stepGrid p { margin: 0; font-size: 14px; line-height: 1.78; color: var(--muted); }
+.sc-stepNote { margin: 26px 0 0; padding-left: 16px; border-left: 3px solid #cfd8cb; font-size: 13px; line-height: 1.75; color: #7b7b81; }
+.sc-faqSection { padding: 100px 0 0; }
+.sc-faqList { display: grid; gap: 12px; }
+.sc-faqList details { border: 1px solid #e7e7ea; border-radius: 18px; background: #fff; padding: 0 26px; }
+.sc-faqList summary { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 22px 0; cursor: pointer; font-size: 17px; font-weight: 550; letter-spacing: -.01em; list-style: none; }
+.sc-faqList summary::-webkit-details-marker { display: none; }
+.sc-faqList summary svg { flex-shrink: 0; color: var(--green); transition: transform .22s; }
+.sc-faqList details[open] summary svg { transform: rotate(90deg); }
+.sc-faqList p { margin: 0; padding: 0 0 24px; max-width: 920px; font-size: 15px; line-height: 1.8; color: var(--muted); }
+.sc-footerNotes { display: grid; gap: 6px; justify-items: end; max-width: 620px; text-align: right; }
+
+@media (max-width: 900px) {
+  .sc-colorwayGrid { grid-template-columns: minmax(0, 1fr); }
+  .sc-infoGrid { grid-template-columns: minmax(0, 1fr); }
+  .sc-stepGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .sc-colorwaySection, .sc-infoSection, .sc-stepsSection, .sc-faqSection { padding-top: 63px; }
+  .sc-colorwayCopy { padding: 20px 22px 24px; }
+  .sc-colorwayFooter { display: block; }
+  .sc-colorwayFooter p { margin-top: 13px; }
+  .sc-infoCard { padding: 24px 22px; }
+  .sc-infoCard li { font-size: 14px; }
+  .sc-stepGrid { grid-template-columns: minmax(0, 1fr); }
+  .sc-faqList details { padding: 0 20px; }
+  .sc-faqList summary { font-size: 16px; padding: 19px 0; }
+  .sc-footerNotes { justify-items: start; max-width: none; text-align: left; }
+}

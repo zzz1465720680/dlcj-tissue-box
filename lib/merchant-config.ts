@@ -1,5 +1,5 @@
 // 商家经营信息与客服渠道的唯一配置入口。
-// 电话及微信由商家于2026-09-24提供；价格、交期等未确认资料继续留待沟通。
+// 电话及微信由商家提供；2026-09-29确认现有款99、自由定制159，特殊工艺私聊报价。
 // 首页与咨询面板共用这些渠道。
 
 export type ContactKind = 'wechat' | 'phone' | 'link' | 'email';
@@ -47,7 +47,9 @@ export const MERCHANT_CONFIG: MerchantConfig = {
       '请将需求文字或方案文件发回此前联系的商家账号。本站暂未提供直接联系入口，方案不会自动发送。',
   },
   facts: {
-    confirmed: [],
+    confirmed: [
+      {zh: '现有款式99元/件；自由定制159元/件。专属图案、刺绣等特殊工艺需私聊报价。', en: 'Existing styles are CNY 99 per piece; custom combinations are CNY 159. Personal artwork, embroidery and special work are quoted privately.'},
+    ],
     pending: [
       {zh: '成品尺寸与抽纸适配：请提供放置位置和抽纸包装尺寸，供商家核对。', en: 'Fit: share the available space and tissue-pack dimensions for confirmation.'},
       {zh: '材料与图案：按实物色卡、可用材料和实际工艺确认。', en: 'Materials and artwork: confirm physical swatches, available materials and production methods.'},

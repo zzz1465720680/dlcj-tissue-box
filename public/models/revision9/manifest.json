@@ -1,0 +1,31 @@
+{
+  "revision": 9,
+  "asset": "tissuebox-r9.glb",
+  "asset_bytes": 21195912,
+  "asset_sha256": "6fdcd93a1af14c00360d865548987ef200c9b1a810f5bddd5f9f9d7887561050",
+  "source_sha256": "e49b7ffe6edeb043efaf8a2abe237158db26d68eb3c6313e4a4b969fbd3351bc",
+  "fixed_centers": "fixed-centers.json",
+  "perforation": {
+    "method": "saved r9 fixed-center atlas evaluated by web GLSL",
+    "diameter_mm": 0.86,
+    "pitch_x_mm": 2.4,
+    "row_pitch_mm": 2.1,
+    "rim_width_mm": 0.13,
+    "rim_depth": 0.55,
+    "mask_ramp_mm": 0.023,
+    "candidates_per_fragment": 9,
+    "distance_scale": 1000.0,
+    "atlas_space": "Blender object meters, Z-up, no glTF frame conversion",
+    "body_trim_branch": "legacy _WEB_METRIC tangent metric, unchanged"
+  },
+  "objects": 38,
+  "compression": {
+    "codec": "EXT_meshopt_compression",
+    "filter": "NONE",
+    "quantization": "none",
+    "lossless": true,
+    "uncompressed_bytes": 33083056,
+    "uncompressed_sha256": "cd9104affa38e353541205e9d4cdbc1dea19b2992bddf86b094882e3448da3ad",
+    "buffer_views": 182
+  }
+}

@@ -1,0 +1,2298 @@
+{
+  "kind": "revision9-fixed-hole-centers",
+  "revision": 9,
+  "encoding": {
+    "dtype": "float32",
+    "endian": "little",
+    "channels": 4,
+    "layout": "RGBA",
+    "rgb": "hole center xyz in Blender object meters",
+    "alpha": "1 valid, 0 invalid; invalid pixels are black",
+    "row_order": "Blender image row 0 = jmin (texture v = 0), sample with flipY=false",
+    "component_order": "row major, one float32 per channel, row 0 first"
+  },
+  "filtering": {
+    "min": "nearest",
+    "mag": "nearest",
+    "mipmaps": false,
+    "colorSpace": "none"
+  },
+  "grid": {
+    "u_from": "imin + 0.5 + column",
+    "v_from": "jmin + 0.5 + row",
+    "uv": "center of hole (i,j) is (i + 0.25 + 0.5*(j mod 2), 0.25 + 0.5*j)"
+  },
+  "diameterMm": 0.86,
+  "surfacePositionAttribute": "_WEB_SURFACE_POSITION",
+  "sourceBlendSha256": "e49b7ffe6edeb043efaf8a2abe237158db26d68eb3c6313e4a4b969fbd3351bc",
+  "parts": {
+    "corner0": {
+      "image": "R9_corner0_fixed_centers",
+      "file": "corner0-hole-centers.rgba32f.bin",
+      "bytes": 22400,
+      "sha256": "a381b488ad55159450e2535dca20c17dcdb913c8aa25d69d8bf72ad3a560c0c5",
+      "width": 25,
+      "height": 56,
+      "imin": -2,
+      "jmin": -2,
+      "imax": 22,
+      "jmax": 53,
+      "holeuv_min": [
+        0.4741639494895935,
+        0.17001043260097504
+      ],
+      "holeuv_max": [
+        19.888195037841797,
+        25.177854537963867
+      ],
+      "valid_pixels": 694,
+      "invalid_pixels": 706,
+      "audited_centers_json": 694,
+      "audited_inside_json": 601,
+      "sampled_max_pixel_vs_json_mm": 4.163500021516569e-06,
+      "json_compare_step": 3,
+      "source_exr_sha256": "fbf301f27a1b660a0acb3a447ed4c1c14d176337db159e3617ff1517bea0d64c",
+      "exr_packed_bytes": 23717,
+      "node_group": "R9_corner0_round_fixed_holes",
+      "node_group_graph": {
+        "group": "R9_corner0_round_fixed_holes",
+        "nodes": [
+          {
+            "type": "GROUP_INPUT",
+            "name": "组输入"
+          },
+          {
+            "type": "GROUP_OUTPUT",
+            "name": "组输出"
+          },
+          {
+            "type": "SEPXYZ",
+            "name": "分离 XYZ"
+          },
+          {
+            "type": "MATH",
+            "name": "运算",
+            "operation": "MULTIPLY",
+            "defaults": [
+              2.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.001",
+            "operation": "FLOOR",
+            "defaults": [
+              0.5,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.002",
+            "operation": "ADD",
+            "defaults": [
+              -1.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.003",
+            "operation": "FLOORED_MODULO",
+            "defaults": [
+              2.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.004",
+            "operation": "MULTIPLY",
+            "defaults": [
+              0.5,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.005",
+            "operation": "ADD",
+            "defaults": [
+              0.25,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.006",
+            "operation": "SUBTRACT",
+            "defaults": [
+              0.5
+            ],
+            "linked_inputs": [
+              "Value",
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.007",
+            "operation": "ADD",
+            "defaults": [
+              0.5,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.008",
+            "operation": "FLOOR",
+            "defaults": [
+              0.5,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.009",
+            "operation": "ADD",
+            "defaults": [
+              2.5,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.010",
+            "operation": "DIVIDE",
+            "defaults": [
+              56.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.011",
+            "operation": "ADD",
+            "defaults": [
+              1.5,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.012",
+            "operation": "DIVIDE",
+            "defaults": [
+              25.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "COMBXYZ",
+            "name": "合并 XYZ"
+          },
+          {
+            "type": "TEX_IMAGE",
+            "name": "图像纹理",
+            "image": "R9_corner0_fixed_centers",
+            "interpolation": "Closest",
+            "extension": "CLIP"
+          },
+          {
+            "type": "VECT_MATH",
+            "name": "矢量运算",
+            "operation": "SUBTRACT"
+          },
+          {
+            "type": "VECT_MATH",
+            "name": "矢量运算.001",
+            "operation": "LENGTH"
+          },
+          {
+            "type": "MATH",
+            "name": "运算.013",
+            "operation": "MULTIPLY",
+            "defaults": [
+              1000.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.014",
+            "operation": "SUBTRACT",
+            "defaults": [
+              1.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.015",
+            "operation": "MULTIPLY",
+            "defaults": [
+              1000.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.016",
+            "operation": "ADD",
+            "defaults": [
+              0.5
+            ],
+            "linked_inputs": [
+              "Value",
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.017",
+            "operation": "ADD",
+            "defaults": [
+              2.5,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.018",
+            "operation": "DIVIDE",
+            "defaults": [
+              25.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "COMBXYZ",
+            "name": "合并 XYZ.001"
+          },
+          {
+            "type": "TEX_IMAGE",
+            "name": "图像纹理.001",
+            "image": "R9_corner0_fixed_centers",
+            "interpolation": "Closest",
+            "extension": "CLIP"
+          },
+          {
+            "type": "VECT_MATH",
+            "name": "矢量运算.002",
+            "operation": "SUBTRACT"
+          },
+          {
+            "type": "VECT_MATH",
+            "name": "矢量运算.003",
+            "operation": "LENGTH"
+          },
+          {
+            "type": "MATH",
+            "name": "运算.019",
+            "operation": "MULTIPLY",
+            "defaults": [
+              1000.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.020",
+            "operation": "SUBTRACT",
+            "defaults": [
+              1.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.021",
+            "operation": "MULTIPLY",
+            "defaults": [
+              1000.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.022",
+            "operation": "ADD",
+            "defaults": [
+              0.5
+            ],
+            "linked_inputs": [
+              "Value",
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.023",
+            "operation": "MINIMUM",
+            "defaults": [
+              0.5
+            ],
+            "linked_inputs": [
+              "Value",
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.024",
+            "operation": "ADD",
+            "defaults": [
+              3.5,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.025",
+            "operation": "DIVIDE",
+            "defaults": [
+              25.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "COMBXYZ",
+            "name": "合并 XYZ.002"
+          },
+          {
+            "type": "TEX_IMAGE",
+            "name": "图像纹理.002",
+            "image": "R9_corner0_fixed_centers",
+            "interpolation": "Closest",
+            "extension": "CLIP"
+          },
+          {
+            "type": "VECT_MATH",
+            "name": "矢量运算.004",
+            "operation": "SUBTRACT"
+          },
+          {
+            "type": "VECT_MATH",
+            "name": "矢量运算.005",
+            "operation": "LENGTH"
+          },
+          {
+            "type": "MATH",
+            "name": "运算.026",
+            "operation": "MULTIPLY",
+            "defaults": [
+              1000.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.027",
+            "operation": "SUBTRACT",
+            "defaults": [
+              1.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.028",
+            "operation": "MULTIPLY",
+            "defaults": [
+              1000.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.029",
+            "operation": "ADD",
+            "defaults": [
+              0.5
+            ],
+            "linked_inputs": [
+              "Value",
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.030",
+            "operation": "MINIMUM",
+            "defaults": [
+              0.5
+            ],
+            "linked_inputs": [
+              "Value",
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.031",
+            "operation": "ADD",
+            "defaults": [
+              0.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.032",
+            "operation": "FLOORED_MODULO",
+            "defaults": [
+              2.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.033",
+            "operation": "MULTIPLY",
+            "defaults": [
+              0.5,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.034",
+            "operation": "ADD",
+            "defaults": [
+              0.25,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.035",
+            "operation": "SUBTRACT",
+            "defaults": [
+              0.5
+            ],
+            "linked_inputs": [
+              "Value",
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.036",
+            "operation": "ADD",
+            "defaults": [
+              0.5,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.037",
+            "operation": "FLOOR",
+            "defaults": [
+              0.5,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.038",
+            "operation": "ADD",
+            "defaults": [
+              2.5,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.039",
+            "operation": "DIVIDE",
+            "defaults": [
+              56.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.040",
+            "operation": "ADD",
+            "defaults": [
+              1.5,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.041",
+            "operation": "DIVIDE",
+            "defaults": [
+              25.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "COMBXYZ",
+            "name": "合并 XYZ.003"
+          },
+          {
+            "type": "TEX_IMAGE",
+            "name": "图像纹理.003",
+            "image": "R9_corner0_fixed_centers",
+            "interpolation": "Closest",
+            "extension": "CLIP"
+          },
+          {
+            "type": "VECT_MATH",
+            "name": "矢量运算.006",
+            "operation": "SUBTRACT"
+          },
+          {
+            "type": "VECT_MATH",
+            "name": "矢量运算.007",
+            "operation": "LENGTH"
+          },
+          {
+            "type": "MATH",
+            "name": "运算.042",
+            "operation": "MULTIPLY",
+            "defaults": [
+              1000.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.043",
+            "operation": "SUBTRACT",
+            "defaults": [
+              1.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.044",
+            "operation": "MULTIPLY",
+            "defaults": [
+              1000.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.045",
+            "operation": "ADD",
+            "defaults": [
+              0.5
+            ],
+            "linked_inputs": [
+              "Value",
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.046",
+            "operation": "MINIMUM",
+            "defaults": [
+              0.5
+            ],
+            "linked_inputs": [
+              "Value",
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.047",
+            "operation": "ADD",
+            "defaults": [
+              2.5,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.048",
+            "operation": "DIVIDE",
+            "defaults": [
+              25.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "COMBXYZ",
+            "name": "合并 XYZ.004"
+          },
+          {
+            "type": "TEX_IMAGE",
+            "name": "图像纹理.004",
+            "image": "R9_corner0_fixed_centers",
+            "interpolation": "Closest",
+            "extension": "CLIP"
+          },
+          {
+            "type": "VECT_MATH",
+            "name": "矢量运算.008",
+            "operation": "SUBTRACT"
+          },
+          {
+            "type": "VECT_MATH",
+            "name": "矢量运算.009",
+            "operation": "LENGTH"
+          },
+          {
+            "type": "MATH",
+            "name": "运算.049",
+            "operation": "MULTIPLY",
+            "defaults": [
+              1000.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.050",
+            "operation": "SUBTRACT",
+            "defaults": [
+              1.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.051",
+            "operation": "MULTIPLY",
+            "defaults": [
+              1000.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.052",
+            "operation": "ADD",
+            "defaults": [
+              0.5
+            ],
+            "linked_inputs": [
+              "Value",
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.053",
+            "operation": "MINIMUM",
+            "defaults": [
+              0.5
+            ],
+            "linked_inputs": [
+              "Value",
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.054",
+            "operation": "ADD",
+            "defaults": [
+              3.5,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.055",
+            "operation": "DIVIDE",
+            "defaults": [
+              25.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "COMBXYZ",
+            "name": "合并 XYZ.005"
+          },
+          {
+            "type": "TEX_IMAGE",
+            "name": "图像纹理.005",
+            "image": "R9_corner0_fixed_centers",
+            "interpolation": "Closest",
+            "extension": "CLIP"
+          },
+          {
+            "type": "VECT_MATH",
+            "name": "矢量运算.010",
+            "operation": "SUBTRACT"
+          },
+          {
+            "type": "VECT_MATH",
+            "name": "矢量运算.011",
+            "operation": "LENGTH"
+          },
+          {
+            "type": "MATH",
+            "name": "运算.056",
+            "operation": "MULTIPLY",
+            "defaults": [
+              1000.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.057",
+            "operation": "SUBTRACT",
+            "defaults": [
+              1.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.058",
+            "operation": "MULTIPLY",
+            "defaults": [
+              1000.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.059",
+            "operation": "ADD",
+            "defaults": [
+              0.5
+            ],
+            "linked_inputs": [
+              "Value",
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.060",
+            "operation": "MINIMUM",
+            "defaults": [
+              0.5
+            ],
+            "linked_inputs": [
+              "Value",
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.061",
+            "operation": "ADD",
+            "defaults": [
+              1.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.062",
+            "operation": "FLOORED_MODULO",
+            "defaults": [
+              2.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.063",
+            "operation": "MULTIPLY",
+            "defaults": [
+              0.5,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.064",
+            "operation": "ADD",
+            "defaults": [
+              0.25,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.065",
+            "operation": "SUBTRACT",
+            "defaults": [
+              0.5
+            ],
+            "linked_inputs": [
+              "Value",
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.066",
+            "operation": "ADD",
+            "defaults": [
+              0.5,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.067",
+            "operation": "FLOOR",
+            "defaults": [
+              0.5,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.068",
+            "operation": "ADD",
+            "defaults": [
+              2.5,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.069",
+            "operation": "DIVIDE",
+            "defaults": [
+              56.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.070",
+            "operation": "ADD",
+            "defaults": [
+              1.5,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.071",
+            "operation": "DIVIDE",
+            "defaults": [
+              25.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "COMBXYZ",
+            "name": "合并 XYZ.006"
+          },
+          {
+            "type": "TEX_IMAGE",
+            "name": "图像纹理.006",
+            "image": "R9_corner0_fixed_centers",
+            "interpolation": "Closest",
+            "extension": "CLIP"
+          },
+          {
+            "type": "VECT_MATH",
+            "name": "矢量运算.012",
+            "operation": "SUBTRACT"
+          },
+          {
+            "type": "VECT_MATH",
+            "name": "矢量运算.013",
+            "operation": "LENGTH"
+          },
+          {
+            "type": "MATH",
+            "name": "运算.072",
+            "operation": "MULTIPLY",
+            "defaults": [
+              1000.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.073",
+            "operation": "SUBTRACT",
+            "defaults": [
+              1.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.074",
+            "operation": "MULTIPLY",
+            "defaults": [
+              1000.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.075",
+            "operation": "ADD",
+            "defaults": [
+              0.5
+            ],
+            "linked_inputs": [
+              "Value",
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.076",
+            "operation": "MINIMUM",
+            "defaults": [
+              0.5
+            ],
+            "linked_inputs": [
+              "Value",
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.077",
+            "operation": "ADD",
+            "defaults": [
+              2.5,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.078",
+            "operation": "DIVIDE",
+            "defaults": [
+              25.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "COMBXYZ",
+            "name": "合并 XYZ.007"
+          },
+          {
+            "type": "TEX_IMAGE",
+            "name": "图像纹理.007",
+            "image": "R9_corner0_fixed_centers",
+            "interpolation": "Closest",
+            "extension": "CLIP"
+          },
+          {
+            "type": "VECT_MATH",
+            "name": "矢量运算.014",
+            "operation": "SUBTRACT"
+          },
+          {
+            "type": "VECT_MATH",
+            "name": "矢量运算.015",
+            "operation": "LENGTH"
+          },
+          {
+            "type": "MATH",
+            "name": "运算.079",
+            "operation": "MULTIPLY",
+            "defaults": [
+              1000.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.080",
+            "operation": "SUBTRACT",
+            "defaults": [
+              1.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.081",
+            "operation": "MULTIPLY",
+            "defaults": [
+              1000.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.082",
+            "operation": "ADD",
+            "defaults": [
+              0.5
+            ],
+            "linked_inputs": [
+              "Value",
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.083",
+            "operation": "MINIMUM",
+            "defaults": [
+              0.5
+            ],
+            "linked_inputs": [
+              "Value",
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.084",
+            "operation": "ADD",
+            "defaults": [
+              3.5,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.085",
+            "operation": "DIVIDE",
+            "defaults": [
+              25.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "COMBXYZ",
+            "name": "合并 XYZ.008"
+          },
+          {
+            "type": "TEX_IMAGE",
+            "name": "图像纹理.008",
+            "image": "R9_corner0_fixed_centers",
+            "interpolation": "Closest",
+            "extension": "CLIP"
+          },
+          {
+            "type": "VECT_MATH",
+            "name": "矢量运算.016",
+            "operation": "SUBTRACT"
+          },
+          {
+            "type": "VECT_MATH",
+            "name": "矢量运算.017",
+            "operation": "LENGTH"
+          },
+          {
+            "type": "MATH",
+            "name": "运算.086",
+            "operation": "MULTIPLY",
+            "defaults": [
+              1000.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.087",
+            "operation": "SUBTRACT",
+            "defaults": [
+              1.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.088",
+            "operation": "MULTIPLY",
+            "defaults": [
+              1000.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.089",
+            "operation": "ADD",
+            "defaults": [
+              0.5
+            ],
+            "linked_inputs": [
+              "Value",
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.090",
+            "operation": "MINIMUM",
+            "defaults": [
+              0.5
+            ],
+            "linked_inputs": [
+              "Value",
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.091",
+            "operation": "SUBTRACT",
+            "defaults": [
+              0.4300000071525574,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.092",
+            "operation": "DIVIDE",
+            "defaults": [
+              0.023000000044703484,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.093",
+            "operation": "ADD",
+            "defaults": [
+              0.5,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.094",
+            "operation": "MAXIMUM",
+            "defaults": [
+              0.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.095",
+            "operation": "MINIMUM",
+            "defaults": [
+              1.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.096",
+            "operation": "DIVIDE",
+            "defaults": [
+              0.12999999523162842,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.097",
+            "operation": "MULTIPLY",
+            "defaults": [
+              0.5
+            ],
+            "linked_inputs": [
+              "Value",
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.098",
+            "operation": "MULTIPLY",
+            "defaults": [
+              -1.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.099",
+            "operation": "EXPONENT",
+            "defaults": [
+              0.5,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.100",
+            "operation": "MULTIPLY",
+            "defaults": [
+              0.550000011920929,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          },
+          {
+            "type": "MATH",
+            "name": "运算.101",
+            "operation": "SUBTRACT",
+            "defaults": [
+              1.0,
+              0.5
+            ],
+            "linked_inputs": [
+              "Value"
+            ]
+          }
+        ],
+        "links": [
+          {
+            "from": "组输入.UV",
+            "to": "分离 XYZ.Vector"
+          },
+          {
+            "from": "分离 XYZ.Y",
+            "to": "运算.Value"
+          },
+          {
+            "from": "运算.Value",
+            "to": "运算.001.Value"
+          },
+          {
+            "from": "运算.001.Value",
+            "to": "运算.002.Value"
+          },
+          {
+            "from": "运算.002.Value",
+            "to": "运算.003.Value"
+          },
+          {
+            "from": "运算.003.Value",
+            "to": "运算.004.Value"
+          },
+          {
+            "from": "运算.004.Value",
+            "to": "运算.005.Value"
+          },
+          {
+            "from": "分离 XYZ.X",
+            "to": "运算.006.Value"
+          },
+          {
+            "from": "运算.005.Value",
+            "to": "运算.006.Value"
+          },
+          {
+            "from": "运算.006.Value",
+            "to": "运算.007.Value"
+          },
+          {
+            "from": "运算.007.Value",
+            "to": "运算.008.Value"
+          },
+          {
+            "from": "运算.002.Value",
+            "to": "运算.009.Value"
+          },
+          {
+            "from": "运算.009.Value",
+            "to": "运算.010.Value"
+          },
+          {
+            "from": "运算.008.Value",
+            "to": "运算.011.Value"
+          },
+          {
+            "from": "运算.011.Value",
+            "to": "运算.012.Value"
+          },
+          {
+            "from": "运算.012.Value",
+            "to": "合并 XYZ.X"
+          },
+          {
+            "from": "运算.010.Value",
+            "to": "合并 XYZ.Y"
+          },
+          {
+            "from": "合并 XYZ.Vector",
+            "to": "图像纹理.Vector"
+          },
+          {
+            "from": "组输入.Surface position",
+            "to": "矢量运算.Vector"
+          },
+          {
+            "from": "图像纹理.Color",
+            "to": "矢量运算.Vector"
+          },
+          {
+            "from": "矢量运算.Vector",
+            "to": "矢量运算.001.Vector"
+          },
+          {
+            "from": "矢量运算.001.Value",
+            "to": "运算.013.Value"
+          },
+          {
+            "from": "图像纹理.Alpha",
+            "to": "运算.014.Value"
+          },
+          {
+            "from": "运算.014.Value",
+            "to": "运算.015.Value"
+          },
+          {
+            "from": "运算.013.Value",
+            "to": "运算.016.Value"
+          },
+          {
+            "from": "运算.015.Value",
+            "to": "运算.016.Value"
+          },
+          {
+            "from": "运算.008.Value",
+            "to": "运算.017.Value"
+          },
+          {
+            "from": "运算.017.Value",
+            "to": "运算.018.Value"
+          },
+          {
+            "from": "运算.018.Value",
+            "to": "合并 XYZ.001.X"
+          },
+          {
+            "from": "运算.010.Value",
+            "to": "合并 XYZ.001.Y"
+          },
+          {
+            "from": "合并 XYZ.001.Vector",
+            "to": "图像纹理.001.Vector"
+          },
+          {
+            "from": "组输入.Surface position",
+            "to": "矢量运算.002.Vector"
+          },
+          {
+            "from": "图像纹理.001.Color",
+            "to": "矢量运算.002.Vector"
+          },
+          {
+            "from": "矢量运算.002.Vector",
+            "to": "矢量运算.003.Vector"
+          },
+          {
+            "from": "矢量运算.003.Value",
+            "to": "运算.019.Value"
+          },
+          {
+            "from": "图像纹理.001.Alpha",
+            "to": "运算.020.Value"
+          },
+          {
+            "from": "运算.020.Value",
+            "to": "运算.021.Value"
+          },
+          {
+            "from": "运算.019.Value",
+            "to": "运算.022.Value"
+          },
+          {
+            "from": "运算.021.Value",
+            "to": "运算.022.Value"
+          },
+          {
+            "from": "运算.016.Value",
+            "to": "运算.023.Value"
+          },
+          {
+            "from": "运算.022.Value",
+            "to": "运算.023.Value"
+          },
+          {
+            "from": "运算.008.Value",
+            "to": "运算.024.Value"
+          },
+          {
+            "from": "运算.024.Value",
+            "to": "运算.025.Value"
+          },
+          {
+            "from": "运算.025.Value",
+            "to": "合并 XYZ.002.X"
+          },
+          {
+            "from": "运算.010.Value",
+            "to": "合并 XYZ.002.Y"
+          },
+          {
+            "from": "合并 XYZ.002.Vector",
+            "to": "图像纹理.002.Vector"
+          },
+          {
+            "from": "组输入.Surface position",
+            "to": "矢量运算.004.Vector"
+          },
+          {
+            "from": "图像纹理.002.Color",
+            "to": "矢量运算.004.Vector"
+          },
+          {
+            "from": "矢量运算.004.Vector",
+            "to": "矢量运算.005.Vector"
+          },
+          {
+            "from": "矢量运算.005.Value",
+            "to": "运算.026.Value"
+          },
+          {
+            "from": "图像纹理.002.Alpha",
+            "to": "运算.027.Value"
+          },
+          {
+            "from": "运算.027.Value",
+            "to": "运算.028.Value"
+          },
+          {
+            "from": "运算.026.Value",
+            "to": "运算.029.Value"
+          },
+          {
+            "from": "运算.028.Value",
+            "to": "运算.029.Value"
+          },
+          {
+            "from": "运算.023.Value",
+            "to": "运算.030.Value"
+          },
+          {
+            "from": "运算.029.Value",
+            "to": "运算.030.Value"
+          },
+          {
+            "from": "运算.001.Value",
+            "to": "运算.031.Value"
+          },
+          {
+            "from": "运算.031.Value",
+            "to": "运算.032.Value"
+          },
+          {
+            "from": "运算.032.Value",
+            "to": "运算.033.Value"
+          },
+          {
+            "from": "运算.033.Value",
+            "to": "运算.034.Value"
+          },
+          {
+            "from": "分离 XYZ.X",
+            "to": "运算.035.Value"
+          },
+          {
+            "from": "运算.034.Value",
+            "to": "运算.035.Value"
+          },
+          {
+            "from": "运算.035.Value",
+            "to": "运算.036.Value"
+          },
+          {
+            "from": "运算.036.Value",
+            "to": "运算.037.Value"
+          },
+          {
+            "from": "运算.031.Value",
+            "to": "运算.038.Value"
+          },
+          {
+            "from": "运算.038.Value",
+            "to": "运算.039.Value"
+          },
+          {
+            "from": "运算.037.Value",
+            "to": "运算.040.Value"
+          },
+          {
+            "from": "运算.040.Value",
+            "to": "运算.041.Value"
+          },
+          {
+            "from": "运算.041.Value",
+            "to": "合并 XYZ.003.X"
+          },
+          {
+            "from": "运算.039.Value",
+            "to": "合并 XYZ.003.Y"
+          },
+          {
+            "from": "合并 XYZ.003.Vector",
+            "to": "图像纹理.003.Vector"
+          },
+          {
+            "from": "组输入.Surface position",
+            "to": "矢量运算.006.Vector"
+          },
+          {
+            "from": "图像纹理.003.Color",
+            "to": "矢量运算.006.Vector"
+          },
+          {
+            "from": "矢量运算.006.Vector",
+            "to": "矢量运算.007.Vector"
+          },
+          {
+            "from": "矢量运算.007.Value",
+            "to": "运算.042.Value"
+          },
+          {
+            "from": "图像纹理.003.Alpha",
+            "to": "运算.043.Value"
+          },
+          {
+            "from": "运算.043.Value",
+            "to": "运算.044.Value"
+          },
+          {
+            "from": "运算.042.Value",
+            "to": "运算.045.Value"
+          },
+          {
+            "from": "运算.044.Value",
+            "to": "运算.045.Value"
+          },
+          {
+            "from": "运算.030.Value",
+            "to": "运算.046.Value"
+          },
+          {
+            "from": "运算.045.Value",
+            "to": "运算.046.Value"
+          },
+          {
+            "from": "运算.037.Value",
+            "to": "运算.047.Value"
+          },
+          {
+            "from": "运算.047.Value",
+            "to": "运算.048.Value"
+          },
+          {
+            "from": "运算.048.Value",
+            "to": "合并 XYZ.004.X"
+          },
+          {
+            "from": "运算.039.Value",
+            "to": "合并 XYZ.004.Y"
+          },
+          {
+            "from": "合并 XYZ.004.Vector",
+            "to": "图像纹理.004.Vector"
+          },
+          {
+            "from": "组输入.Surface position",
+            "to": "矢量运算.008.Vector"
+          },
+          {
+            "from": "图像纹理.004.Color",
+            "to": "矢量运算.008.Vector"
+          },
+          {
+            "from": "矢量运算.008.Vector",
+            "to": "矢量运算.009.Vector"
+          },
+          {
+            "from": "矢量运算.009.Value",
+            "to": "运算.049.Value"
+          },
+          {
+            "from": "图像纹理.004.Alpha",
+            "to": "运算.050.Value"
+          },
+          {
+            "from": "运算.050.Value",
+            "to": "运算.051.Value"
+          },
+          {
+            "from": "运算.049.Value",
+            "to": "运算.052.Value"
+          },
+          {
+            "from": "运算.051.Value",
+            "to": "运算.052.Value"
+          },
+          {
+            "from": "运算.046.Value",
+            "to": "运算.053.Value"
+          },
+          {
+            "from": "运算.052.Value",
+            "to": "运算.053.Value"
+          },
+          {
+            "from": "运算.037.Value",
+            "to": "运算.054.Value"
+          },
+          {
+            "from": "运算.054.Value",
+            "to": "运算.055.Value"
+          },
+          {
+            "from": "运算.055.Value",
+            "to": "合并 XYZ.005.X"
+          },
+          {
+            "from": "运算.039.Value",
+            "to": "合并 XYZ.005.Y"
+          },
+          {
+            "from": "合并 XYZ.005.Vector",
+            "to": "图像纹理.005.Vector"
+          },
+          {
+            "from": "组输入.Surface position",
+            "to": "矢量运算.010.Vector"
+          },
+          {
+            "from": "图像纹理.005.Color",
+            "to": "矢量运算.010.Vector"
+          },
+          {
+            "from": "矢量运算.010.Vector",
+            "to": "矢量运算.011.Vector"
+          },
+          {
+            "from": "矢量运算.011.Value",
+            "to": "运算.056.Value"
+          },
+          {
+            "from": "图像纹理.005.Alpha",
+            "to": "运算.057.Value"
+          },
+          {
+            "from": "运算.057.Value",
+            "to": "运算.058.Value"
+          },
+          {
+            "from": "运算.056.Value",
+            "to": "运算.059.Value"
+          },
+          {
+            "from": "运算.058.Value",
+            "to": "运算.059.Value"
+          },
+          {
+            "from": "运算.053.Value",
+            "to": "运算.060.Value"
+          },
+          {
+            "from": "运算.059.Value",
+            "to": "运算.060.Value"
+          },
+          {
+            "from": "运算.001.Value",
+            "to": "运算.061.Value"
+          },
+          {
+            "from": "运算.061.Value",
+            "to": "运算.062.Value"
+          },
+          {
+            "from": "运算.062.Value",
+            "to": "运算.063.Value"
+          },
+          {
+            "from": "运算.063.Value",
+            "to": "运算.064.Value"
+          },
+          {
+            "from": "分离 XYZ.X",
+            "to": "运算.065.Value"
+          },
+          {
+            "from": "运算.064.Value",
+            "to": "运算.065.Value"
+          },
+          {
+            "from": "运算.065.Value",
+            "to": "运算.066.Value"
+          },
+          {
+            "from": "运算.066.Value",
+            "to": "运算.067.Value"
+          },
+          {
+            "from": "运算.061.Value",
+            "to": "运算.068.Value"
+          },
+          {
+            "from": "运算.068.Value",
+            "to": "运算.069.Value"
+          },
+          {
+            "from": "运算.067.Value",
+            "to": "运算.070.Value"
+          },
+          {
+            "from": "运算.070.Value",
+            "to": "运算.071.Value"
+          },
+          {
+            "from": "运算.071.Value",
+            "to": "合并 XYZ.006.X"
+          },
+          {
+            "from": "运算.069.Value",
+            "to": "合并 XYZ.006.Y"
+          },
+          {
+            "from": "合并 XYZ.006.Vector",
+            "to": "图像纹理.006.Vector"
+          },
+          {
+            "from": "组输入.Surface position",
+            "to": "矢量运算.012.Vector"
+          },
+          {
+            "from": "图像纹理.006.Color",
+            "to": "矢量运算.012.Vector"
+          },
+          {
+            "from": "矢量运算.012.Vector",
+            "to": "矢量运算.013.Vector"
+          },
+          {
+            "from": "矢量运算.013.Value",
+            "to": "运算.072.Value"
+          },
+          {
+            "from": "图像纹理.006.Alpha",
+            "to": "运算.073.Value"
+          },
+          {
+            "from": "运算.073.Value",
+            "to": "运算.074.Value"
+          },
+          {
+            "from": "运算.072.Value",
+            "to": "运算.075.Value"
+          },
+          {
+            "from": "运算.074.Value",
+            "to": "运算.075.Value"
+          },
+          {
+            "from": "运算.060.Value",
+            "to": "运算.076.Value"
+          },
+          {
+            "from": "运算.075.Value",
+            "to": "运算.076.Value"
+          },
+          {
+            "from": "运算.067.Value",
+            "to": "运算.077.Value"
+          },
+          {
+            "from": "运算.077.Value",
+            "to": "运算.078.Value"
+          },
+          {
+            "from": "运算.078.Value",
+            "to": "合并 XYZ.007.X"
+          },
+          {
+            "from": "运算.069.Value",
+            "to": "合并 XYZ.007.Y"
+          },
+          {
+            "from": "合并 XYZ.007.Vector",
+            "to": "图像纹理.007.Vector"
+          },
+          {
+            "from": "组输入.Surface position",
+            "to": "矢量运算.014.Vector"
+          },
+          {
+            "from": "图像纹理.007.Color",
+            "to": "矢量运算.014.Vector"
+          },
+          {
+            "from": "矢量运算.014.Vector",
+            "to": "矢量运算.015.Vector"
+          },
+          {
+            "from": "矢量运算.015.Value",
+            "to": "运算.079.Value"
+          },
+          {
+            "from": "图像纹理.007.Alpha",
+            "to": "运算.080.Value"
+          },
+          {
+            "from": "运算.080.Value",
+            "to": "运算.081.Value"
+          },
+          {
+            "from": "运算.079.Value",
+            "to": "运算.082.Value"
+          },
+          {
+            "from": "运算.081.Value",
+            "to": "运算.082.Value"
+          },
+          {
+            "from": "运算.076.Value",
+            "to": "运算.083.Value"
+          },
+          {
+            "from": "运算.082.Value",
+            "to": "运算.083.Value"
+          },
+          {
+            "from": "运算.067.Value",
+            "to": "运算.084.Value"
+          },
+          {
+            "from": "运算.084.Value",
+            "to": "运算.085.Value"
+          },
+          {
+            "from": "运算.085.Value",
+            "to": "合并 XYZ.008.X"
+          },
+          {
+            "from": "运算.069.Value",
+            "to": "合并 XYZ.008.Y"
+          },
+          {
+            "from": "合并 XYZ.008.Vector",
+            "to": "图像纹理.008.Vector"
+          },
+          {
+            "from": "组输入.Surface position",
+            "to": "矢量运算.016.Vector"
+          },
+          {
+            "from": "图像纹理.008.Color",
+            "to": "矢量运算.016.Vector"
+          },
+          {
+            "from": "矢量运算.016.Vector",
+            "to": "矢量运算.017.Vector"
+          },
+          {
+            "from": "矢量运算.017.Value",
+            "to": "运算.086.Value"
+          },
+          {
+            "from": "图像纹理.008.Alpha",
+            "to": "运算.087.Value"
+          },
+          {
+            "from": "运算.087.Value",
+            "to": "运算.088.Value"
+          },
+          {
+            "from": "运算.086.Value",
+            "to": "运算.089.Value"
+          },
+          {
+            "from": "运算.088.Value",
+            "to": "运算.089.Value"
+          },
+          {
+            "from": "运算.083.Value",
+            "to": "运算.090.Value"
+          },
+          {
+            "from": "运算.089.Value",
+            "to": "运算.090.Value"
+          },
+          {
+            "from": "运算.090.Value",
+            "to": "运算.091.Value"
+          },
+          {
+            "from": "运算.091.Value",
+            "to": "运算.092.Value"
+          },
+          {
+            "from": "运算.092.Value",
+            "to": "运算.093.Value"
+          },
+          {
+            "from": "运算.093.Value",
+            "to": "运算.094.Value"
+          },
+          {
+            "from": "运算.094.Value",
+            "to": "运算.095.Value"
+          },
+          {
+            "from": "运算.091.Value",
+            "to": "运算.096.Value"
+          },
+          {
+            "from": "运算.096.Value",
+            "to": "运算.097.Value"
+          },
+          {
+            "from": "运算.096.Value",
+            "to": "运算.097.Value"
+          },
+          {
+            "from": "运算.097.Value",
+            "to": "运算.098.Value"
+          },
+          {
+            "from": "运算.098.Value",
+            "to": "运算.099.Value"
+          },
+          {
+            "from": "运算.099.Value",
+            "to": "运算.100.Value"
+          },
+          {
+            "from": "运算.100.Value",
+            "to": "运算.101.Value"
+          },
+          {
+            "from": "运算.095.Value",
+            "to": "组输出.Mask"
+          },
+          {
+            "from": "运算.101.Value",
+            "to": "组输出.Rim height"
+          }
+        ]
+      }
+    },
+    "corner1": {
+      "image": "R9_corner1_fixed_centers",
+      "file": "corner1-hole-centers.rgba32f.bin",
+      "bytes": 23296,
+      "sha256": "3603e943d1bc5a375a89203b6df3d973e4903ade780b400c37016626c925d478",
+      "width": 26,
+      "height": 56,
+      "imin": -2,
+      "jmin": -2,
+      "imax": 23,
+      "jmax": 53,
+      "holeuv_min": [
+        0.9700241088867188,
+        0.17582030594348907
+      ],
+      "holeuv_max": [
+        20.571077346801758,
+        25.284408569335938
+      ],
+      "valid_pixels": 693,
+      "invalid_pixels": 763,
+      "audited_centers_json": 693,
+      "audited_inside_json": 607,
+      "sampled_max_pixel_vs_json_mm": 4.202049708320755e-06,
+      "json_compare_step": 3,
+      "source_exr_sha256": "0e8c8288717ecb28a3eafd96c2d8fd00c3d5cdea9af94e651e8aef271d80cdc4",
+      "exr_packed_bytes": 24613,
+      "node_group": "R9_corner1_round_fixed_holes"
+    },
+    "corner2": {
+      "image": "R9_corner2_fixed_centers",
+      "file": "corner2-hole-centers.rgba32f.bin",
+      "bytes": 22400,
+      "sha256": "bc153dc3e17bc20341e165f7c533564d186c96b39b7a9f40a15f994e58d1a311",
+      "width": 25,
+      "height": 56,
+      "imin": -2,
+      "jmin": -1,
+      "imax": 22,
+      "jmax": 54,
+      "holeuv_min": [
+        0.39132019877433777,
+        0.8117767572402954
+      ],
+      "holeuv_max": [
+        19.921358108520508,
+        25.715835571289062
+      ],
+      "valid_pixels": 692,
+      "invalid_pixels": 708,
+      "audited_centers_json": 692,
+      "audited_inside_json": 602,
+      "sampled_max_pixel_vs_json_mm": 4.1134585619678135e-06,
+      "json_compare_step": 3,
+      "source_exr_sha256": "cbc05694d1b66829df15631618dce82b5184ed23feb29a3e630d69f3ddc172ce",
+      "exr_packed_bytes": 23717,
+      "node_group": "R9_corner2_round_fixed_holes"
+    },
+    "corner3": {
+      "image": "R9_corner3_fixed_centers",
+      "file": "corner3-hole-centers.rgba32f.bin",
+      "bytes": 22400,
+      "sha256": "f65deef6bc28eb3e724ad1541c51e76e88776e6ab15fa57ff6c97f4712dc5115",
+      "width": 25,
+      "height": 56,
+      "imin": -2,
+      "jmin": -1,
+      "imax": 22,
+      "jmax": 54,
+      "holeuv_min": [
+        0.09434431046247482,
+        0.7437373995780945
+      ],
+      "holeuv_max": [
+        19.415504455566406,
+        25.817602157592773
+      ],
+      "valid_pixels": 684,
+      "invalid_pixels": 716,
+      "audited_centers_json": 684,
+      "audited_inside_json": 602,
+      "sampled_max_pixel_vs_json_mm": 4.205690869275823e-06,
+      "json_compare_step": 3,
+      "source_exr_sha256": "b4ec85762aa94f15f7c6178a2150b943d94e5553689e79671870db49e96b293e",
+      "exr_packed_bytes": 23717,
+      "node_group": "R9_corner3_round_fixed_holes"
+    }
+  }
+}

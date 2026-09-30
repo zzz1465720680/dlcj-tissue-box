@@ -1,333 +1,71 @@
 export type Lang = 'zh' | 'en';
+export const resolveLang = (value?: string): Lang => value === 'en' ? 'en' : 'zh';
 
-export type Colorway = {id: string; name: string; description: string; alt: string};
-
-export type ShowcaseCopy = {
-  meta: { title: string; description: string };
-  skipLink: string;
-  navLabel: string;
-  logoLabel: string;
-  brand: string;
-  nav: { collection: string; colorways: string; details: string; purchase: string; studio: string; cta: string };
-  langToggle: { label: string; zh: string; en: string };
-  collection: {
-    title: string;
-    tagline: string;
-    series: string;
-    seriesColors: string;
-    seriesNote: string;
-    heroAlt: string;
-    eyebrow: string;
-    heroTitle: string;
-    heroDescription: string;
-    explore: string;
-    detailsLink: string;
-    captionLeft: string;
-    captionRight: string;
-  };
-  hero: { start: string; how: string };
-  colorways: {
-    title: string;
-    intro: string;
-    presetNote: string;
-    items: readonly Colorway[];
-    choose: string;
-    freeform: string;
-    freeformNote: string;
-  };
-  info: {
-    title: string;
-    intro: readonly string[];
-    rangeTitle: string;
-    range: readonly string[];
-    confirmedTitle: string;
-    confirmed: readonly string[];
-    pendingTitle: string;
-    careTitle: string;
-    care: readonly string[];
-  };
-  steps: { title: string; intro: string; items: readonly {title: string; body: string}[]; note: string };
-  faq: { title: string; intro: string; items: readonly {q: string; a: string}[] };
-  languageNote: string;
-  poster: {
-    label: string;
-    imageAlt: string;
-    eyebrow: string;
-    title: readonly string[];
-    description: readonly string[];
-    cta: string;
-    footerLeft: string;
-    footerRight: string;
-    noteColors: string;
-    noteText: string;
-  };
-  details: {
-    title: string;
-    intro: readonly string[];
-    craftLabel: string;
-    craftTitle: string;
-    craftBody: readonly string[];
-    craftAlt: string;
-    sceneLabel: string;
-    sceneTitle: string;
-    sceneBody: readonly string[];
-    sceneAlt: string;
-    sceneNote: string;
-  };
-  closing: { eyebrow: string; title: string; cta: string };
-  footer: { brand: string; wordmark: string; note: string };
+const zh = {
+  meta: { title: '鼎立车眷 · 车载纸巾盒', description: '七款现有款式99元/件，自由定制159元/件。从喜欢的配色开始，搭配你的车载纸巾盒；专属图案、刺绣等特殊需求请私聊报价。' },
+  brand: '鼎立车眷', skip: '跳转到选款', navLabel: '页面导航', language: '语言',
+  nav: ['选款式', '看细节', '自由定制'], customize: '开始定制',
+  hero: { eyebrow: '鼎立车眷 · 车载纸巾盒', title: ['一件小物，', '随你心意。'], body: '从喜欢的配色开始，让车里的日常，也有自己的样子。', choose: '挑选款式', custom: '自由搭配', caption: '白瓷 · 青柠', alt: '白色皮革与青柠绿封边纸巾盒，棚拍风格精修图' },
+  colorways: { label: '01 / 选现有款', title: '先选一个，喜欢的样子。', intro: '以下款式，统一价格。', choose: '咨询这款', note: '产品图经 AI 精修，颜色与细节以实物为准。', items: [
+    { id: 'white-lime', name: '白瓷 · 青柠', description: '柔白皮纹，一抹清新绿。', colors: ['#eeede5', '#91c866'], alt: '白瓷青柠纸巾盒：白色主体、打孔包角与青柠绿封边' },
+    { id: 'black-coral', name: '曜石 · 珊瑚红', description: '深色皮面，珊瑚红勾边。', colors: ['#282b2a', '#e96469'], alt: '曜石珊瑚红纸巾盒：黑色主体、打孔包角与红色封边' },
+    { id: 'ivory', name: '奶油白', description: '同色缝线，干净而柔和。', colors: ['#e9e5da', '#d5d0c2'], alt: '奶油白纸巾盒：象牙白主体、无孔包角与同色缝线' },
+    { id: 'warm-grey', name: '暖灰', description: '温润灰调，浅色封边。', colors: ['#b7ad9c', '#ded3ba'], alt: '暖灰色纸巾盒：纯色皮面、无孔包角与浅色封边' },
+    { id: 'diamond-ivory', name: '菱格打孔', description: '细密孔纹，透出一抹蓝。', colors: ['#d7d4c9', '#4d798c'], alt: '浅色菱格打孔纸巾盒：主体菱形孔纹透出蓝色，搭配无孔包角' },
+    { id: 'orange', name: '橙色', description: '明快橙色，为日常添一点活力。', colors: ['#ec731a', '#eedab5'], alt: '橙色纸巾盒：纯色皮面、橙色缝线和细浅色封边' },
+    { id: 'yellow', name: '明黄', description: '温暖明黄，细线勾勒轮廓。', colors: ['#e3b324', '#e9dcb4'], alt: '明黄色纸巾盒：纯色皮面、同色缝线与浅色封边' },
+  ] },
+  details: { label: '02 / 看细节', title: ['好看的配色，', '也值得细看。'], caption: '曜石 · 珊瑚红 / 车内实拍', alt: '用户实拍的黑红纸巾盒放在深色汽车座椅上', items: [
+    { title: '看得见的皮纹', body: '皮面的纹理与柔和光泽，近看也有层次。' },
+    { title: '包角与封边', body: '打孔包角搭配撞色封边，或选择同色搭配，轮廓各有表情。' },
+    { title: '细节，由你搭配', body: '主体、包角和抽纸口饰边，都可以分别调整颜色与缝线。' },
+  ] },
+  start: { label: '03 / 自由定制', title: '想自己搭配？', body: '主体、包角、封边与缝线，搭配自己的颜色。', steps: [
+    { title: '选一个起点', body: '用推荐款开始，或自由搭配。' },
+    { title: '调整喜欢的细节', body: '搭配皮料、封边与缝线；特殊工艺先聊一聊。' },
+    { title: '确认后制作', body: '把方案发给商家，确认材料、报价和交期。' },
+  ], custom: '进入定制工坊', contact: '想先聊一聊？联系定制', questions: '定制前，你可能想了解', purchase: '价格、交期与购买方式', purchaseNote: '网站用于选款和整理方案，不在线收款。购买前请与商家确认：' },
+  faq: [
+    { q: '99元和159元，有什么区别？', a: '页面展示的现有款式均为99元/件，包括菱格打孔款。自己搭配颜色与细节的自由定制为159元/件；加入自己的图案、刺绣等特殊需求，需要私聊确认工艺和报价。运费与交期另行确认。' },
+    { q: '尺寸和抽纸适配，怎么确认？', a: '请量好车内放置位置和抽纸包装尺寸，发给商家核对。工坊里的 16 × 10.5 × 约 6 cm 是建模参考，成品尺寸以实测确认为准。' },
+    { q: '颜色、材质和图案可以改吗？', a: '自由定制可以在工坊中调整主体、四个包角、抽纸口饰边和侧标。加入文字、图片或手绘可用于表达想法，专属图案与刺绣等特殊制作需私聊报价。实际材料、颜色和工艺，以与商家确认为准。' },
+    { q: '搭配好了，怎么保存和发送？', a: '无需账号即可在本机搭配与保存草稿。在工坊点击“确认方案 · 咨询”，核对数量和备注，复制需求或下载方案，再主动发送给商家。手机慢网时也可以切换轻量预览。' },
+    { q: '车内怎样摆放和养护？', a: '放在不易滑动、不挡视线、不影响安全气囊的位置。避免长时间暴晒与浸水；沾水后用干布轻擦，具体养护请按商家说明。' },
+  ],
+  footer: '颜色与材质以实物为准；制作与交付以双方确认为准。', languageNote: '',
 };
 
-const zh: ShowcaseCopy = {
-  meta: {
-    title: '鼎立车眷 · 车载纸巾盒',
-    description: '小物，也有讲究。白色撞色系列车载纸巾盒：选一款推荐配色，或自己定材质、颜色、打孔与图案，生成可发给商家的定制方案。',
-  },
-  skipLink: '跳转到产品展示',
-  navLabel: '主导航',
-  logoLabel: '鼎立车眷首页',
-  brand: '鼎立车眷',
-  nav: { collection: '车载纸巾盒', colorways: '推荐配色', details: '产品细节', purchase: '购买流程', studio: '定制工坊', cta: '开始定制' },
-  langToggle: { label: '语言', zh: '中文', en: 'EN' },
-  collection: {
-    title: '车载纸巾盒',
-    tagline: '把讲究，带进日常。',
-    series: '白色撞色系列',
-    seriesColors: '清新绿、晴空蓝、暖杏橙三款配色',
-    seriesNote: '一抹色彩，恰到好处。',
-    heroAlt: '白色纸巾盒，绿色包边与打孔包角',
-    eyebrow: '鼎立车眷 · 车载纸巾盒',
-    heroTitle: '小物，也有讲究。',
-    heroDescription: '配色、缝线和图案，按你的喜好搭配。生成专属方案，与商家确认材料和报价。',
-    explore: '选一款推荐配色',
-    detailsLink: '定制与购买流程',
-    captionLeft: '白色为底，清新点睛。',
-    captionRight: '清新绿',
-  },
-  hero: { start: '选一款推荐配色', how: '定制与购买流程' },
-  colorways: {
-    title: '先挑一款配色，再慢慢改。',
-    intro: '下面三款是推荐搭配，点一下就会带进定制工坊，进去以后每个部位都可以继续调整。',
-    presetNote: '预设示例图（本站 3D 渲染缩略图），不是你当前设计的实时效果。',
-    items: [
-      {id: 'porcelain-blue', name: '白瓷 · 湖蓝', description: '白色主体与湖蓝封边，清爽的撞色搭配。', alt: '「白瓷 · 湖蓝」预设搭配缩略图：白色主体与湖蓝封边'},
-      {id: 'black-coral', name: '曜石 · 珊瑚红', description: '黑色主体与打孔包角，配珊瑚红封边。', alt: '「曜石 · 珊瑚红」预设搭配缩略图：黑色主体、黑色包角与珊瑚红封边'},
-      {id: 'forest-linen', name: '森林 · 亚麻', description: '墨绿主体配亚麻色包角，带一枚侧标，偏沉稳。', alt: '「森林 · 亚麻」预设搭配缩略图：墨绿主体与亚麻色包角'},
-    ],
-    choose: '用这款配色定制',
-    freeform: '从零自由定制',
-    freeformNote: '保留已有搭配，也可以从推荐款开始调整。编辑中的配色切换支持撤销。',
-  },
-  info: {
-    title: '定制前，先了解这些。',
-    intro: ['先选择喜欢的效果，再与商家确认实际材料、尺寸和报价。'],
-    rangeTitle: '可以预览的设计选项',
-    range: [
-      '主体：预览细纹、光面、绒面质感，调整颜色与打孔效果',
-      '四个包角：可以整组联动，也可以分别设成不同颜色与质感',
-      '抽纸口饰边：封边油颜色与缝线颜色可以分开选择',
-      '图案：图片、文字、手绘笔迹，添加后随皮料折合实时显示',
-      '侧标：窄边布标可留空、写最多 12 字，或换成一张小图',
-      '配色：12种推荐颜色，也可自选；实物颜色需按色卡确认',
-    ],
-    confirmedTitle: '你的方案如何保存',
-    confirmed: [
-      '设计选项用于表达喜好，材料供应和制作工艺由商家确认',
-      '可定制部位：主体皮料、四个包角、抽纸口饰边，共 6 个部位，另有侧标',
-      '图案方式：图片、文字、手绘笔迹，编辑时实时预览折合效果',
-      '选款与导出：无需账号即可在本机完成搭配、保存草稿并导出方案文件',
-    ],
-    pendingTitle: '购买前一起确认',
-    careTitle: '摆放与养护',
-    care: [
-      '抽纸口在顶部，抽出方向朝上；车内请放在不易滑动、不挡视线、不影响安全气囊的位置',
-      '皮料避免长时间暴晒与浸水，沾到水用干布轻擦；具体养护以商家说明为准',
-      '是否适配你的车：先量一下打算放置的位置，再把车型一起告诉商家确认',
-    ],
-  },
-  steps: {
-    title: '从看到，到手边。',
-    intro: '四步走完：先定搭配，再和商家确认，然后付款、收货。',
-    items: [
-      {title: '选款或自由设计', body: '挑选推荐配色，或在定制工坊调整各个部位、缝线和图案。'},
-      {title: '生成方案并确认细节', body: '在工坊点「确认方案 · 咨询这款」，核对 6 个部位、侧标、数量与备注，复制需求文字，或下载方案文件（JSON）与多角度效果图（PNG）。'},
-      {title: '与商家确认后购买', body: '把需求发给商家，确认材料、可制作性、价格、交期与运费之后，按商家给出的付款方式购买。网站上暂不支持在线支付。'},
-      {title: '制作与交付', body: '商家按确认后的方案制作并安排发货；定制确认、修改与售后规则以商家说明为准。'},
-    ],
-    note: '请将方案主动发给商家。确认报价和制作细节后再购买，本站不在线收款。',
-  },
-  faq: {
-    title: '常见问题',
-    intro: '关于适配、配色与购买，你可能还想了解。',
-    items: [
-      {q: '尺寸适合我的车吗？', a: '建模参考尺寸是 16 × 10.5 × 约 6 cm，用来做 3D 预览；成品实测尺寸和抽纸适配规格还要等商家确认，我们不承诺具体车型适配。建议先量一下中控台、扶手箱或门板格的放置位置，再把车型告诉商家。'},
-      {q: '颜色和材质能做到完全一样吗？', a: '屏幕效果可能与实物有差别。网页颜色和质感用于表达设计意向，购买前请与商家核对实物色卡及可用材料。'},
-      {q: '我想要的图案、照片能做吗？', a: '可以先上传图案查看搭配。能否制作、采用何种工艺及实际效果，需要商家根据原图确认；预览不等于成品效果。'},
-      {q: '价格怎么算？', a: '价格、加价规则（图案数量、特殊材料、打孔工艺等）、起订量与运费由商家根据你的方案确认。网站上暂时不显示价格，也不在线收款。'},
-      {q: '多久能做好，怎么收到？', a: '提交需求时可以备注期望收到的时间。制作交期、配送方式与运费由商家在购买前确认。'},
-      {q: '怎样购买这款定制纸巾盒？', a: '完成搭配后，复制需求或下载方案，发给此前联系的商家账号。确认材料、报价和交期后，再按双方确认的方式购买。'},
-      {q: '一定要用 3D 吗？', a: '不用。3D 只是预览，并且是按需加载的。手机或网络不佳时，可以先选配色，再生成需求文字和方案文件（JSON），一样能完成咨询。'},
-    ],
-  },
-  languageNote: '本页与定制工坊均提供中文；工坊与方案摘要目前只有中文版本。',
-  poster: {
-    label: '进入定制工坊，设计你的纸巾盒',
-    imageAlt: '白色主体搭配清新绿、晴空蓝、暖杏橙包边的三款纸巾盒',
-    eyebrow: '定制工坊',
-    title: ['一件日常，', '你的模样。'],
-    description: ['从配色到图案，', '把喜欢的样子，变成自己的设计。'],
-    cta: '开始定制',
-    footerLeft: '材质 · 配色 · 图案 · 细节',
-    footerRight: '实时 3D 预览',
-    noteColors: '清新绿 / 晴空蓝 / 暖杏橙',
-    noteText: '从一抹灵感开始，自由搭配。',
-  },
-  details: {
-    title: '细看，才更动心。',
-    intro: ['一处纹理，一道线条。', '把对日常的用心，放进细节里。'],
-    craftLabel: '纹理与线条',
-    craftTitle: '细节，自有分寸。',
-    craftBody: ['细腻皮纹与打孔包角相映，', '一道撞色包边，勾勒利落轮廓。'],
-    craftAlt: '白色皮纹、细密缝线、绿色包边与打孔包角的近景',
-    sceneLabel: '车内日常',
-    sceneTitle: '小小一隅，也有生活感。',
-    sceneBody: ['让一抹清新，与车内的色调相处。', '日常小物，也可以是喜欢的风景。'],
-    sceneAlt: '白绿纸巾盒置于深色汽车座椅上的场景示意',
-    sceneNote: '场景示意',
-  },
-  closing: { eyebrow: '鼎立车眷', title: '把讲究，带进日常。', cta: '设计我的纸巾盒' },
-  footer: {
-    brand: '鼎立车眷',
-    wordmark: 'DINGLI CHEJUAN',
-    note: '页面配色与定制效果供参考，成品以实物打样为准；价格、交期与售后以商家确认为准。',
-  },
+const en = {
+  meta: { title: '鼎立车眷 · Car Tissue Box', description: 'Seven existing styles at CNY 99 per piece. Custom combinations at CNY 159. Personal artwork, embroidery and special work are quoted privately.' },
+  brand: '鼎立车眷', skip: 'Skip to colourways', navLabel: 'Page navigation', language: 'Language',
+  nav: ['Styles', 'Details', 'Customize'], customize: 'Customize',
+  hero: { eyebrow: 'DINGLI CHEJUAN · CAR TISSUE BOX', title: ['A little detail.', 'Entirely you.'], body: 'Start with a colour you love. Make the everyday feel a little more your own.', choose: 'Explore styles', custom: 'Create your own', caption: 'Porcelain · Lime', alt: 'White leather tissue box with lime edging, retouched studio product image' },
+  colorways: { label: '01 / EXISTING STYLES', title: 'Find a style you love.', intro: 'One price for every style shown.', choose: 'Enquire about this style', note: 'Product images are AI-retouched. Confirm colours and details against the physical product.', items: [
+    { id: 'white-lime', name: 'Porcelain · Lime', description: 'Soft white, a fresh line of green.', colors: ['#eeede5', '#91c866'], alt: 'White tissue box with perforated white corners and lime edging' },
+    { id: 'black-coral', name: 'Obsidian · Coral', description: 'Dark leather, outlined in coral.', colors: ['#282b2a', '#e96469'], alt: 'Black tissue box with perforated corners and coral-red edging' },
+    { id: 'ivory', name: 'Soft Ivory', description: 'Tonal stitching, quietly simple.', colors: ['#e9e5da', '#d5d0c2'], alt: 'Ivory tissue box with unperforated corners and matching stitching' },
+    { id: 'warm-grey', name: 'Warm Grey', description: 'A warm grey tone with a pale outline.', colors: ['#b7ad9c', '#ded3ba'], alt: 'Warm greige tissue cover with solid corner pieces and pale edging' },
+    { id: 'diamond-ivory', name: 'Diamond Perforation', description: 'Fine perforations with a hint of blue.', colors: ['#d7d4c9', '#4d798c'], alt: 'Light leather tissue cover with diamond perforations over blue backing and solid corners' },
+    { id: 'orange', name: 'Orange', description: 'A bright touch for the everyday.', colors: ['#ec731a', '#eedab5'], alt: 'Orange leather tissue cover with matching stitching and thin pale edging' },
+    { id: 'yellow', name: 'Golden Yellow', description: 'Warm yellow, gently outlined.', colors: ['#e3b324', '#e9dcb4'], alt: 'Golden yellow leather tissue cover with tonal stitching and pale edging' },
+  ] },
+  details: { label: '02 / DETAILS', title: ['A colour you love.', 'Details to look closer at.'], caption: 'Obsidian · Coral / Original photograph', alt: 'Original photograph of the black and coral tissue box on a dark car seat', items: [
+    { title: 'Leather texture', body: 'Visible grain and a soft sheen bring depth to the surface.' },
+    { title: 'Corners and edging', body: 'Perforated corners and contrasting edges, or a quiet tonal combination.' },
+    { title: 'Made personal', body: 'Choose colours and stitching for the body, corners and opening trim separately.' },
+  ] },
+  start: { label: '03 / CUSTOM COMBINATIONS', title: 'Make it your own.', body: 'Choose your own colours for the body, corners, edging and stitching.', steps: [
+    { title: 'Choose a starting point', body: 'Start from a colourway or build your own.' },
+    { title: 'Add your details', body: 'Explore leather, edging and stitching. Discuss special work with the maker.' },
+    { title: 'Confirm with the maker', body: 'Share your plan and agree on materials, price and lead time.' },
+  ], custom: 'Open the design studio', contact: 'Prefer to talk first? Contact the maker', questions: 'Before you customize', purchase: 'Price, delivery and purchasing', purchaseNote: 'This site helps you design and prepare a request. It does not take payments. Confirm these details with the maker:' },
+  faq: [
+    { q: 'What is the difference between CNY 99 and CNY 159?', a: 'All existing styles shown, including Diamond Perforation, are CNY 99 per piece. Your own colour and detail combinations are CNY 159 per piece. Personal artwork, embroidery and other special work are quoted privately. Confirm shipping and lead time separately.' },
+    { q: 'How do I check the size and tissue-pack fit?', a: 'Measure the available space in your car and your tissue pack, then share both with the maker. The studio’s 16 × 10.5 × approximately 6 cm is a modelling reference, not a confirmed finished size.' },
+    { q: 'Can I change the colours, materials and artwork?', a: 'Customize the body, four corners, opening trim and side label. Text, images and drawings express your ideas; personal artwork and embroidery production are quoted privately. Confirm available materials, colours and production methods with the maker.' },
+    { q: 'How do I save and share my design?', a: 'No account is needed to design and keep a local draft. Use “确认方案 · 咨询” to review quantity and notes, copy or download the request, then send it to the maker. A lightweight preview is available for slower connections.' },
+    { q: 'How should I place and care for it?', a: 'Choose a stable spot that does not block your view or interfere with airbags. Avoid long sun exposure and soaking. Wipe water off with a dry cloth and follow the maker’s care advice.' },
+  ],
+  footer: 'Confirm physical colours and materials, production and delivery with the maker.', languageNote: 'The design studio is currently in Chinese.',
 };
-
-const en: ShowcaseCopy = {
-  meta: {
-    title: '鼎立车眷 · Car Tissue Box',
-    description: 'Small things, made with care. The White Contrast Series car tissue box: pick a colourway or customize material, colour, perforation and pattern, then export a plan to confirm with the maker.',
-  },
-  skipLink: 'Skip to the collection',
-  navLabel: 'Main navigation',
-  logoLabel: '鼎立车眷 home',
-  brand: '鼎立车眷',
-  nav: { collection: 'Car Tissue Box', colorways: 'Colourways', details: 'Product Details', purchase: 'How to Buy', studio: 'Custom Studio', cta: 'Customize' },
-  langToggle: { label: 'Language', zh: '中文', en: 'EN' },
-  collection: {
-    title: 'Car Tissue Box',
-    tagline: 'Bring care into the everyday.',
-    series: 'White Contrast Series',
-    seriesColors: 'Fresh Green, Sky Blue and Warm Apricot',
-    seriesNote: 'A touch of colour, exactly enough.',
-    heroAlt: 'White tissue box with green edging and perforated corners',
-    eyebrow: '鼎立车眷 · Car Tissue Box',
-    heroTitle: 'Small things, made with care.',
-    heroDescription: 'Choose your colours, stitching and artwork. Create a personal design, then confirm materials and a quote with the maker.',
-    explore: 'Pick a Colourway',
-    detailsLink: 'How Customizing Works',
-    captionLeft: 'White as the base, a fresh accent.',
-    captionRight: 'Fresh Green',
-  },
-  hero: { start: 'Pick a colourway', how: 'How customizing works' },
-  colorways: {
-    title: 'Start from a colourway, then change anything.',
-    intro: 'These three are recommended combinations. One tap takes them into the studio, where every part can still be adjusted.',
-    presetNote: 'Preset example images (thumbnails rendered by this site) — not a live view of your own design.',
-    items: [
-      {id: 'porcelain-blue', name: 'Porcelain · Lake Blue', description: 'A white body with crisp lake-blue edging.', alt: 'Preset thumbnail: white body with lake-blue edging'},
-      {id: 'black-coral', name: 'Obsidian · Coral', description: 'Black body and perforated black corners with coral-red edging.', alt: 'Preset thumbnail: black body and black corners with coral-red edging'},
-      {id: 'forest-linen', name: 'Forest · Linen', description: 'Deep green body with linen corners and a side label — the calmest of the three.', alt: 'Preset thumbnail: deep green body with linen corners'},
-    ],
-    choose: 'Customize with this colourway',
-    freeform: 'Start from scratch',
-    freeformNote: 'Continue your local draft or start with a recommended combination. Colourway changes can be undone while editing.',
-  },
-  info: {
-    title: 'A few details before you customize.',
-    intro: ['Explore your design, then confirm physical materials, dimensions and pricing with the maker.'],
-    rangeTitle: 'Design options to preview',
-    range: [
-      'Preview grain, smooth or suede finishes and adjust colour and perforation',
-      'Four corners: adjust them as a group, or give each one its own colour and finish',
-      'Opening trim: edge-paint colour and thread colour are chosen separately',
-      'Artwork: images, text and freehand strokes, folded onto the leather in the live preview',
-      'Side label: leave it blank, write up to 12 characters, or use a small image',
-      'Colour: a 12-colour palette plus a custom picker, with separate values for edge paint and thread',
-    ],
-    confirmedTitle: 'Keeping your design',
-    confirmed: [
-      'Preview options express your preferences; available materials and production methods need confirmation',
-      'Customizable parts: body, four corners and opening trim — six parts in total, plus a side label',
-      'Artwork methods: images, text and freehand strokes with a live folded preview',
-      'Selecting and exporting: no account needed — design, keep a local draft and export the plan file',
-    ],
-    pendingTitle: 'Confirm before purchasing',
-    careTitle: 'Placement and care',
-    care: [
-      'The opening faces up on the top face; keep it somewhere it will not slide, block your view or interfere with an airbag',
-      'Avoid long sun exposure and soaking; wipe with a dry cloth if it gets wet — follow the maker’s care instructions',
-      'To check the fit for your car, measure the spot you have in mind and tell the maker your car model',
-    ],
-  },
-  steps: {
-    title: 'From looking to holding.',
-    intro: 'Four steps: choose the design, confirm with the maker, pay, then receive it.',
-    items: [
-      {title: 'Pick a colourway or design freely', body: 'Pick a recommended combination or adjust each part, stitching and artwork in the studio.'},
-      {title: 'Generate the plan and check the details', body: 'In the studio, tap “确认方案 · 咨询这款” to review all six parts, the side label, quantity and notes, then copy the request text or download the plan file (JSON) and multi-angle image (PNG).'},
-      {title: 'Confirm with the maker, then buy', body: 'Send the request to the maker and confirm material, feasibility, price, lead time and shipping, then pay the way the maker asks. Online payment is not supported on this site yet.'},
-      {title: 'Made and delivered', body: 'The maker produces the confirmed design and arranges delivery; confirmation, change and after-sales rules follow the maker’s terms.'},
-    ],
-    note: 'Send your plan to the maker and confirm the quote before buying. This site does not take online payments.',
-  },
-  faq: {
-    title: 'Questions people ask',
-    intro: 'Fit, colours and how to purchase your custom piece.',
-    items: [
-      {q: 'Will it fit my car?', a: 'The modelling reference is about 16 × 10.5 × 6 cm, used for the 3D preview. The measured finished size and the tissue pack it fits still need confirmation from the maker, and we do not promise a fit for any specific car. Measure the spot you have in mind and tell the maker your car model.'},
-      {q: 'Can the colour and material match exactly?', a: 'Screen colours and textures may differ from the finished item. Confirm physical swatches and available materials with the maker before buying.'},
-      {q: 'Can my pattern or photo be made?', a: 'Upload artwork to explore a design. The maker needs to review the original file and confirm feasibility, production method and the finished effect.'},
-      {q: 'How is the price calculated?', a: 'Price, upcharges (number of artwork elements, special materials, perforation), minimum order quantity and shipping are confirmed by the maker based on your design. This site does not display prices and does not take payment.'},
-      {q: 'How long does it take, and how do I receive it?', a: 'Production lead time, shipping method, delivery scope and cost are confirmed by the maker. This site does not promise a number of days or free shipping.'},
-      {q: 'How do I buy my custom tissue box?', a: 'Copy or download your plan and send it to the maker you contacted. Agree on materials, price and lead time, then use the agreed purchase method.'},
-      {q: 'Do I have to use the 3D view?', a: 'No. 3D is only a preview and loads on demand. On a phone or a slow connection you can pick a colourway first and then generate the request text and plan file (JSON) — that is enough to start the conversation.'},
-    ],
-  },
-  languageNote: 'This page is available in English and Chinese. The customization studio and the request summary are currently in Chinese only.',
-  poster: {
-    label: 'Open the customization studio and design your tissue box',
-    imageAlt: 'Three tissue boxes with white bodies and fresh green, sky blue and warm apricot corners',
-    eyebrow: 'Custom Studio',
-    title: ['Your everyday,', 'made yours.'],
-    description: ['From colour to pattern —', 'turn what you like into your own design.'],
-    cta: 'Start Customizing',
-    footerLeft: 'Material · Colour · Pattern · Detail',
-    footerRight: 'Live 3D Preview',
-    noteColors: 'Fresh Green / Sky Blue / Warm Apricot',
-    noteText: 'Start from a touch of inspiration, then mix freely.',
-  },
-  details: {
-    title: 'Look closer, love it more.',
-    intro: ['A texture, a line —', 'the care for daily life, kept in the details.'],
-    craftLabel: 'Texture & Line',
-    craftTitle: 'Details, held in measure.',
-    craftBody: ['Fine grain meets perforated corners,', 'a contrast edge draws a clean outline.'],
-    craftAlt: 'Close-up of white leather grain, fine stitching, green edging and perforated corners',
-    sceneLabel: 'In the Car',
-    sceneTitle: 'A small corner, still full of life.',
-    sceneBody: ['Let a fresh accent settle into the cabin.', 'Even a small object can be a view you enjoy.'],
-    sceneAlt: 'Illustrative scene of the white and green tissue box on a dark car seat',
-    sceneNote: 'Illustrative scene',
-  },
-  closing: { eyebrow: '鼎立车眷', title: 'Bring care into the everyday.', cta: 'Design My Tissue Box' },
-  footer: {
-    brand: '鼎立车眷',
-    wordmark: 'DINGLI CHEJUAN',
-    note: 'Colours and customization are shown for reference; the finished product follows the physical sample, and price, lead time and after-sales follow the maker’s confirmation.',
-  },
-};
-
-export const SHOWCASE_COPY: Record<Lang, ShowcaseCopy> = { zh, en };
-
-export const resolveLang = (value?: string | null): Lang => (value === 'en' ? 'en' : 'zh');
+export const SHOWCASE_COPY = { zh, en };

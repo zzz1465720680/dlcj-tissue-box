@@ -1,8 +1,11 @@
 import * as THREE from 'three';
+import type {FixedCenterAtlas} from './revision9-holes';
+import {fixedCenterFragmentShader,fixedCenterVertexShader} from './revision9-holes';
 
 // The saved revision7 node group, ported without re-unwrapping HoleUV.
 // glTF flips V; restore Blender's chart before evaluating its metric (g00,g01,g11).
 // Keep these display dimensions fixed, independent of artwork and grain UVs.
+// revision9 keeps this branch for the body and the trim only.
 export const holeShader = /* glsl */`
 varying vec2 vPhysicalHoleUv;
 varying vec3 vPhysicalHoleMetric;
@@ -16,21 +19,36 @@ float holeDistance() {
 }
 `;
 
-export function applyPerforation<T extends THREE.Material>(material:T, rim=true):T {
+const metricVertexShader = /* glsl */`
+attribute vec3 _web_metric;
+varying vec2 vPhysicalHoleUv;
+varying vec3 vPhysicalHoleMetric;
+`;
+
+/** Shared by the corner fixed-center branch and the legacy metric branch.
+ * `atlas` selects the saved revision9 calculation for one corner part; without
+ * it the body/trim metric above stays in charge, byte for byte as before.
+ */
+export function applyPerforation<T extends THREE.Material>(material:T, rim=true, atlas:FixedCenterAtlas|null=null):T {
   // Declare uv2 even in the shadow shader, which has no image alpha map.
   const configurable=material as T & {defines?:Record<string,unknown>};
   configurable.defines = {
     ...configurable.defines, USE_UV2: '',
   };
   material.onBeforeCompile = shader => {
-    shader.vertexShader = `attribute vec3 _web_metric;
-varying vec2 vPhysicalHoleUv;
-varying vec3 vPhysicalHoleMetric;
-` + shader.vertexShader;
+    shader.vertexShader = (atlas ? fixedCenterVertexShader : metricVertexShader) + shader.vertexShader;
     shader.vertexShader = shader.vertexShader.replace('#include <uv_vertex>', `#include <uv_vertex>
 vPhysicalHoleUv = vec2(uv2.x, 1.0 - uv2.y);
-vPhysicalHoleMetric = _web_metric;`);
-    shader.fragmentShader = holeShader + shader.fragmentShader;
+${atlas ? 'vFixedSurfacePosition = _web_surface_position;' : 'vPhysicalHoleMetric = _web_metric;'}`);
+    shader.fragmentShader = (atlas ? fixedCenterFragmentShader : holeShader) + shader.fragmentShader;
+    if (atlas) {
+      // The saved center atlas and its exact fix_holes.py grid origin. Shared by
+      // the surface material and its customDepthMaterial, so holes, shadows and
+      // screenshots evaluate one identical mask.
+      shader.uniforms.uFixedCenters = {value: atlas.texture};
+      shader.uniforms.uFixedGridOrigin = {value: new THREE.Vector2(atlas.imin, atlas.jmin)};
+      shader.uniforms.uFixedGridSize = {value: new THREE.Vector2(atlas.width, atlas.height)};
+    }
     shader.fragmentShader = shader.fragmentShader.replace('#include <alphatest_fragment>', `
 float physicalHoleEdge = holeDistance() - 0.43;
 float holeAA = max(fwidth(physicalHoleEdge), 0.023);
@@ -48,6 +66,8 @@ float leatherDet = dot(leatherSX, leatherR1);
 vec3 leatherGrad = sign(leatherDet) * (rimGradient.x*leatherR1 + rimGradient.y*leatherR2);
 normal = normalize(abs(leatherDet)*normal - leatherGrad);`);
   };
-  material.customProgramCacheKey = () => `revision7-physical-holes-${rim ? 'surface' : 'depth'}-2`;
+  material.customProgramCacheKey = () => atlas
+    ? `revision9-fixed-centers-${atlas.part}-${rim ? 'surface' : 'depth'}-1`
+    : `revision7-physical-holes-${rim ? 'surface' : 'depth'}-2`;
   return material;
 }

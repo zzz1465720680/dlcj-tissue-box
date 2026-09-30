@@ -49,3 +49,6 @@ next-env.d.ts
 # Local revision7 QA captures and draft backups; never publish private test data.
 /checks/revision7/
 /checks/showcase-20260922/
+
+# Local QA screenshots, draft backups and uncompressed model exports.
+/checks/

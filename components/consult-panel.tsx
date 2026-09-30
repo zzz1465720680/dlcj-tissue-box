@@ -11,6 +11,7 @@ import {
 } from '@/lib/purchase';
 import {Input} from '@/components/ui/input';
 import ContactOptions from './contact-options';
+import CustomizationPriceNote from './customization-price-note';
 
 function download(data: Blob, name: string) {
   const url = URL.createObjectURL(data);
@@ -68,6 +69,7 @@ export default function ConsultPanel({design, modelReady, onExportPng, input, on
 
   return (
     <div className="consult-panel">
+      <CustomizationPriceNote />
       <section className="consult-block">
         <h3>你的搭配<span>方案参考码 DLCJ-{signature}</span></h3>
         <ul className="consult-highlights">

@@ -1,6 +1,7 @@
 // 需求摘要（询价草案）的唯一生成逻辑：纯函数，不发起任何提交。
 // 复制、下载都只是把本机生成的文本/文件交给用户，不代表已经发送给商家。
 import {PARTS, PALETTE, PART_NAMES, type Design, type Material, type Part} from './design';
+import {CUSTOM_INQUIRY_PRICE_NOTE} from './pricing';
 
 export const QUANTITY_MIN = 1;
 export const QUANTITY_MAX = 999;
@@ -154,6 +155,7 @@ export function buildInquiryText(design: Design, draft: InquiryDraft, when: Date
     '',
     `设计名称：${design.name}`,
     `数量：${draft.quantity} 件`,
+    `价格说明：${CUSTOM_INQUIRY_PRICE_NOTE}`,
     `备注：${note || '（无）'}`,
     '',
     '【部位方案】',
@@ -195,7 +197,7 @@ export function buildInquiryJson(design: Design, draft: InquiryDraft, when: Date
       generatedAt: when.toISOString(),
       sent: false,
       note: '本文件由客户在本机生成，尚未发送给商家；图片与笔迹原图完整保存在 design 字段内。',
-      request: {quantity: draft.quantity, note: draft.note.trim()},
+      request: {quantity: draft.quantity, note: draft.note.trim(), pricingNote: CUSTOM_INQUIRY_PRICE_NOTE},
       summary: summarizeDesign(design),
       design,
     },

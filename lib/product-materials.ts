@@ -3,6 +3,7 @@ import type {Artwork,Design,Part,Surface} from './design';
 import {PARTS} from './design';
 import {loadArt,paintArtwork} from './artwork';
 import {applyPerforation} from './perforation';
+import type {FixedCenterAtlas} from './revision9-holes';
 import {meshIdentity,type ProductAssets} from './product-assets';
 
 function sameArt(a:Artwork[],b:Artwork[]){
@@ -18,13 +19,32 @@ function canvasTexture(width:number,height:number){
   const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
   const texture=new THREE.CanvasTexture(canvas);texture.flipY=false;texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=8;return texture;
 }
-function setPerforated(material:THREE.MeshStandardMaterial,perforated:boolean){
+/** One entry point for both hole branches. A corner passes its saved r9 fixed
+ * center atlas, which the surface material and the depth material share; the
+ * body and the trim keep the legacy metric and pass nothing. Turning holes off
+ * clears the uv2 define, the compile hook and the cache key, so no stale r9
+ * program or atlas uniform survives the toggle. Atlas textures are owned by
+ * ProductAssets and are never allocated or disposed per toggle.
+ */
+function setPerforated(material:THREE.MeshStandardMaterial,perforated:boolean,atlas:FixedCenterAtlas|null=null){
   material.alphaTest=perforated?.5:0;
-  if(perforated)applyPerforation(material);
+  if(perforated)applyPerforation(material,true,atlas);
   else{
     if(material.defines)delete material.defines.USE_UV2;
     material.onBeforeCompile=()=>{};material.customProgramCacheKey=()=> 'revision7-solid-v1';
   }
+  // Keep the existing physical grain scale and expand its subtle roughness
+  // variation, so reflected light does not form one uniform plastic highlight.
+  // This changes surface response only, composed with the physical hole shader.
+  const compile=material.onBeforeCompile,key=material.customProgramCacheKey();
+  material.onBeforeCompile=function(shader,renderer){
+    compile.call(this,shader,renderer);
+    shader.fragmentShader=shader.fragmentShader.replace('#include <roughnessmap_fragment>',`#include <roughnessmap_fragment>
+#ifdef USE_ROUGHNESSMAP
+roughnessFactor = roughness * clamp(0.68 + (texelRoughness.g - 0.495) * 2.2, 0.46, 0.86);
+#endif`);
+  };
+  material.customProgramCacheKey=()=>key+'-leather-response-20260929';
   material.needsUpdate=true;
 }
 function paintSurface(material:THREE.MeshPhysicalMaterial,surface:Surface){
@@ -59,9 +79,9 @@ function tissueMesh(){
 export function createProduct(assets:ProductAssets):ProductRuntime{
   const parts={} as Record<Part,PartMaterials>;
   for(const part of PARTS)parts[part]={
-    surface:new THREE.MeshPhysicalMaterial({normalMap:assets.normal,roughnessMap:assets.roughness,metalness:0,ior:1.46,specularIntensity:.5,clearcoat:.035,clearcoatRoughness:.45,sheenRoughness:.85,side:THREE.DoubleSide}),
-    edge:new THREE.MeshStandardMaterial({roughness:.36}),thread:new THREE.MeshStandardMaterial({roughness:.82}),
-    depth:applyPerforation(new THREE.MeshDepthMaterial({depthPacking:THREE.RGBADepthPacking,alphaTest:.5,side:THREE.DoubleSide}),false),meshes:[],
+    surface:new THREE.MeshPhysicalMaterial({normalMap:assets.normal,roughnessMap:assets.roughness,aoMap:assets.occlusion?.[part]??null,aoMapIntensity:part==='body'?.72:.62,metalness:0,ior:1.46,specularIntensity:.68,clearcoat:0,clearcoatRoughness:.68,sheenColor:'#b8b3a8',sheenRoughness:.85,side:THREE.DoubleSide}),
+    edge:new THREE.MeshStandardMaterial({roughness:.50}),thread:new THREE.MeshStandardMaterial({roughness:.95}),
+    depth:applyPerforation(new THREE.MeshDepthMaterial({depthPacking:THREE.RGBADepthPacking,alphaTest:.5,side:THREE.DoubleSide}),false,assets.fixedCenters[part]??null),meshes:[],
   };
   const product:ProductRuntime={group:assets.template.clone(true),parts,pickables:[],inside:new THREE.MeshStandardMaterial({color:'#c6c0b5',roughness:.94,side:THREE.DoubleSide}),label:new THREE.MeshStandardMaterial({roughness:.95,side:THREE.DoubleSide}),labelMeshes:[],tissue:tissueMesh(),previousTissue:false,materialUpdates:0,artworkPaints:0};
   product.group.traverse(object=>{
@@ -84,12 +104,13 @@ export function updateProduct(product:ProductRuntime,design:Design,assets:Produc
     const featuresChanged=!old||old.material!==next.material||old.perforated!==next.perforated||!!old.art.length!==!!next.art.length;
     if(paintChanged){paintSurface(material,next);if(next.art.length)product.artworkPaints++;changed=true;}
     if(!old||old.material!==next.material){
-      const strength=next.material==='smooth'?.18:next.material==='suede'?1.3:1.1;
-      material.normalScale.set(strength,strength);material.roughness=next.material==='grain'?1:next.material==='smooth'?.32:.9;
-      material.roughnessMap=next.material==='grain'?assets.roughness:null;material.clearcoat=next.material==='smooth'?.12:.035;material.sheen=next.material==='suede'?.3:0;changed=true;
+      const strength=next.material==='smooth'?.23:next.material==='suede'?1.35:part==='body'?1.25:1.05;
+      material.normalScale.set(strength,strength);material.roughness=next.material==='grain'?(part==='body'?.95:1):next.material==='smooth'?.43:.94;
+      material.specularIntensity=next.material==='smooth'?.8:next.material==='suede'?.45:part==='body'?.68:.58;
+      material.roughnessMap=next.material==='grain'?assets.roughness:null;material.clearcoat=next.material==='smooth'?.06:0;material.sheen=next.material==='suede'?.3:0;changed=true;
     }
     if(!old||old.perforated!==next.perforated){
-      setPerforated(material,next.perforated);
+      setPerforated(material,next.perforated,assets.fixedCenters[part]??null);
       for(const mesh of set.meshes)mesh.customDepthMaterial=next.perforated?set.depth:undefined;
       if(part==='body')setPerforated(product.inside,next.perforated);
       shadows=true;changed=true;
@@ -119,6 +140,8 @@ export function highlightProduct(product:ProductRuntime,selected:string){
   product.label.emissive.set('#365b66');product.label.emissiveIntensity=selected==='label'?.018:0;
 }
 export function disposeProduct(product:ProductRuntime){
+  // Model, leather and revision9 center textures belong to the cached assets and
+  // stay alive, exactly like the existing normal/roughness/contact maps.
   const materials=[...Object.values(product.parts).flatMap(p=>[p.surface,p.edge,p.thread,p.depth]),product.inside,product.label,product.tissue.material as THREE.Material];
   for(const material of materials){if('map'in material&&material.map instanceof THREE.CanvasTexture)material.map.dispose();material.dispose();}
   product.tissue.geometry.dispose();

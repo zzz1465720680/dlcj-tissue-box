@@ -7,6 +7,7 @@ import {Design,Part,preset} from '@/lib/design';
 import {loadProductAssets,type ProductAssets} from '@/lib/product-assets';
 import {createProduct,prepareDesignImages,updateProduct,highlightProduct,disposeProduct,type ProductRuntime} from '@/lib/product-materials';
 import {createRenderProfiler,type RenderReport} from '@/lib/render-profiler';
+import {createContactShadow} from '@/lib/contact-shadow';
 export {loadArt,paintArtwork} from '@/lib/artwork';
 
 type CaptureOptions={views?:string[];width?:number;height?:number;format?:'image/png'|'image/webp'};
@@ -14,7 +15,7 @@ export type ProductHandle={view:(name:string)=>void;zoom:(n:number)=>void;captur
 type Props={design:Design;selected:Part|string;onSelect:(p:Part|string)=>void;onReady?:(h:ProductHandle)=>void;onUnavailable?:()=>void;showTissue:boolean;rotating:boolean;previewSrc?:string;previewAlt?:string};
 type SceneState={
   scene:THREE.Scene;camera:THREE.PerspectiveCamera;renderer:THREE.WebGLRenderer;controls:OrbitControls;
-  product:ProductRuntime;assets:ProductAssets;generation:number;dirty:boolean;exporting:boolean;
+  product:ProductRuntime;assets:ProductAssets;generation:number;dirty:boolean;exporting:boolean;contactDirty:boolean;
   profiler:ReturnType<typeof createRenderProfiler>;invalidate:()=>void;pixelOverride:number|null;
 };
 
@@ -39,31 +40,34 @@ export default function ProductView({design,selected,onSelect,onReady,onUnavaila
       let renderer:THREE.WebGLRenderer;
       try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:false,powerPreference:'high-performance'});}
       catch{setError('当前浏览器暂时无法显示 3D 预览。');setLoading(false);return;}
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+      renderer.setPixelRatio(Math.min(Math.max(window.devicePixelRatio,1.5),2));
+      renderer.outputColorSpace=THREE.SRGBColorSpace;
       renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;renderer.shadowMap.autoUpdate=false;renderer.shadowMap.needsUpdate=true;
-      renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.90;
+      renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.9;
       const el=host.current!;el.appendChild(renderer.domElement);
       const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(34,1,.02,80);camera.position.set(3.41,2.8,3.91);
       const controls=new OrbitControls(camera,renderer.domElement);
       controls.enableDamping=true;controls.dampingFactor=.08;controls.enablePan=false;controls.minDistance=2.8;controls.maxDistance=10;controls.autoRotateSpeed=.6;
       const pmrem=new THREE.PMREMGenerator(renderer),room=new RoomEnvironment(),environment=pmrem.fromScene(room,.04);
-      scene.environment=environment.texture;scene.environmentIntensity=.38;room.dispose();pmrem.dispose();
-      scene.add(new THREE.HemisphereLight(0xffffff,0x929b9c,.28));
-      const key=new THREE.DirectionalLight(0xfffcf5,1.05);key.position.set(-3,5,4);key.castShadow=true;
-      key.shadow.mapSize.set(2048,2048);Object.assign(key.shadow.camera,{left:-3,right:3,top:3,bottom:-3,near:.1,far:12});
-      key.shadow.normalBias=.001;key.shadow.bias=-.000005;key.shadow.radius=5;scene.add(key);
-      const fill=new THREE.DirectionalLight(0xddeaff,.25);fill.position.set(3,2,-2);scene.add(fill);
-      const floor=new THREE.Mesh(new THREE.PlaneGeometry(40,40),new THREE.ShadowMaterial({opacity:.09}));
-      floor.rotation.x=-Math.PI/2;floor.position.y=-.603;floor.receiveShadow=true;scene.add(floor);
+      scene.environment=environment.texture;scene.environmentIntensity=.5;room.dispose();pmrem.dispose();
+      scene.add(new THREE.HemisphereLight(0xffffff,0xa6aaa4,.32));
+      const key=new THREE.DirectionalLight(0xfffcf6,1.8);key.position.set(-3,6,4);key.castShadow=true;
+      key.shadow.mapSize.set(2048,2048);Object.assign(key.shadow.camera,{left:-2.8,right:2.8,top:2.8,bottom:-2.8,near:.1,far:14});
+      key.shadow.normalBias=.002;key.shadow.bias=-.00001;key.shadow.radius=1.5;scene.add(key);
+      const fill=new THREE.DirectionalLight(0xffffff,.52);fill.position.set(4,2.2,4.5);scene.add(fill);
+      const rim=new THREE.DirectionalLight(0xffffff,.9);rim.position.set(1,3.5,-4);scene.add(rim);
+      const contactShadow=createContactShadow(scene,renderer);
 
       const requestFrame=()=>{if(!raf&&!cancelled&&!document.hidden)raf=requestAnimationFrame(animate);};
       const invalidate=()=>{if(own)own.dirty=true;requestFrame();};
       const pixelRatio=(moving:boolean)=>{
         if(own?.pixelOverride)return own.pixelOverride;
+        const area=Math.max(1,el.clientWidth*el.clientHeight);
         const native=Math.min(window.devicePixelRatio,2);
-        // Interaction uses a pixel budget; the full device resolution returns
-        // immediately after damping settles. Geometry, holes and UVs stay exact.
-        return moving?Math.min(native,motionCeiling,Math.max(.75,Math.sqrt(1350000/Math.max(1,el.clientWidth*el.clientHeight)))):native;
+        // Supersample the still frame on ordinary displays, within a 3 MP cap.
+        // Rotation keeps its existing pixel budget; the sharper frame follows
+        // once damping settles, with no continuous rendering while idle.
+        return moving?Math.min(native,motionCeiling,Math.max(.75,Math.sqrt(1350000/area))):Math.min(2,Math.max(window.devicePixelRatio,1.5),Math.sqrt(3000000/area));
       };
       function animate(time:number){
         raf=0;const s=own;if(!s||cancelled||s.exporting)return;
@@ -77,6 +81,7 @@ export default function ProductView({design,selected,onSelect,onReady,onUnavaila
         const ratio=pixelRatio(moving);
         if(Math.abs(renderer.getPixelRatio()-ratio)>.01){renderer.setPixelRatio(ratio);s.dirty=true;}
         if(changed||s.dirty||s.profiler.active){
+          if(s.contactDirty){contactShadow.update();s.contactDirty=false;}
           const started=performance.now();renderer.render(scene,camera);s.profiler.sample(performance.now()-started);s.dirty=false;
         }
         if(moving)requestFrame();
@@ -109,7 +114,7 @@ export default function ProductView({design,selected,onSelect,onReady,onUnavaila
         if(cleaned)return;cleaned=true;cancelAnimationFrame(raf);observer.disconnect();controls.dispose();
         document.removeEventListener('visibilitychange',visibility);
         renderer.domElement.removeEventListener('pointerdown',down);renderer.domElement.removeEventListener('pointerup',up);
-        if(own)disposeProduct(own.product);environment.dispose();floor.geometry.dispose();floor.material.dispose();key.shadow.map?.dispose();
+        if(own)disposeProduct(own.product);environment.dispose();contactShadow.dispose();key.shadow.map?.dispose();
         renderer.dispose();renderer.domElement.remove();if(state.current===own){state.current=null;api.current=null;}
       };
       try{
@@ -121,17 +126,17 @@ export default function ProductView({design,selected,onSelect,onReady,onUnavaila
         while(!cancelled&&(shown.design!==latest.current.design||shown.showTissue!==latest.current.showTissue)){shown=latest.current;images=await prepareDesignImages(shown.design);}
         if(cancelled){disposeProduct(product);cleanup();return;}
         updateProduct(product,shown.design,assets,shown.showTissue,images);highlightProduct(product,latest.current.selected);
-        const s:SceneState={scene,camera,controls,renderer,product,assets,generation:0,dirty:true,exporting:false,profiler:createRenderProfiler(renderer),invalidate,pixelOverride:null};
+        const s:SceneState={scene,camera,controls,renderer,product,assets,generation:0,dirty:true,exporting:false,contactDirty:true,profiler:createRenderProfiler(renderer),invalidate,pixelOverride:null};
         own=s;state.current=s;scene.add(product.group);
         const view=(name:string,draw=true)=>{
           const poses:Record<string,[number,number,number]>={hero:[3.41,2.8,3.91],top:[0,5.8,.001],bottom:[0,-5.8,.001],long:[0,.18,4.5],short:[4.1,.18,0]};
           controls.enableDamping=false;const oldKey=key.position.clone(),oldAuto=controls.autoRotate;controls.autoRotate=false;
           if(name==='grain'){
             controls.minDistance=.65;camera.position.set(.20,.26,2.16);controls.target.set(0,0,1.04);
-            key.position.set(-2.4,1.5,1.6);key.intensity=1.2;fill.intensity=.10;scene.environmentIntensity=.16;
+            key.position.set(-2.4,1.5,1.6);key.intensity=1.8;fill.intensity=.25;scene.environmentIntensity=.3;
           }else{
             controls.minDistance=2.8;camera.position.set(...(poses[name]??poses.hero));controls.target.set(0,0,0);
-            key.position.set(-3,5,4);key.intensity=1.05;fill.intensity=.25;scene.environmentIntensity=.38;
+            key.position.set(-3,6,4);key.intensity=1.8;fill.intensity=.52;scene.environmentIntensity=.5;
             if(name==='corner'||name==='tip'){
               const target=name==='tip'?new THREE.Vector3(1.54,.55,-.52):new THREE.Vector3(1.56,.13,-.42);
               controls.minDistance=.25;controls.target.copy(target);camera.position.copy(target).addScaledVector(new THREE.Vector3(.223,.133,-.079).normalize(),name==='tip'?.98:3.5);
@@ -147,7 +152,8 @@ export default function ProductView({design,selected,onSelect,onReady,onUnavaila
           view,
           zoom:n=>{camera.position.sub(controls.target).multiplyScalar(n).add(controls.target);controls.update();invalidate();},
           capture:()=>{
-            const oldRatio=renderer.getPixelRatio();renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+            if(s.contactDirty){contactShadow.update();s.contactDirty=false;}
+            const oldRatio=renderer.getPixelRatio();renderer.setPixelRatio(pixelRatio(false));
             renderer.render(scene,camera);const png=renderer.domElement.toDataURL('image/png');renderer.setPixelRatio(oldRatio);invalidate();return png;
           },
           captureViews:async(designToExport?:Design,options:CaptureOptions={})=>{
@@ -156,7 +162,7 @@ export default function ProductView({design,selected,onSelect,onReady,onUnavaila
             let exported:ProductRuntime|null=null;const result:string[]=[];s.exporting=true;controls.autoRotate=false;
             try{
               if(designToExport){const images=await prepareDesignImages(designToExport);exported=createProduct(assets);updateProduct(exported,designToExport,assets,latest.current.showTissue,images);product.group.visible=false;scene.add(exported.group);}
-              renderer.shadowMap.needsUpdate=true;renderer.setPixelRatio(1);
+              contactShadow.update();renderer.shadowMap.needsUpdate=true;renderer.setPixelRatio(1);
               const width=options.width??1100,height=options.height??850;renderer.setSize(width,height,false);camera.aspect=width/height;camera.updateProjectionMatrix();
               for(const name of options.views??['hero','top','long','short','bottom']){
                 view(name,false);camera.position.sub(controls.target).multiplyScalar(1.14).add(controls.target);
@@ -170,12 +176,12 @@ export default function ProductView({design,selected,onSelect,onReady,onUnavaila
               camera.position.copy(old.position);controls.target.copy(old.target);controls.minDistance=old.min;
               key.position.copy(old.key);key.intensity=old.keyIntensity;fill.intensity=old.fill;scene.environmentIntensity=old.environment;
               controls.enableDamping=false;controls.update();controls.enableDamping=true;controls.autoRotate=old.auto;
-              renderer.shadowMap.needsUpdate=true;s.exporting=false;invalidate();
+              s.contactDirty=true;renderer.shadowMap.needsUpdate=true;s.exporting=false;invalidate();
             }
           },
         };
         api.current=handle;setLoading(false);setError('');latest.current.onReady?.(handle);invalidate();
-      }catch(error){console.error('Revision7 model load failed',error);if(!cancelled){setError('模型未能载入，请检查网络后重试。');setLoading(false);}}
+      }catch(error){console.error('Revision9 model load failed',error);if(!cancelled){setError('模型未能载入，请检查网络后重试。');setLoading(false);}}
     })();
     return()=>{cancelled=true;cleanup();};
   },[retry]);
@@ -186,13 +192,13 @@ export default function ProductView({design,selected,onSelect,onReady,onUnavaila
       if(state.current!==s||generation!==s.generation)return;
       const result=updateProduct(s.product,design,s.assets,showTissue,images);
       highlightProduct(s.product,latest.current.selected);
-      if(result.shadows)s.renderer.shadowMap.needsUpdate=true;
+      if(result.shadows){s.renderer.shadowMap.needsUpdate=true;s.contactDirty=true;}
       if(result.changed)s.invalidate();setError('');
     }).catch(()=>setError('有一张图案未能载入，请重新添加。'));
   },[design,showTissue]);
   useEffect(()=>{const s=state.current;if(s){highlightProduct(s.product,selected);s.invalidate();}},[selected]);
   useEffect(()=>{state.current?.invalidate();},[rotating]);
-  return <div ref={host} className="product-canvas" data-model-revision="7" aria-label="revision7 纸巾盒 3D 模型" aria-busy={loading}>
+  return <div ref={host} className="product-canvas" data-model-revision="9" aria-label="纸巾盒 3D 模型" aria-busy={loading}>
     {(loading||error)&&<figure className="model-preview"><img src={previewSrc} alt={previewAlt} width="840" height="473" decoding="async"/><figcaption>{error?'静态参考图 · 3D 未载入':'静态参考图 · 3D 加载中'}</figcaption></figure>}
     {loading&&<div className="model-loading" role="status">{stage}</div>}
     {error&&<div className="model-error"><p>{error}</p><p className="model-error-note">你仍可调整配色、复制需求或下载方案。</p><button className="button" onClick={()=>{setError('');setLoading(true);setStage('正在准备 3D 预览');setRetry(v=>v+1);}}>重新载入</button></div>}

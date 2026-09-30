@@ -2,13 +2,25 @@
 
 A brand website for a leather car tissue box, with a 3D customizer where a customer picks the material, colour, perforation and artwork for each part.
 
-**I'm looking for feedback on the visual design** — the style, the aesthetics, and where it could be improved. Every page is shown below on desktop and mobile, so nothing needs to be installed or run.
+This is an early demo of a product website I'm experimenting with for a leather car tissue box, featuring an interactive 3D customization experience. Every page is shown below on desktop and mobile, so nothing needs to be installed or run.
 
 Chinese notes: [README.zh.md](README.zh.md)
 
+## Current storefront · 2026-09-30
+
+- Seven existing styles are **CNY 99 per piece**, including Diamond Perforation. Side arrows switch the main photo; the full style list opens only when needed.
+- Custom colour and detail combinations are **CNY 159 per piece**. Personal artwork, embroidery and other special work are quoted privately.
+- Style enquiries retain the selected name and price. Customers can copy their request and contact the maker directly.
+- Four new product photos use a consistent camera angle, light background and soft studio lighting. The website serves responsive WebP images.
+- The 3D studio uses the approved revision9 model, with the existing local drafts, artwork editor and plan exports.
+
+![Current storefront with arrow selection and CNY 99 pricing](docs/screenshots/stock-gallery-20260929.png)
+
+TypeScript checks and the production build passed. Desktop and mobile checks covered style switching, enquiries and the pricing notes. The screenshots below record the earlier design.
+
 ---
 
-## Desktop
+## Earlier screenshots · Desktop
 
 ### Home — Chinese
 
@@ -32,7 +44,7 @@ An internal page used to check the web model against the Blender reference rende
 
 ---
 
-## Mobile
+## Earlier screenshots · Mobile
 
 | Home · Chinese | Home · English | Home · customization poster |
 | --- | --- | --- |
@@ -46,7 +58,7 @@ An internal page used to check the web model against the Blender reference rende
 
 ---
 
-## Design notes
+## Earlier design notes
 
 Written down so the intent is clear and can be judged against the result.
 
@@ -56,22 +68,6 @@ Written down so the intent is clear and can be judged against the result.
 - **Art direction** — studio-lit product photography on light grey. The customization poster is the single dark, high-contrast moment on the page, and the whole poster is one clickable target.
 - **Language switch** — a quiet outlined pill sitting next to the primary button. Deliberately subordinate: visible at a glance, but it must not compete with "Start Customizing".
 - **Mobile** — the desktop composition is not simply stacked; the hero, poster and detail cards each get their own mobile arrangement and image cropping.
-
-## What feedback would help most
-
-1. **Hierarchy** — does the eye land on the hero product first and then move to the customization poster, or does something else pull attention?
-2. **The dark poster** — it's the only heavy, high-contrast block in an otherwise light page. Does it earn that weight, or is it too loud?
-3. **Typography** — are the display sizes and the letter-spacing comfortable, or is anything cramped or loose? This is the part I'm least sure about.
-4. **The language switch** — is it visible enough without taking attention from the main button? Is the pill the right treatment?
-5. **Colour** — the green accent `#315d43` is close in hue to the green edging on the product itself. Does that read as intentional, or does it muddy both?
-6. **Mobile rhythm** — does the vertical spacing between sections hold up, or does the page drag on a phone?
-7. **Detail cards** — the two cards under "Look closer, love it more" are the weakest composition on the page in my own view. Any direction here would be welcome.
-
-## Where I already know it's weak
-
-- The **"grain" close-up** inside the studio zooms in so far that the leather texture is hard to read, and the model overlaps the section heading. The model review page renders the same texture correctly, so it is a camera and lighting problem rather than a texture one.
-- The studio's **first load is about 26 MB**. The loading state now shows a clearly labelled still preview plus the real stage it is in (no invented percentage), and the studio stays usable without 3D — you can still pick colours and export the plan text and JSON. The download itself is still heavy.
-- The **car interior shot** is a composite rather than real photography, and is labelled "illustrative scene" on the page.
 
 ## Running it (optional)
 

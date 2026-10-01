@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-html-link-for-pages -- This entry is a static browser app, without Next routing. */
 import {Component, type ReactNode} from 'react';
 import {createRoot} from 'react-dom/client';
+import {frontendPreview} from '../lib/frontend-preview';
 import '../app/globals.css';
 import '../app/showcase.css';
 import '../app/store.css';
@@ -23,10 +24,13 @@ async function start() {
   const {captureReferralFromUrl} = await import('../lib/store-client');
   void captureReferralFromUrl();
   let page: ReactNode;
-  if (path === '/customize') {
+  if (frontendPreview && ['/my', '/login', '/checkout', '/admin', '/gallery'].includes(path)) {
+    document.title = '测试预览 · 服务未启用';
+    page = <main style={{padding: '3rem 1.5rem', maxWidth: 720, margin: 'auto'}}><h1>此功能等待服务接入</h1><p>当前链接用于检查外观与本机定制。手机号登录、云端设计、订单、优惠券、作品发布和商家后台暂未启用，也不会发送短信、邮件或处理付款。</p><p>请不要在测试预览中填写真实个人信息。</p><p><a href="/customize">体验本机定制</a> · <a href="/">返回首页</a></p></main>;
+  } else if (path === '/customize') {
     const {default: Studio} = await import('../components/store-studio');
     document.title = '纸巾盒定制工坊 · 鼎立车眷';
-    page = <Studio lightPreview={params.get('preview') === 'light'} localOnly={params.get('storage') === 'local'} initialDesignId={params.get('design') ?? undefined}/>;
+    page = <Studio lightPreview={params.get('preview') === 'light'} localOnly={frontendPreview || params.get('storage') === 'local'} initialDesignId={frontendPreview ? undefined : params.get('design') ?? undefined}/>;
   } else if (path === '/my') {
     const {default: Account} = await import('../components/store-account');
     document.title = '我的 · 鼎立车眷'; page = <Account/>;
@@ -57,7 +61,7 @@ async function start() {
   } else {
     page = <main style={{padding: '3rem'}}><h1>没有找到这个页面</h1><a href="/">返回产品展示</a></main>;
   }
-  createRoot(document.getElementById('root')!).render(<ErrorBoundary>{page}</ErrorBoundary>);
+  createRoot(document.getElementById('root')!).render(<ErrorBoundary>{frontendPreview && <aside aria-label="测试预览说明" style={{padding: '12px 18px', background: '#fff3cd', color: '#513b00', borderBottom: '1px solid #e2c875', fontSize: 14, lineHeight: 1.65}}><strong>前端测试预览</strong> · 可浏览和本机定制，设计仅保存在当前浏览器。登录、云端订单、短信邮件和付款均未启用，请勿填写真实个人信息。</aside>}{page}</ErrorBoundary>);
 }
 
 start().catch(error => {

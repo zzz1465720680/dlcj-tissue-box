@@ -8,7 +8,7 @@ import { pathToFileURL } from 'node:url';
 function privatePath(value) {
   if (typeof value !== 'string' || !isAbsolute(value)) throw new Error('An absolute private path is required');
   const canonical = realpathSync(value);
-  for (const exposed of ['public', 'dist', 'dist-netlify', '.next']) {
+  for (const exposed of ['public', 'dist', 'dist-netlify', 'dist-netlify-preview', '.next']) {
     const offset = relative(resolve(exposed), canonical);
     if (offset === '' || (!offset.startsWith(`..${sep}`) && offset !== '..' && !isAbsolute(offset))) {
       throw new Error('Database and backups must stay outside served directories');

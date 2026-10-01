@@ -1,0 +1,25 @@
+# INACTIVE EXAMPLE ONLY. Do not deploy before host, private key and ingress validation.
+# Merge only these approved rules into the actual site's netlify.toml when ready.
+# STORE_NETLIFY_PROXY_SECRET names a Runtime environment variable; no secret belongs here.
+
+[[redirects]]
+  from = "/api/store/auth/otp/request"
+  to = "https://api.example.invalid/api/store/auth/otp/request"
+  status = 200
+  force = true
+  signed = "STORE_NETLIFY_PROXY_SECRET"
+  [redirects.rate_limit]
+    window_limit = 10
+    window_size = 60
+    aggregate_by = ["ip", "domain"]
+
+[[redirects]]
+  from = "/api/store/*"
+  to = "https://api.example.invalid/api/store/:splat"
+  status = 200
+  force = true
+  signed = "STORE_NETLIFY_PROXY_SECRET"
+  [redirects.rate_limit]
+    window_limit = 600
+    window_size = 60
+    aggregate_by = ["ip", "domain"]

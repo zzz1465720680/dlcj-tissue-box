@@ -3,14 +3,27 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import ts from 'typescript';
 import {initialDesign} from '../lib/design.ts';
-const source=ts.transpileModule(readFileSync(new URL('../lib/store-client.ts',import.meta.url),'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ES2022}}).outputText;
-const client=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
+const compile=value=>ts.transpileModule(value,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ES2022}}).outputText;
+const dataModule=value=>'data:text/javascript;base64,'+Buffer.from(value).toString('base64');
+async function loadClient(preview){
+  const helper=`const __STORE_FRONTEND_PREVIEW__=${preview};\n`+compile(readFileSync(new URL('../lib/frontend-preview.ts',import.meta.url),'utf8'));
+  const source=compile(readFileSync(new URL('../lib/store-client.ts',import.meta.url),'utf8'));
+  return import(dataModule(source.replace("'./frontend-preview'",JSON.stringify(dataModule(helper)))));
+}
+const client=await loadClient(false);
 const oldFetch=globalThis.fetch;
 const storage=new Map();
 globalThis.sessionStorage={getItem:key=>storage.get(key)??null,setItem:(key,value)=>storage.set(key,value),removeItem:key=>storage.delete(key)};
 globalThis.window={location:{origin:'https://store.example',href:'https://store.example/'},history:{replaceState(){}}};
 const reply=(value,status=200)=>Response.json(value,{status});
 test.after(()=>{globalThis.fetch=oldFetch;delete globalThis.sessionStorage;delete globalThis.window;});
+
+test('frontend preview blocks store transport and referral capture before any network request',async()=>{
+  const preview=await loadClient(true);let calls=0;globalThis.fetch=async()=>{calls++;throw new Error('Unexpected request');};
+  await assert.rejects(preview.storeRequest('/session'),{code:'FRONTEND_PREVIEW'});
+  await assert.rejects(preview.storePost('/orders',{operationKey:'synthetic'}),{code:'FRONTEND_PREVIEW'});
+  assert.equal(await preview.captureReferralFromUrl(),false);assert.equal(calls,0);
+});
 
 test('login return destinations reject external, protocol-relative, slash confusion and control characters',()=>{
   for(const raw of ['https://evil.test','//evil.test','/\\evil.test','/\r\nevil','javascript:alert(1)','/login?return_to=//evil'])assert.equal(client.safeReturnTo(raw),'/my');

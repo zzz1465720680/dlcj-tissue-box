@@ -13,7 +13,7 @@ try {
     if (!isAbsolute(process.env.STORE_DB_PATH || '')) throw new Error();
     const filename = realpathSync(process.env.STORE_DB_PATH);
     if (!statSync(filename).isFile()) throw new Error();
-    for (const folder of ['public', 'dist', 'dist-netlify', '.next']) {
+    for (const folder of ['public', 'dist', 'dist-netlify', 'dist-netlify-preview', '.next']) {
       const root = resolve(folder); if (filename === root || filename.startsWith(root + sep)) throw new Error();
     }
     if (action === 'list-held') {

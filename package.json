@@ -24,7 +24,8 @@
     "test:design-roundtrip": "node scripts/verify-design-roundtrip.mjs",
     "store:backup": "node server/backup.mjs create",
     "store:verify-backup": "node server/backup.mjs verify",
-    "store:outbox": "node server/outbox.mjs"
+    "store:outbox": "node server/outbox.mjs",
+    "store:check-config": "node server/check-config.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

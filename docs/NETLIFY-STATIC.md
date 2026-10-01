@@ -12,6 +12,14 @@ npm run preview:netlify -- --host 127.0.0.1
 
 Publish the contents of `dist-netlify`, with `index.html`, `_redirects` and `_headers` at the deployment root. The source checkout includes `netlify.toml` for a future authorized Git-connected build. No repository push is required for a manual upload.
 
+## Frontend-only review preview
+
+Run `npm run build:netlify -- --mode frontend-preview` to produce the separate `dist-netlify-preview` directory. This opt-in build adds a visible test notice, forces local-only design storage, blocks store API transport and referral capture, and replaces account, login, checkout, gallery and admin routes with a service-unavailable explanation. No real personal information should be entered into this preview. The normal build retains the complete store behavior.
+
+The preview emits both a robots meta tag and `X-Robots-Tag: noindex, nofollow`; these discourage indexing but do not provide access control. Anyone with an unprotected preview link can open it. Preview browser storage belongs to that preview's origin, so export JSON before moving to another link.
+
+Deploy this output only as an explicitly authorized non-production draft. The current site's Netlify Drop upload UI has automatic production publishing enabled, so uploading there would replace the public site. The Netlify CLI's default `deploy` command supports a draft URL; do not use `--prod`. CLI authentication requires its own authorization if no login already exists. Do not create credentials or change site publishing settings just to get around that requirement.
+
 ## Earlier static-only behavior
 
 The store expansion supersedes the static-only default described below. See [STORE-IMPLEMENTATION.md](STORE-IMPLEMENTATION.md). Local saved designs remain available at `/customize?storage=local`; the legacy header-trusting Cloudflare API is now retired with HTTP 410.

@@ -1,11 +1,13 @@
 import { createServer } from 'node:http';
 import { randomBytes, randomUUID } from 'node:crypto';
-import { mkdirSync, chmodSync } from 'node:fs';
+import { mkdirSync, chmodSync, realpathSync, lstatSync } from 'node:fs';
+import { isIP } from 'node:net';
 import { resolve, dirname, isAbsolute, sep } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { pathToFileURL, fileURLToPath } from 'node:url';
 import { ApiError, createAuth, enforceOrigin, clientIp } from './auth.mjs';
 import { createProviders, drainEmailOutbox } from './providers.mjs';
 import { createObjectStore, CHUNK_BYTES } from './objects.mjs';
+import { loadIngressConfig, createIngressVerifier } from './ingress.mjs';
 
 const PREFIX = '/api/store';
 const JSON_LIMIT = 64_000;
@@ -52,18 +54,20 @@ function listPage(url, total) {
 
 /** Used in tests with injected in-memory dependencies. Never supplies an authentication bypass. */
 export function createStoreServer({ store, origin = 'http://localhost:5173', secret, providers,
-  now = Date.now, production = false, testMode = false, trustedProxies = [], logger = () => {} }) {
+  now = Date.now, production = false, testMode = false, trustedProxies = [], ingress, providerEnv = process.env, logger = () => {} }) {
   if (production && (testMode || providers)) throw new Error('Production dependency injection is prohibited');
   const parsedOrigin = new URL(origin);
   if (parsedOrigin.origin !== origin || !['http:', 'https:'].includes(parsedOrigin.protocol) || (production && parsedOrigin.protocol !== 'https:')) throw new Error('Invalid STORE_PUBLIC_ORIGIN');
-  const providerSet = providers || createProviders();
+  const providerSet = providers || createProviders(providerEnv);
   const auth = createAuth({ db: store.db, store, secret, sms: providerSet.sms, now, production, testMode });
   const objects = createObjectStore({ db: store.db, store, now });
+  const verifyIngress = createIngressVerifier(ingress, now);
   const server = createServer({ maxHeaderSize: 16_384 }, async (req, res) => {
     const requestId = randomUUID();
     try {
       const url = new URL(req.url, origin); const path = url.pathname;
       if (!path.startsWith(`${PREFIX}/`) || url.origin !== origin) throw new ApiError('NOT_FOUND', 404, '接口不存在。');
+      verifyIngress(req);
       enforceOrigin(req, origin);
       const ip = clientIp(req, trustedProxies);
       auth.limit('http-ip', ip, 600, 60000);
@@ -200,32 +204,58 @@ export function createStoreServer({ store, origin = 'http://localhost:5173', sec
   return { server, auth, objects, providers: providerSet };
 }
 
+function canonicalPath(filename) {
+  let current = resolve(filename); const missing = [];
+  while (true) {
+    try { return resolve(realpathSync(current), ...missing); }
+    catch (error) {
+      if (error.code !== 'ENOENT' || dirname(current) === current) throw new Error('STORE_DB_PATH cannot be resolved safely');
+      if (lstatSync(current, { throwIfNoEntry: false })?.isSymbolicLink()) throw new Error('STORE_DB_PATH contains an unresolved symbolic link');
+      missing.unshift(current.slice(dirname(current).length + (dirname(current).endsWith(sep) ? 0 : 1)));
+      current = dirname(current);
+    }
+  }
+}
+
 export function loadConfig(env = process.env) {
   const production = env.NODE_ENV === 'production';
   const origin = env.STORE_PUBLIC_ORIGIN || (production ? '' : 'http://localhost:5173');
   const secret = env.STORE_AUTH_SECRET || (production ? '' : randomBytes(32).toString('hex'));
-  const filename = env.STORE_DB_PATH || (production ? '' : resolve('.store-data/store.sqlite'));
-  if (!origin || !filename || Buffer.byteLength(secret) < 32 || !isAbsolute(filename)) throw new Error('Configure STORE_PUBLIC_ORIGIN, STORE_AUTH_SECRET (32+ bytes), and absolute STORE_DB_PATH');
+  const suppliedFilename = env.STORE_DB_PATH || (production ? '' : resolve('.store-data/store.sqlite'));
+  if (!origin || !suppliedFilename || Buffer.byteLength(secret) < 32 || !isAbsolute(suppliedFilename)) throw new Error('Configure STORE_PUBLIC_ORIGIN, STORE_AUTH_SECRET (32+ bytes), and absolute STORE_DB_PATH');
+  const filename = canonicalPath(suppliedFilename);
   const url = new URL(origin);
   if (url.origin !== origin || (production && url.protocol !== 'https:')) throw new Error('Production STORE_PUBLIC_ORIGIN must be a canonical HTTPS origin');
-  for (const exposed of ['public', 'dist', 'dist-netlify', '.next']) {
-    const root = resolve(exposed);
-    if (filename === root || filename.startsWith(`${root}${sep}`)) throw new Error('Database must be outside served/static directories');
+  for (const base of [process.cwd(), fileURLToPath(new URL('..', import.meta.url))]) {
+    for (const exposed of ['public', 'dist', 'dist-netlify', 'dist-netlify-preview', '.next']) {
+      const root = canonicalPath(resolve(base, exposed));
+      if (filename === root || filename.startsWith(`${root}${sep}`)) throw new Error('STORE_DB_PATH must be outside served/static directories');
+    }
   }
   const port = Number(env.STORE_PORT || 8788);
   if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Invalid STORE_PORT');
-  return { production, origin, secret, filename, port, host: env.STORE_HOST || '127.0.0.1',
-    trustedProxies: (env.STORE_TRUSTED_PROXY_IPS || '').split(',').map(s => s.trim()).filter(Boolean) };
+  const host = env.STORE_HOST || '127.0.0.1';
+  const trustedProxies = (env.STORE_TRUSTED_PROXY_IPS || '').split(',').map(s => s.trim()).filter(Boolean);
+  if (host !== 'localhost' && !isIP(host)) throw new Error('STORE_HOST must be a literal IP address or localhost');
+  if (trustedProxies.some(value => !isIP(value))) throw new Error('STORE_TRUSTED_PROXY_IPS must contain exact IP addresses, not wildcards or ranges');
+  return { production, origin, secret, filename, port, host,
+    ingress: loadIngressConfig(env),
+    trustedProxies };
 }
 
 export async function startServer(env = process.env) {
-  const config = loadConfig(env); process.umask(0o077);
+  const config = loadConfig(env);
+  createProviders(env); // Validate approved provider configuration before creating private storage.
+  process.umask(0o077);
   mkdirSync(dirname(config.filename), { recursive: true, mode: 0o700 });
   const { createStore } = await import('./domain.mjs');
   const store = createStore({ filename: config.filename });
   chmodSync(config.filename, 0o600);
-  const app = createStoreServer({ store, ...config, logger: event => process.stderr.write(`${JSON.stringify(event)}\n`) });
-  await new Promise((resolveListen, reject) => { app.server.once('error', reject); app.server.listen(config.port, config.host, resolveListen); });
+  let app;
+  try {
+    app = createStoreServer({ store, ...config, providerEnv: env, logger: event => process.stderr.write(`${JSON.stringify(event)}\n`) });
+    await new Promise((resolveListen, reject) => { app.server.once('error', reject); app.server.listen(config.port, config.host, resolveListen); });
+  } catch (error) { app?.server.close(); store.close(); throw error; }
   // Retry outbox only when an approved email adapter is enabled. Disabled delivery leaves jobs pending.
   let draining = false;
   const timer = setInterval(async () => {

@@ -55,6 +55,7 @@ next-env.d.ts
 
 # Isolated Netlify static output.
 /dist-netlify/
+/dist-netlify-preview/
 
 # Private local API data and uploads. Never publish.
 /.store-data/

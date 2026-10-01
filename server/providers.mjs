@@ -10,14 +10,25 @@ function approvedGateway(env, prefix) {
     throw new Error(`${prefix} requires an HTTPS gateway and a configured gateway token`);
   }
   return async payload => {
-    const response = await fetch(parsed, {
-      method: 'POST', redirect: 'error', signal: AbortSignal.timeout(10000),
-      headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
-      body: JSON.stringify(payload),
-    });
+    let response;
+    try {
+      response = await fetch(parsed, {
+        method: 'POST', redirect: 'error', signal: AbortSignal.timeout(10000),
+        headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
+        body: JSON.stringify(payload),
+      });
+    } catch {
+      const error = new ApiError('PROVIDER_UNAVAILABLE', 503, '通知服务暂时不可用。');
+      error.deliveryUncertain = true; throw error;
+    }
     // Never log or persist provider response bodies, which may echo secrets or personal data.
-    await response.body?.cancel();
-    if (!response.ok) throw new ApiError('PROVIDER_UNAVAILABLE', 503, '通知服务暂时不可用。');
+    await response.body?.cancel().catch(() => {});
+    if (!response.ok) {
+      const error = new ApiError('PROVIDER_UNAVAILABLE', 503, '通知服务暂时不可用。');
+      // A gateway may have accepted delivery before returning 5xx or losing the response.
+      error.deliveryUncertain = ![400, 401, 403, 404, 410, 422, 429].includes(response.status);
+      throw error;
+    }
   };
 }
 function selectProvider(env, prefix, direct) {

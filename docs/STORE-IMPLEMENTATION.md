@@ -73,7 +73,7 @@ The provider boundary retains an approved HTTPS gateway adapter and now includes
 
 SMS gateway payload: `type`, verified-format phone, one-time code, expiry seconds. Email gateway payload is explicitly limited to fixed merchant recipient, notice type, order reference, generic product, amount in integer fen (or null for pending bespoke quote), authenticated admin path, and idempotency key. Gateways must enforce idempotency, origin/account restrictions, approved recipients/templates and retries; secrets are operator-owned. The API never returns or logs OTP values or raw provider replies.
 
-The email outbox is retried only while the approved email adapter is enabled. Atomic claims prevent concurrent sends; uncertain direct-provider results and abandoned claims require operator reconciliation. Pending notices remain queued while disabled. Before enabling an existing queue, the merchant must review whether historical test/order notices should be sent. Fixture data belongs only in temporary test databases.
+The email outbox is retried only while the approved email adapter is enabled. Atomic claims prevent concurrent sends; uncertain direct-provider or gateway results and abandoned claims require operator reconciliation. Pending notices remain queued while disabled. Before enabling an existing queue, the merchant must review whether historical test/order notices should be sent. Fixture data belongs only in temporary test databases.
 
 Admin role setup is operator-only and not executed by this implementation. After a real account is OTP-verified and the merchant approves the role grant, the protected `server/manage.mjs` command can promote that existing account. It requires the deliberately supplied account phone, private API configuration and `--confirm-role-change`; there is no first-user promotion or web bootstrap route. Back up and restrict access to the database before operating this command.
 
@@ -82,6 +82,14 @@ Admin role setup is operator-only and not executed by this implementation. After
 Source lint had17 pre-existing errors before expansion; the broad `npm run lint` also walks ignored local QA bundles (80 errors at initial baseline). Report focused new-file lint separately rather than calling the whole repository clean. No pre-existing errors are silently waived by a package change.
 
 The local Chromium process and cloud browser currently cannot open the isolated local preview in this execution environment. DOM/interaction checks and build checks can still run, but actual responsive screenshots, browser history/back behavior and real HTTPS mobile OTP/provider acceptance must be checked on an approved reachable staging host before production.
+
+### October 1: approved frontend review and ingress preparation
+
+An independently authorized Netlify draft preview has been built and visually reviewed; the user approved its appearance. The preview is private under Netlify account access, has a visible test banner and noindex metadata, forces browser-local design storage and blocks store transport. Live browser checks covered homepage selection, unavailable checkout, saved local designs and reload recovery. Cloud WebGL is disabled, so full 3D rendering and mobile viewport acceptance remain unverified. The production deployment was not replaced.
+
+Optional Netlify HS256 ingress verification and a read-only `store:check-config` command are now implemented; actual proxy endpoints and signing credentials remain unconfigured. See [STORE-INGRESS.md](STORE-INGRESS.md) for the exact scope, inactive routing example and remaining client-IP validation. Startup validates enabled providers before creating storage. Database configuration rejects known static output paths, normalized traversal and unresolved symbolic links. Gateway timeouts/ambiguous responses now hold notifications for operator reconciliation.
+
+Final checks for this increment: 79 backend/client/security tests, historical design round-trip, TypeScript, focused lint and both Netlify/Vinext builds passed. The latest frontend change also passed 119 DOM checks before preview deployment. Existing broad source-lint failures remain separate; this is not a claim that production hosting, real SMS/email or payment are activated.
 
 ### Persistence and financial-interface details
 

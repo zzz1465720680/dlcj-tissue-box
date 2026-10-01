@@ -79,5 +79,49 @@
     "providers": "Aliyun SMS and DirectMail; mocked requests only; default disabled",
     "outbox": "atomic claims, uncertain outcomes held, operator reconciliation, migration verified",
     "realNotificationsSent": false
+  },
+  "frontendPreviewAndIngressReview": {
+    "date": "2026-10-01",
+    "baseCommit": "ccb84d49e5e2ae844f369a5507e8ea1540019973",
+    "serverClientSecurityTests": 79,
+    "typecheck": "passed",
+    "focusedLint": "passed",
+    "netlifyBuild": "passed",
+    "originalBuild": "passed",
+    "designRoundtrip": "passed",
+    "domChecks": {
+      "homepage": 26,
+      "studio": 33,
+      "storeFlows": 60
+    },
+    "frontendPreview": {
+      "deployed": true,
+      "access": "private Netlify account access",
+      "userApprovedAppearance": true,
+      "storeBackendEnabled": false,
+      "liveBrowserChecks": [
+        "homepage selection",
+        "checkout unavailable",
+        "browser-local design save",
+        "reload recovery",
+        "cloud-mode link absent in frontend-only preview"
+      ],
+      "limitations": [
+        "cloud WebGL disabled",
+        "mobile viewport not verified"
+      ]
+    },
+    "productionDeploymentChanged": false,
+    "signedProxy": "optional implementation tested; real routing and keys unconfigured; unsigned client IP not trusted by signature alone",
+    "productionPreflight": "read-only; no storage creation, outbound requests or secret output",
+    "notifications": "mocked tests only; gateway uncertain outcomes held",
+    "remaining": [
+      "durable backend host and domain",
+      "private production configuration and trusted client IP verification",
+      "provider approvals and delivery acceptance",
+      "administrator activation",
+      "shipping and policy decisions",
+      "separate production publication approval"
+    ]
   }
 }

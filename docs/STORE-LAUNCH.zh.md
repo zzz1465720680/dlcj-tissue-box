@@ -84,11 +84,11 @@ Next告警仅影响把攻击者可控SVG内容/属性/样式交给Node版 `next/
 
 1. 用户选择主机地区/预算、现有或新域名、供应商；使用已确认的个体工商户主体核实账号认证与短信审核流程。确认费用和服务条款后才创建/购买
 2. 配置 Node 24；一个 API 进程；私有持久 `STORE_DB_PATH`；精确 HTTPS `STORE_PUBLIC_ORIGIN`；32 字节以上 `STORE_AUTH_SECRET` 由用户通过安全入口配置，绝不能写进 Vite/前端变量、源码或聊天
-3. 保留 Netlify 时补上同源反向代理；尚未配置真实 API 目标。Netlify 支持 signed proxy（HS256 `x-nf-sign`），但当前 API 尚未实现其验签；不可只设置一个 rewrite 就宣布入口安全完成。须校验来源、替换客户端 IP 头、只信任确定的 ingress，真实 IP 限流、Cookie 和 Origin 行为通过预发布验收后再开放。[Netlify proxy](https://docs.netlify.com/manage/routing/redirects/rewrites-proxies/)
+3. 保留 Netlify 时补上同源反向代理；尚未配置真实 API 目标。可选 signed proxy 验签已在代码中实现，默认关闭，校验 HS256 `x-nf-sign` 的站点、网址、环境与过期时间。签名不包含请求正文或客户端 IP，不能据此直接信任转发头。参见 [入口配置与检查](STORE-INGRESS.md)，先运行 `npm run store:check-config`，再验收真实入口替换客户端 IP 头、限流、Cookie 和 Origin 行为。[Netlify proxy](https://docs.netlify.com/manage/routing/redirects/rewrites-proxies/)
 4. 选择所需适配器：阿里短信/DirectMail直连已有本地实现，其他厂商仍需网关开发；参见 STORE-PROVIDERS.md，联调超时、失败、幂等与配额；审核签名/模板与域名后，批准指定测试手机号/收件邮箱，再通过安全入口配置密钥和 `STORE_*_DELIVERY_APPROVED`
 5. 真手机号完成 OTP 后，再由用户批准该账号为管理员；不把第一个注册用户自动提升。后台入口本身不能替代管理员授权
 6. 福州发货：确认区域运费/包邮规则、售后与隐私条款；未确定地区继续逐单报价确认。支付继续保持关闭
 7. 预发布检查：桌面/手机截图、真实浏览器返回/前进、OTP 失效/重发/限流、私有资料隔离、商家/顾客报价确认、通知失败恢复、备份恢复、重启数据保留和存储报警
 8. 单独批准仓库推送、发布以及真实服务启用；发布后核对线上版本和测试结果。此次无上述生产动作
 
-当前本地浏览器被套接字权限和回环导航限制阻挡，未重试被拒路线，DOM 回归不冒充真实浏览器验收。此清单随云端开发稿保存。当前线上仍为旧版。
+当前本地回环预览仍不可用，未重试被拒路线。另经授权建立了独立 Netlify 私有前端测试预览，已验证首页、测试下单阻断、本机保存与刷新恢复；用户已认可外观。云浏览器 WebGL 被禁用，完整3D和手机视口尚未据此验收。正式线上仍为旧版，独立预览不接真实后台、通知或付款。

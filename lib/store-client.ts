@@ -1,4 +1,5 @@
 import type {Design} from './design';
+import {frontendPreview} from './frontend-preview';
 
 export type StoreUser = {id: string; role: 'customer' | 'admin'; phoneMasked: string};
 export type StoreSession = {user: StoreUser | null; capabilities: {sms: boolean; orders: boolean; payment: false}};
@@ -18,6 +19,7 @@ export class StoreApiError extends Error {
 export const API_BASE = '/api/store';
 /** JSON transport only. Session cookies are HttpOnly and supplied by the browser. */
 export async function storeRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
+  if (frontendPreview) throw new StoreApiError('FRONTEND_PREVIEW', '当前是前端测试预览，账号、云端保存和订单服务未启用。请使用本机设计。', 503);
   if (!path.startsWith('/') || path.startsWith('//')) throw new StoreApiError('INVALID_PATH', '请求地址无效');
   let response: Response;
   try {response = await fetch(API_BASE + path, {...init, credentials: 'same-origin', headers: {...(typeof init.body === 'string' ? {'Content-Type': 'application/json'} : {}), ...init.headers}});}
@@ -89,6 +91,7 @@ const REFERRAL_KEY = 'dlcj-referral-code';
 export function pendingReferralCode(): string {try {return sessionStorage.getItem(REFERRAL_KEY) || '';} catch {return '';}}
 export function clearPendingReferral(): void {try {sessionStorage.removeItem(REFERRAL_KEY);} catch { /* Optional storage only. */ }}
 export async function captureReferralFromUrl(): Promise<boolean> {
+  if (frontendPreview) return false;
   const url = new URL(window.location.href), inviteCode = url.searchParams.get('ref');
   if (!inviteCode || !/^[A-Za-z0-9_-]{4,40}$/.test(inviteCode)) return false;
   try {sessionStorage.setItem(REFERRAL_KEY, inviteCode);} catch { /* Explicit URL still remains available. */ }

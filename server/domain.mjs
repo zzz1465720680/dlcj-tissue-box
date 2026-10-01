@@ -312,14 +312,46 @@ export function createStore({ filename = ':memory:', now = () => new Date(), ant
       return { order: orderView(orderRow(order.id)), cashRefundFen, couponReturnedFen: deltaCoupon, fullRefund: full };
     });
   }
-  function listPendingOutbox({ limit = 20 } = {}) { integer(limit, '批次数量', 1, 100); return all("SELECT * FROM store_outbox WHERE status='pending' AND next_attempt_at<=? ORDER BY created_at,id LIMIT ?", clock(), limit).map(row => ({ id: row.id, eventKey: row.event_key, recipient: row.recipient, payload: JSON.parse(row.payload_json), attempts: row.attempts, nextAttemptAt: row.next_attempt_at })); }
-  function recordOutboxResult({ id, success, error } = {}) {
+  function listPendingOutbox({ limit = 20 } = {}) {
+    integer(limit, '批次数量', 1, 100);
+    return all("SELECT * FROM store_outbox WHERE status='pending' AND delivery_token IS NULL AND delivery_requires_review=0 AND next_attempt_at<=? ORDER BY created_at,id LIMIT ?", clock(), limit)
+      .map(row => ({ id: row.id, eventKey: row.event_key, recipient: row.recipient, payload: JSON.parse(row.payload_json), attempts: row.attempts, nextAttemptAt: row.next_attempt_at }));
+  }
+  function claimOutbox({ id } = {}) {
+    const token = randomUUID(); const claimedAt = clock();
+    const result = run("UPDATE store_outbox SET delivery_token=?,delivery_claimed_at=? WHERE id=? AND status='pending' AND delivery_token IS NULL AND delivery_requires_review=0 AND next_attempt_at<=?", token, claimedAt, id, claimedAt);
+    return result.changes ? { id, token } : null;
+  }
+  function listHeldOutbox({ limit = 20 } = {}) {
+    integer(limit, '批次数量', 1, 100);
+    return all("SELECT id,event_key AS eventKey,attempts,delivery_claimed_at AS claimedAt,last_error AS error FROM store_outbox WHERE status='pending' AND (delivery_token IS NOT NULL OR delivery_requires_review=1) ORDER BY created_at,id LIMIT ?", limit);
+  }
+  function recordOutboxResult({ id, success, error, deliveryToken } = {}) {
     if (typeof success !== 'boolean') fail('INVALID_INPUT', '发送结果无效');
-    return transaction(() => { const row = one('SELECT * FROM store_outbox WHERE id=?', id); if (!row) fail('NOT_FOUND', '没有找到通知', 404); if (row.status === 'sent') return { id, status: 'sent' };
+    return transaction(() => {
+      const row = one('SELECT * FROM store_outbox WHERE id=?', id);
+      if (!row) fail('NOT_FOUND', '没有找到通知', 404);
+      if (row.status === 'sent') return { id, status: 'sent' };
+      if (row.delivery_requires_review || (row.delivery_token && row.delivery_token !== deliveryToken) || (!row.delivery_token && deliveryToken)) fail('DELIVERY_CLAIM_MISMATCH', '通知需核对当前投递状态', 409);
       const next = new Date(Date.parse(clock()) + Math.min(24 * 3600000, 60000 * 2 ** Math.min(row.attempts, 11))).toISOString();
       // Do not retain provider errors containing addresses, request bodies or secrets.
       const safeError = success ? null : typeof error === 'string' && /^[A-Z_]{1,64}$/.test(error) ? error : 'DELIVERY_FAILED';
-      run('UPDATE store_outbox SET status=?,attempts=attempts+1,next_attempt_at=?,last_error=?,sent_at=? WHERE id=?', success ? 'sent' : 'pending', next, safeError, success ? clock() : null, id); return { id, status: success ? 'sent' : 'pending', nextAttemptAt: success ? null : next };
+      const held = !success && safeError === 'DELIVERY_UNCERTAIN';
+      run('UPDATE store_outbox SET status=?,attempts=attempts+1,next_attempt_at=?,last_error=?,sent_at=?,delivery_token=NULL,delivery_requires_review=? WHERE id=?', success ? 'sent' : 'pending', next, safeError, success ? clock() : null, held ? 1 : 0, id);
+      return { id, status: success ? 'sent' : held ? 'review_required' : 'pending', nextAttemptAt: success || held ? null : next };
+    });
+  }
+  // Operator-only reconciliation after checking the provider; never exposed through HTTP.
+  function reconcileOutbox({ id, accepted, confirmation } = {}) {
+    if (typeof accepted !== 'boolean' || confirmation !== 'provider-result-reviewed') fail('REVIEW_REQUIRED', '须先核对供应商投递结果', 409);
+    return transaction(() => {
+      const row = one('SELECT * FROM store_outbox WHERE id=?', id);
+      if (!row) fail('NOT_FOUND', '没有找到通知', 404);
+      if (row.status === 'sent') return { id, status: 'sent' };
+      if (!row.delivery_token && !row.delivery_requires_review) fail('NOT_HELD', '该通知未等待人工核对', 409);
+      run('UPDATE store_outbox SET status=?,sent_at=?,delivery_token=NULL,delivery_requires_review=0,next_attempt_at=?,last_error=? WHERE id=?', accepted ? 'sent' : 'pending', accepted ? clock() : null, clock(), accepted ? null : 'OPERATOR_RETRY_APPROVED', id);
+      audit('operator', 'notification_reconciled', id, { accepted });
+      return { id, status: accepted ? 'sent' : 'pending' };
     });
   }
   return {
@@ -329,7 +361,7 @@ export function createStore({ filename = ':memory:', now = () => new Date(), ant
     listCoupons, getReferralSummary, adminGrantCoupon, adminRevokeCoupon, listAdminCoupons: (adminId, options) => { admin(adminId); const { limit, offset } = page(options); return all('SELECT * FROM store_coupons ORDER BY (revoked_at IS NOT NULL),(expires_at<=?),expires_at,id LIMIT ? OFFSET ?', clock(), limit, offset).map(couponView); },
     createOrder, getOrder, listOrders, getAdminOrder, adminGetOrder: getAdminOrder, listAdminOrders, adminListOrders: listAdminOrders, cancelOrder,
     adminSetShippingQuote, acceptShippingQuote, adminSetQuote, acceptQuote, proposeMaterial, acceptMaterial, canReadMaterialPhoto, startProduction, dispatchOrder, adminDispatch: dispatchOrder,
-    internal: Object.freeze({ confirmPayment, confirmRefund, listPendingOutbox, recordOutboxResult }),
+    internal: Object.freeze({ confirmPayment, confirmRefund, listPendingOutbox, claimOutbox, listHeldOutbox, recordOutboxResult, reconcileOutbox }),
   };
 }
 export const createStoreDomain = ({ dbPath, ...options } = {}) => createStore({ ...options, ...(dbPath ? { filename: dbPath } : {}) });

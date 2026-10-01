@@ -23,7 +23,8 @@
     "test:ui": "node scripts/qa/homepage.mjs && node scripts/qa/studio.mjs && node scripts/qa/store-ui.mjs",
     "test:design-roundtrip": "node scripts/verify-design-roundtrip.mjs",
     "store:backup": "node server/backup.mjs create",
-    "store:verify-backup": "node server/backup.mjs verify"
+    "store:verify-backup": "node server/backup.mjs verify",
+    "store:outbox": "node server/outbox.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

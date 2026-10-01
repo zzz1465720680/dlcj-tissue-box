@@ -231,8 +231,11 @@ export async function startServer(env = process.env) {
   const timer = setInterval(async () => {
     if (draining || !app.providers.email.available) return;
     draining = true;
-    try { await drainEmailOutbox({ store, email: app.providers.email }); }
-    catch { process.stderr.write('Store email worker will retry after a temporary failure.\n'); }
+    try {
+      const result = await drainEmailOutbox({ store, email: app.providers.email });
+      if (result.held) process.stderr.write('Store email delivery needs operator review; uncertain notices will not retry automatically.\n');
+    }
+    catch { process.stderr.write('Store email worker paused an attempt; inspect held notices before retrying.\n'); }
     finally { draining = false; }
   }, 30000);
   timer.unref();

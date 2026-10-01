@@ -39,7 +39,7 @@ test('verified unique mobile, explicit operator admin and persistent migrations'
   code(() => store.registerVerifiedUser({ phone: '+12025550123' }), 'INVALID_PHONE');
   code(() => store.bootstrapAdmin({ phone: '13800000009' }), 'VERIFIED_USER_REQUIRED');
   const saved = save(store, user); const second = createStore({ filename });
-  try { assert.equal(second.getDesign(user.id, saved.id).version, 1); assert.equal(second.db.prepare('SELECT COUNT(*) AS n FROM store_migrations').get().n, 1); } finally { second.close(); }
+  try { assert.equal(second.getDesign(user.id, saved.id).version, 1); assert.equal(second.db.prepare('SELECT COUNT(*) AS n FROM store_migrations').get().n, 2); } finally { second.close(); }
 });
 
 test('private designs, immutable versions, idempotency and immutable order snapshots', t => {

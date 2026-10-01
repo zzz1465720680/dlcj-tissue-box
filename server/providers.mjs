@@ -1,4 +1,5 @@
 import { ApiError } from './auth.mjs';
+import { aliyunSms, aliyunMail, singleEmail } from './aliyun-providers.mjs';
 
 function approvedGateway(env, prefix) {
   if (env[`${prefix}_MODE`] !== 'approved-gateway' || env[`${prefix}_DELIVERY_APPROVED`] !== 'true') return null;
@@ -19,21 +20,19 @@ function approvedGateway(env, prefix) {
     if (!response.ok) throw new ApiError('PROVIDER_UNAVAILABLE', 503, '通知服务暂时不可用。');
   };
 }
+function selectProvider(env, prefix, direct) {
+  if (env[`${prefix}_DELIVERY_APPROVED`] !== 'true') return null;
+  if (env[`${prefix}_MODE`] === 'aliyun') return direct(env);
+  if (env[`${prefix}_MODE`] === 'approved-gateway') return approvedGateway(env, prefix);
+  throw new Error(`Unsupported ${prefix}_MODE`);
+}
 /** No credentials are generated, no provider is contacted until a specifically enabled operation runs. */
 export function createProviders(env = process.env) {
-  const smsSend = approvedGateway(env, 'STORE_SMS');
-  const emailSend = approvedGateway(env, 'STORE_EMAIL');
+  const smsSend = selectProvider(env, 'STORE_SMS', aliyunSms);
+  const emailSend = selectProvider(env, 'STORE_EMAIL', aliyunMail);
   let emailOrigin; let orderEmailTo;
   if (emailSend) {
-    orderEmailTo = env.STORE_ORDER_EMAIL_TO;
-    const parts = typeof orderEmailTo === 'string' ? orderEmailTo.split('@') : [];
-    const labels = parts.length === 2 ? parts[1].split('.') : [];
-    if (typeof orderEmailTo !== 'string' || orderEmailTo.length > 254 || orderEmailTo.trim() !== orderEmailTo ||
-        parts.length !== 2 || !/^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]{1,64}$/.test(parts[0]) ||
-        parts[0].startsWith('.') || parts[0].endsWith('.') || parts[0].includes('..') || labels.length < 2 ||
-        labels.some(label => !/^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?$/.test(label))) {
-      throw new Error('Email delivery requires one private STORE_ORDER_EMAIL_TO address');
-    }
+    orderEmailTo = singleEmail(env.STORE_ORDER_EMAIL_TO, 'STORE_ORDER_EMAIL_TO');
     try { emailOrigin = new URL(env.STORE_PUBLIC_ORIGIN); } catch { throw new Error('Email delivery requires STORE_PUBLIC_ORIGIN'); }
     if (emailOrigin.protocol !== 'https:' || emailOrigin.origin !== env.STORE_PUBLIC_ORIGIN) throw new Error('Email delivery requires a canonical HTTPS STORE_PUBLIC_ORIGIN');
   }
@@ -46,7 +45,8 @@ export function createProviders(env = process.env) {
       if (!emailSend) throw new ApiError('EMAIL_UNAVAILABLE', 503);
       // Whitelist, rather than forwarding an order or arbitrary outbox object.
       const { orderRef: reference, product, amountFen, adminLink: adminPath, idempotencyKey } = notice;
-      if (typeof reference !== 'string' || reference.length > 100 || typeof product !== 'string' || product.length > 100 ||
+      if (typeof reference !== 'string' || !/^[A-Za-z0-9_-]{1,100}$/.test(reference) || typeof product !== 'string' || !product.trim() || product.length > 100 || /[\r\n\0]/.test(product) ||
+          typeof idempotencyKey !== 'string' || !/^[A-Za-z0-9_-]{1,128}$/.test(idempotencyKey) ||
           !(amountFen === null || (Number.isSafeInteger(amountFen) && amountFen >= 0)) || typeof adminPath !== 'string' ||
           !/^\/admin(?:\?order=[A-Za-z0-9_-]+)?$/.test(adminPath)) throw new ApiError('INVALID_NOTICE', 400);
       await emailSend({ to: orderEmailTo, type: 'order_notice', reference, product, amountFen, adminLink: new URL(adminPath, emailOrigin).href, idempotencyKey });
@@ -58,14 +58,20 @@ export function createProviders(env = process.env) {
 export async function drainEmailOutbox({ store, email, limit = 20 }) {
   if (!email?.available) return { enabled: false, sent: 0, failed: 0 };
   const pending = store.internal.listPendingOutbox({ limit });
-  let sent = 0; let failed = 0;
+  let sent = 0; let failed = 0; let held = 0;
   for (const row of pending) {
+    const claim = store.internal.claimOutbox({ id: row.id });
+    if (!claim) continue;
     try {
       await email.sendOrderNotice({ ...row.payload, idempotencyKey: row.id });
-      store.internal.recordOutboxResult({ id: row.id, success: true }); sent += 1;
-    } catch {
-      store.internal.recordOutboxResult({ id: row.id, success: false, error: 'DELIVERY_FAILED' }); failed += 1;
+    } catch (error) {
+      const uncertain = error?.deliveryUncertain === true;
+      store.internal.recordOutboxResult({ id: row.id, deliveryToken: claim.token, success: false, error: uncertain ? 'DELIVERY_UNCERTAIN' : 'DELIVERY_FAILED' });
+      failed += 1; if (uncertain) held += 1;
+      continue;
     }
+    // If persistence fails after acceptance, leave the claim held; do not turn it into a retry.
+    store.internal.recordOutboxResult({ id: row.id, deliveryToken: claim.token, success: true }); sent += 1;
   }
-  return { enabled: true, sent, failed };
+  return { enabled: true, sent, failed, held };
 }

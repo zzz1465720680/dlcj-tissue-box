@@ -69,5 +69,15 @@
     "changedServerLint": "passed",
     "recipientConfiguration": "private STORE_ORDER_EMAIL_TO; no real-email fallback; missing or invalid recipient fails closed; caller cannot override recipient",
     "sourceSync": "feature branch only; no merge or production deployment"
+  },
+  "optionalProviderReview": {
+    "date": "2026-10-01",
+    "serverClientSecurityTests": 68,
+    "typecheck": "passed",
+    "changedServerLint": "passed",
+    "designRoundtrip": "passed",
+    "providers": "Aliyun SMS and DirectMail; mocked requests only; default disabled",
+    "outbox": "atomic claims, uncertain outcomes held, operator reconciliation, migration verified",
+    "realNotificationsSent": false
   }
 }

@@ -1,0 +1,73 @@
+{
+  "date": "2026-09-30",
+  "baseCommit": "4b77d769020851bcff7a2d918da15e2d2c0e9a0f",
+  "published": false,
+  "paymentUI": false,
+  "serverClientSecurityTests": 51,
+  "domChecks": {
+    "homepage": 26,
+    "studio": 33,
+    "storeFlows": 60
+  },
+  "typecheck": "passed",
+  "netlifyBuild": "passed",
+  "originalBuild": "passed",
+  "newCodeLint": "passed",
+  "fullLint": {
+    "existingErrors": 17,
+    "clean": false
+  },
+  "visualBrowserQA": "blocked: Chromium socket EPERM; cloud browser loopback ERR_BLOCKED_BY_CLIENT",
+  "externalProviders": "not configured; no live sends",
+  "patchIncludesPriorUnpublishedStaticAdapter": true,
+  "lastReadinessReview": {
+    "date": "2026-10-01",
+    "serverClientSecurityTests": 56,
+    "newBackupTests": 5,
+    "domChecks": {
+      "homepage": 26,
+      "studio": 33,
+      "storeFlows": 60
+    },
+    "typecheck": "passed",
+    "netlifyBuild": "passed",
+    "originalBuild": "passed",
+    "backupRestore": "passed with synthetic committed WAL designs, orders, private blobs and outbox",
+    "newCodeLint": "passed",
+    "published": false,
+    "externalProviders": "not configured; no live sends",
+    "remaining": "provider and hosting approval, proxy integration, actual browser and real delivery acceptance",
+    "postDependencyPatchRechecked": true,
+    "productionDependencyAudit": {
+      "before": {
+        "critical": 1,
+        "moderate": 5
+      },
+      "after": {
+        "critical": 0,
+        "high": 0,
+        "moderate": 0,
+        "low": 0,
+        "total": 0
+      },
+      "command": "npm audit --omit=dev",
+      "patched": {
+        "next": "16.3.6",
+        "eslint-config-next": "16.3.6",
+        "fast-uri": "3.1.8",
+        "baseline-browser-mapping": "2.11.26"
+      },
+      "nextOgReachability": "No next/og or ImageResponse usage found in application sources; no claim of live exploit"
+    },
+    "merchantBusinessLicense": "individual business already confirmed",
+    "customDomain": "none, confirmed by user; no purchase authorized"
+  },
+  "privacySyncReview": {
+    "date": "2026-10-01",
+    "serverClientSecurityTests": 57,
+    "typecheck": "passed",
+    "changedServerLint": "passed",
+    "recipientConfiguration": "private STORE_ORDER_EMAIL_TO; no real-email fallback; missing or invalid recipient fails closed; caller cannot override recipient",
+    "sourceSync": "feature branch only; no merge or production deployment"
+  }
+}

@@ -11,6 +11,11 @@ const eslintConfig = defineConfig([
     ".next/**",
     "out/**",
     "build/**",
+    "dist-netlify/**",
+    // Local generated QA bundles are already gitignored; lint maintained sources.
+    "checks/**",
+    // Ignored local QA bundles contain generated dependencies, not maintained source.
+    "checks/**",
     "next-env.d.ts",
   ]),
   {

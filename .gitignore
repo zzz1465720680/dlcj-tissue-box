@@ -52,3 +52,12 @@ next-env.d.ts
 
 # Local QA screenshots, draft backups and uncompressed model exports.
 /checks/
+
+# Isolated Netlify static output.
+/dist-netlify/
+
+# Private local API data and uploads. Never publish.
+/.store-data/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal

@@ -6,6 +6,18 @@ This is an early demo of a product website I'm experimenting with for a leather 
 
 Chinese notes: [README.zh.md](README.zh.md)
 
+## Expanded store · local review build (not deployed)
+
+The V3 homepage and private store foundation now have a local implementation. See [implementation, configuration and acceptance checklist](docs/STORE-IMPLEMENTATION.md).
+
+- Existing Netlify static build preserved; separate Node24/SQLite API behind same-origin `/api/store`
+- Phone OTP adapter, private versioned designs, merchant-curated consented gallery, referrals/coupons and customer/merchant order workflow
+- Existing browser-only designs remain accessible at `/customize?storage=local`; nothing migrates off-device silently
+- Payment page/integration deferred. SMS/email adapters are disabled unless explicitly configured; these are not live vendor integrations
+- `npm run test:store`, `npm run typecheck`, `npm run build:netlify`; optional DOM checks are documented in [scripts/qa](scripts/qa/README.md)
+
+The live website is unchanged by these local edits. Real provider activation, durable production hosting, shipping rules, responsive browser screenshots and staging acceptance are still separate steps.
+
 ## Current storefront · 2026-09-30
 
 - Seven existing styles are **CNY 99 per piece**, including Diamond Perforation. Side arrows switch the main photo; the full style list opens only when needed.

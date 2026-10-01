@@ -49,11 +49,14 @@ export const MERCHANT_CONFIG: MerchantConfig = {
   facts: {
     confirmed: [
       {zh: '现有款式99元/件；自由定制159元/件。专属图案、刺绣等特殊工艺需私聊报价。', en: 'Existing styles are CNY 99 per piece; custom combinations are CNY 159. Personal artwork, embroidery and special work are quoted privately.'},
+      {zh: '常规款付款确认后1–2个自然日制作；自由定制在客户确认实物皮料和方案后5–7个自然日制作。周末计入，运输另计。', en: 'Standard production takes 1–2 calendar days after verified payment; custom production takes 5–7 calendar days after customer material/design confirmation. Weekends count; transit is additional.'},
+      {zh: '首期仅提供细纹皮革。所有颜色按现有皮料近似匹配，制作前确认实物照片。可在付款前咨询。', en: 'Fine-grain leather only at launch. Colours are close-matched to available stock and confirmed against physical photos. Consultation is available before payment.'},
+      {zh: '发货地：福建福州。', en: 'Ships from Fuzhou, Fujian.'},
     ],
     pending: [
       {zh: '成品尺寸与抽纸适配：请提供放置位置和抽纸包装尺寸，供商家核对。', en: 'Fit: share the available space and tissue-pack dimensions for confirmation.'},
       {zh: '材料与图案：按实物色卡、可用材料和实际工艺确认。', en: 'Materials and artwork: confirm physical swatches, available materials and production methods.'},
-      {zh: '报价与交付：确认数量、总价、制作时间、运费和付款方式。', en: 'Quote and delivery: confirm quantity, total price, lead time, shipping and payment method.'},
+      {zh: '运费与包邮地区尚待确认；未配置地区需商家报价，不默认全国包邮。支付页面暂未开放。', en: 'Shipping rates and free-shipping regions are not yet confirmed. Unconfigured regions need a merchant quote; payment is not available on the site yet.'},
       {zh: '定制约定：确认修改、交付及售后规则后再购买。', en: 'Custom-order terms: agree on changes, delivery and after-sales support before purchasing.'},
     ],
   },

@@ -24,7 +24,7 @@ const serverVisibility = () => false;
 
 const HOME_COPY = {
   zh: {
-    home: '首页', design: '开始设计', mine: '我的', gallery: '设计广场',
+    home: '首页', tissueBox: '纸巾盒', mats: '脚垫', design: '开始设计', mine: '我的', gallery: '设计广场',
     heading: '一件小物，随你心意。', collection: '七款常规设计', select: '选择这款', unit: '件',
     previous: '上一款', next: '下一款', pause: '暂停自动轮播', play: '播放自动轮播',
     reducedMotion: '已按系统设置关闭自动轮播', carousel: '七款常规设计', slide: '款式',
@@ -45,7 +45,7 @@ const HOME_COPY = {
     language: 'English', languageNote: '',
   },
   en: {
-    home: 'Home', design: 'Start designing', mine: 'My designs', gallery: 'Design gallery',
+    home: 'Home', tissueBox: 'Tissue boxes', mats: 'Floor mats', design: 'Start designing', mine: 'My designs', gallery: 'Design gallery',
     heading: 'A little detail. Entirely you.', collection: 'Seven everyday styles', select: 'Choose this style', unit: 'piece',
     previous: 'Previous style', next: 'Next style', pause: 'Pause automatic slideshow', play: 'Start automatic slideshow',
     reducedMotion: 'Automatic slideshow is off to respect reduced motion', carousel: 'Seven everyday styles', slide: 'slide',
@@ -126,7 +126,7 @@ export default function StoreHome({ lang = 'zh' }: { lang?: Lang }) {
           <span>鼎立车眷</span>
         </a>
         <nav className="sh-nav" aria-label={SHOWCASE_COPY[lang].navLabel}>
-          <a href={lang === 'en' ? '/?lang=en' : '/'} aria-current="page">{copy.home}</a>
+          <a href={lang === 'en' ? '/tissue-box?lang=en' : '/tissue-box'} aria-current="page">{copy.tissueBox}</a>
           <a href="/customize">{copy.design}</a>
           <a href="/my">{copy.mine}</a>
         </nav>
@@ -196,10 +196,11 @@ export default function StoreHome({ lang = 'zh' }: { lang?: Lang }) {
       </main>
       <footer className="sh-footer">
         <div className="sh-footerRow"><p>{copy.imageNote}</p><nav aria-label={lang === 'en' ? 'More information' : '更多信息'}>
+          <a href={lang === 'en' ? '/mats?lang=en' : '/mats'}>{copy.mats}</a>
           <a href="/gallery">{copy.gallery}</a>
           <button type="button" aria-expanded={information === 'contact'} aria-controls="sh-contact" onClick={() => setInformation(current => current === 'contact' ? null : 'contact')}>{copy.contact}</button>
           <button type="button" aria-expanded={information === 'terms'} aria-controls="sh-terms" onClick={() => setInformation(current => current === 'terms' ? null : 'terms')}>{copy.terms}</button>
-          <a className="sh-language" href={lang === 'en' ? '/' : '/?lang=en'} hrefLang={lang === 'en' ? 'zh-CN' : 'en'}>{copy.language}</a>
+          <a className="sh-language" href={lang === 'en' ? '/tissue-box' : '/tissue-box?lang=en'} hrefLang={lang === 'en' ? 'zh-CN' : 'en'}>{copy.language}</a>
         </nav></div>
         <section id="sh-contact" className="sh-information" hidden={information !== 'contact'} aria-labelledby="sh-contact-title">
           <div className="sh-informationHeading"><h2 id="sh-contact-title">{copy.contact}</h2><button type="button" onClick={() => { setInformation(null); document.querySelector<HTMLButtonElement>('[aria-controls="sh-contact"]')?.focus(); }} aria-label={`${copy.close} · ${copy.contact}`}><X size={18} aria-hidden="true" /></button></div>

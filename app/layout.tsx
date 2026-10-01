@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import StoreReferralCapture from "@/components/store-referral-capture";
 import "./globals.css";
 import "./showcase.css";
 
 export const metadata: Metadata = {
-  title: "鼎立车眷 · 车载纸巾盒",
-  description: "小物，也有讲究。探索鼎立车眷白色撞色系列车载纸巾盒，从材质、配色到图案，定制你的日常。",
+  title: "鼎立车眷 · 汽车内饰与日常",
+  description: "把材质、配色与细节，放进每一天的出行。探索鼎立车眷的汽车内饰与生活小物。",
   icons: {
     icon: "/brand/dc-logo.svg",
     shortcut: "/brand/dc-logo.svg",
@@ -18,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased"><StoreReferralCapture />{children}</body>
     </html>
   );
 }

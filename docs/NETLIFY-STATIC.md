@@ -1,6 +1,6 @@
 # Netlify static build
 
-This is an isolated deployment mode for the existing storefront and revision9 studio. It does not replace the original `npm run build` / Vinext / Cloudflare setup.
+This is an isolated deployment mode for the brand homepage (`/`), floor-mat showcase (`/mats`), tissue-box storefront (`/tissue-box`) and revision9 studio. It does not replace the original `npm run build` / Vinext / Cloudflare setup.
 
 ## Build and preview
 

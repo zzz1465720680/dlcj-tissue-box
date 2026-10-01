@@ -14,7 +14,7 @@ export default defineConfig(({mode}) => {
       return frontendPreview ? html.replace('</head>', '<meta name="robots" content="noindex, nofollow" /></head>') : html;
     },
     generateBundle() {
-      this.emitFile({type: 'asset', fileName: '_redirects', source: ['/customize','/model-review','/my','/login','/checkout','/admin','/gallery'].map(path => `${path} /index.html 200\n${path}/ /index.html 200\n`).join('')});
+      this.emitFile({type: 'asset', fileName: '_redirects', source: ['/mats','/tissue-box','/customize','/model-review','/my','/login','/checkout','/admin','/gallery'].map(path => `${path} /index.html 200\n${path}/ /index.html 200\n`).join('')});
       this.emitFile({type: 'asset', fileName: '_headers', source: '/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  Cache-Control: public, max-age=0, must-revalidate\n' + (frontendPreview ? '  X-Robots-Tag: noindex, nofollow\n' : '') + '/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n'});
       this.emitFile({type: 'asset', fileName: 'deployment-version.json', source: JSON.stringify({
         sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], {encoding: 'utf8'}).trim(),

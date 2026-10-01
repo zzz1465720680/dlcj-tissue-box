@@ -53,6 +53,7 @@ try{
  // Real component render in a DOM environment, using the intentionally supported light mode.
  await act(async()=>root.render(h(Studio,{lightPreview:true,localOnly:true,designRequest:countedRequest})));await flush();
  record('light preview renders usable studio',document.body.textContent.includes('设计你的纸巾盒'));
+ record('editor returns to tissue-box collection',document.querySelector('.brand').getAttribute('href')==='/tissue-box'&&document.querySelector('.header-title a').getAttribute('href')==='/tissue-box');
  record('custom 159 pricing visible',document.body.textContent.includes('159'));
  record('new material picker offers only grain',!!document.querySelector('button[aria-label="细纹皮革"]')&&!document.querySelector('button[aria-label="光面皮革"]')&&!document.querySelector('button[aria-label="绒面质感"]'));
  record('colour picker explains approximate stock match',document.body.textContent.includes('按现有皮料近似匹配'));

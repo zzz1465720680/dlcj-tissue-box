@@ -20,7 +20,7 @@
     "typecheck": "tsc --noEmit",
     "lint:source": "eslint app components lib hooks netlify-browser server scripts vite.netlify.config.ts",
     "verify:store": "npm run test:store && npm run typecheck && npm run build:netlify",
-    "test:ui": "node scripts/qa/homepage.mjs && node scripts/qa/studio.mjs && node scripts/qa/store-ui.mjs",
+    "test:ui": "node scripts/qa/homepage.mjs && node scripts/qa/studio.mjs && node scripts/qa/store-ui.mjs && node scripts/qa/brand-store.mjs",
     "test:design-roundtrip": "node scripts/verify-design-roundtrip.mjs",
     "store:backup": "node server/backup.mjs create",
     "store:verify-backup": "node server/backup.mjs verify",

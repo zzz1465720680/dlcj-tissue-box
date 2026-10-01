@@ -11,7 +11,7 @@ class ErrorBoundary extends Component<{children: ReactNode}, {failed: boolean}> 
   static getDerivedStateFromError() { return {failed: true}; }
   componentDidCatch(error: unknown) { console.error('Page failed', error); }
   render() {
-    if (this.state.failed) return <main style={{padding: '3rem', fontFamily: 'sans-serif'}}><h1>页面暂时无法打开</h1><p>请刷新重试。已保存的本机设计不会因为刷新而删除。</p><a href="/">返回产品展示</a></main>;
+    if (this.state.failed) return <main style={{padding: '3rem', fontFamily: 'sans-serif'}}><h1>页面暂时无法打开</h1><p>请刷新重试。已保存的本机设计不会因为刷新而删除。</p><a href="/">返回首页</a></main>;
     return this.props.children;
   }
 }
@@ -50,8 +50,12 @@ async function start() {
     const {default: ModelReview} = await import('../components/model-review');
     document.title = 'revision9 模型校对 · 鼎立车眷';
     page = <ModelReview/>;
-  } else if (path === '/') {
-    const {default: Home, generateMetadata} = await import('../app/page');
+  } else if (['/', '/mats', '/tissue-box'].includes(path)) {
+    const {default: Home, generateMetadata} = path === '/mats'
+      ? await import('../app/mats/page')
+      : path === '/tissue-box'
+        ? await import('../app/tissue-box/page')
+        : await import('../app/page');
     const searchParams = Promise.resolve({lang: params.get('lang') ?? undefined});
     const metadata = await generateMetadata({searchParams});
     if (typeof metadata.title === 'string') document.title = metadata.title;
@@ -59,7 +63,7 @@ async function start() {
     document.documentElement.lang = params.get('lang') === 'en' ? 'en' : 'zh-CN';
     page = await Home({searchParams});
   } else {
-    page = <main style={{padding: '3rem'}}><h1>没有找到这个页面</h1><a href="/">返回产品展示</a></main>;
+    page = <main style={{padding: '3rem'}}><h1>没有找到这个页面</h1><a href="/">返回首页</a></main>;
   }
   createRoot(document.getElementById('root')!).render(<ErrorBoundary>{frontendPreview && <aside aria-label="测试预览说明" style={{padding: '12px 18px', background: '#fff3cd', color: '#513b00', borderBottom: '1px solid #e2c875', fontSize: 14, lineHeight: 1.65}}><strong>前端测试预览</strong> · 可浏览和本机定制，设计仅保存在当前浏览器。登录、云端订单、短信邮件和付款均未启用，请勿填写真实个人信息。</aside>}{page}</ErrorBoundary>);
 }
@@ -67,5 +71,5 @@ async function start() {
 start().catch(error => {
   console.error('Application failed to load', error);
   const root = document.getElementById('root')!;
-  root.innerHTML = '<main style="padding:3rem;font-family:sans-serif"><h1>页面暂时无法载入</h1><p>请检查网络后刷新重试。</p><a href="/">返回产品展示</a></main>';
+  root.innerHTML = '<main style="padding:3rem;font-family:sans-serif"><h1>页面暂时无法载入</h1><p>请检查网络后刷新重试。</p><a href="/">返回首页</a></main>';
 });

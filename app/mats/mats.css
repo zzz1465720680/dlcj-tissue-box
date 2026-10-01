@@ -1,0 +1,52 @@
+/* Floor-mat showcase only. No selectors affect the tissue-box editor. */
+.fm-heading { padding-block: 54px 32px; }
+.fm-heading h1 { font-size: clamp(32px, 3.7vw, 52px); line-height: 1.35; letter-spacing: -.035em; }
+.fm-lead { color: var(--dc-muted); font-size: 15px; margin-top: 16px !important; }
+.fm-carousel { min-width: 0; }
+.fm-photoStage { position: relative; overflow: hidden; border-radius: 18px; background: #e7e9e3; aspect-ratio: 16 / 9; touch-action: pan-y pinch-zoom; }
+.fm-photo { width: 100%; height: 100%; object-fit: cover; user-select: none; animation: fm-photoIn .45s ease-out; }
+.fm-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 2; width: 50px; height: 50px; border: 1px solid #ffffffb3; border-radius: 50%; background: #fffffff0; color: #2f4538; display: grid; place-items: center; box-shadow: 0 2px 12px #1113; transition: background .2s; }
+.fm-arrow:hover { background: #fff; }
+.fm-arrow--previous { left: 22px; }
+.fm-arrow--next { right: 22px; }
+.fm-captionRow { display: flex; align-items: center; justify-content: space-between; gap: 28px; padding-top: 22px; }
+.fm-caption h2 { font-size: 20px; letter-spacing: -.02em; }
+.fm-caption p { color: var(--dc-muted); font-size: 13px; margin-top: 5px !important; }
+.fm-controls { display: flex; align-items: center; gap: 24px; flex-shrink: 0; }
+.fm-count { font-size: 13px; color: #929b90; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fm-count strong { color: var(--dc-ink); font-weight: 500; font-size: 16px; }
+.fm-playToggle { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: transparent; border: 1px solid var(--dc-line); border-radius: 99px; color: var(--dc-muted); min-width: 84px; min-height: 44px; padding: 9px 13px; font-size: 12px !important; }
+.fm-playToggle:hover { color: var(--dc-ink); border-color: #abb99f; }
+.fm-imageNote { color: #7a8477; font-size: 12px; line-height: 1.8; margin-top: 20px !important; }
+.fm-about { display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: 70px; border-top: 1px solid var(--dc-line); padding-block: 45px 54px; margin-top: 48px; }
+.fm-about h2 { font-size: 29px; letter-spacing: -.025em; }
+.fm-about > div > p:not(.dc-eyebrow) { color: var(--dc-muted); font-size: 15px; line-height: 1.95; max-width: 29em; }
+.fm-availability { font-size: 13px !important; margin-top: 16px !important; }
+@keyframes fm-photoIn { from { opacity: .3; } to { opacity: 1; } }
+@media (max-width: 900px) {
+  .fm-about { gap: 40px; }
+}
+@media (max-width: 700px) {
+  .fm-heading { padding-block: 36px 24px; }
+  .fm-heading h1 { font-size: clamp(26px, 6.8vw, 38px); }
+  .fm-lead { font-size: 14px; margin-top: 13px !important; }
+  .fm-photoStage { aspect-ratio: 4 / 3; border-radius: 12px; }
+  .fm-photo { object-position: 55% center; }
+  .fm-arrow { width: 44px; height: 44px; }
+  .fm-arrow--previous { left: 10px; }
+  .fm-arrow--next { right: 10px; }
+  .fm-captionRow { padding-top: 18px; gap: 12px; align-items: flex-start; }
+  .fm-caption h2 { font-size: 18px; }
+  .fm-caption p { font-size: 11px; }
+  .fm-controls { gap: 8px; flex-direction: column; align-items: flex-end; }
+  .fm-playToggle { min-width: 70px; gap: 6px; }
+  .fm-imageNote { font-size: 11px; margin-top: 14px !important; }
+  .fm-about { grid-template-columns: 1fr; gap: 18px; margin-top: 30px; padding-block: 30px 36px; }
+  .fm-about h2 { font-size: 24px; }
+  .fm-about > div > p:not(.dc-eyebrow) { font-size: 14px; }
+  .fm-availability { font-size: 12px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fm-photo { animation: none; }
+  .fm-arrow { transition: none; }
+}

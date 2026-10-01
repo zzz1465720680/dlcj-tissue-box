@@ -22,3 +22,5 @@ STORE_UI_QA_DIR=/tmp/dlcj-qa npm run test:ui
 ```
 
 This also runs `homepage.mjs` (26 carousel/terms/navigation checks) and `studio.mjs` (33 editor/local-storage/import/export checks). The studio suite additionally needs the optional `fake-indexeddb` QA package. It validates the real local-storage adapter against a maintained IndexedDB implementation and never transmits local saved designs. All three scripts resolve optional dependencies through `STORE_UI_QA_DIR`, create temporary bundles outside the repository, and leave production dependencies unchanged.
+
+`brand-store.mjs` exercises the actual static entry for the brand home, floor mats and tissue-box collection in both languages, trailing-slash routes, floor-mat interactions, preview service blocking and referral capture in both build modes. All network responses are synthetic. It also checks that floor mats have no checkout form or editor. These DOM checks do not prove responsive pixel layout or WebGL behavior.

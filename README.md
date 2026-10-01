@@ -1,10 +1,21 @@
-# 鼎立车眷 (DINGLI CHEJUAN) — Car Tissue Box Website
+# 鼎立车眷 (DINGLI CHEJUAN) — Brand & Product Website
 
-A brand website for a leather car tissue box, with a 3D customizer where a customer picks the material, colour, perforation and artwork for each part.
+A brand website with separate floor-mat and car tissue-box collections. The tissue-box studio lets a customer pick the material, colour, perforation and artwork for each part.
 
 This is an early demo of a product website I'm experimenting with for a leather car tissue box, featuring an interactive 3D customization experience. Every page is shown below on desktop and mobile, so nothing needs to be installed or run.
 
 Chinese notes: [README.zh.md](README.zh.md)
+
+## Brand home and floor mats · 2026-10-01
+
+- `/` is the mother-brand homepage, with independent product entries that can grow with future collections.
+- `/mats` is a display-only floor-mat collection: nine large photos, side arrows, six-second autoplay, pause/play, keyboard controls and mobile swiping. Manual selection pauses autoplay; reduced-motion settings are respected.
+- The existing tissue-box storefront has moved to `/tissue-box`. Its Chinese/English switch stays within that collection; `/customize` and the design APIs keep their existing routes.
+- New content, styles and assets are separate from the tissue-box design data and backend. The shared-file merge notes and image provenance are in [the integration notes](docs/品牌首页与脚垫模块.md).
+
+![Brand homepage](docs/screenshots/brand-home-20261001.webp)
+
+![Floor-mat showcase with side arrows](docs/screenshots/floor-mats-20261001.webp)
 
 ## Current storefront · 2026-09-30
 

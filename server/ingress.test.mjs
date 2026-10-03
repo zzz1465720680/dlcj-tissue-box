@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
-import { mkdtempSync, rmSync, symlinkSync, existsSync } from 'node:fs';
+import { mkdtempSync, rmSync, symlinkSync, unlinkSync, existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
@@ -83,9 +83,13 @@ test('production config rejects static paths, normalized traversal, existing and
   for (const filename of [resolve('dist-netlify-preview/store.sqlite'), resolve('public') + '/../public/store.sqlite', resolve('.private') + '/../public/store.sqlite']) {
     assert.throws(() => loadConfig({ ...base, STORE_DB_PATH: filename }));
   }
-  symlinkSync(resolve('public'), join(directory, 'linked-public'));
-  symlinkSync(resolve('public/not-created'), join(directory, 'dangling-public'));
-  for (const link of ['linked-public', 'dangling-public']) assert.throws(() => loadConfig({ ...base, STORE_DB_PATH: join(directory, link, 'store.sqlite') }));
+  const link = join(directory, 'linked-public');
+  symlinkSync(resolve('public'), link, process.platform === 'win32' ? 'junction' : 'dir');
+  try { assert.throws(() => loadConfig({ ...base, STORE_DB_PATH: join(link, 'store.sqlite') })); } finally { unlinkSync(link); }
+  if (process.platform !== 'win32') {
+    const dangling = join(directory, 'dangling-public'); symlinkSync(resolve('public/not-created'), dangling, 'dir');
+    try { assert.throws(() => loadConfig({ ...base, STORE_DB_PATH: join(dangling, 'store.sqlite') })); } finally { unlinkSync(dangling); }
+  }
   assert.throws(() => loadConfig({ ...base, STORE_TRUSTED_PROXY_IPS: '*' }));
   assert.throws(() => loadConfig({ ...base, STORE_TRUSTED_PROXY_IPS: '10.0.0.0/8' }));
   assert.throws(() => loadConfig({ ...base, STORE_HOST: 'unexpected.example' }));
@@ -138,7 +142,7 @@ test('gateway uncertain delivery is held durably instead of retried by a second 
   const store = createStore(); t.after(() => store.close()); let calls = 0;
   t.mock.method(globalThis, 'fetch', async () => { calls++; throw new Error('Response lost after acceptance'); });
   const user = store.registerVerifiedUser({ phone: '+8613800000001' }).user;
-  store.createOrder(user.id, { operationKey: 'gateway-hold-test', kind: 'standard', stockId: 'white-lime', checkout: { name: '合成测试', phone: '+8613800000001', address: '合成测试地址' } });
+  store.createOrder(user.id, { expectedPricingVersion: store.getPricing().version, expectedUnitPriceFen: store.getPricing().standardFen, operationKey: 'gateway-hold-test', kind: 'standard', stockId: 'white-lime', checkout: { name: '合成测试', phone: '+8613800000001', address: '合成测试地址' } });
   const email = createProviders(gatewayEnv).email;
   assert.equal((await drainEmailOutbox({ store, email })).held, 1);
   assert.equal((await drainEmailOutbox({ store, email })).sent, 0);

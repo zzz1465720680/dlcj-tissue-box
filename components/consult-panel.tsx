@@ -12,6 +12,7 @@ import {
 import {Input} from '@/components/ui/input';
 import ContactOptions from './contact-options';
 import CustomizationPriceNote from './customization-price-note';
+import {useStorePricing} from '@/hooks/use-store-pricing';
 
 function download(data: Blob, name: string) {
   const url = URL.createObjectURL(data);
@@ -31,6 +32,7 @@ export default function ConsultPanel({design, modelReady, onExportPng, input, on
   design: Design; modelReady: boolean; onExportPng: () => Promise<{url: string; name: string} | null>;
   input: InquiryInput; onInput: Dispatch<SetStateAction<InquiryInput>>; inputReady: boolean; storageFailed: boolean;
 }) {
+  const prices = useStorePricing();
   const {quantity, note, lastCopiedKey} = input;
   const generatedAt = useMemo(() => new Date(), [design, quantity, note]);
   const [manualCopy, setManualCopy] = useState(false);
@@ -45,11 +47,11 @@ export default function ConsultPanel({design, modelReady, onExportPng, input, on
   const validation = parseQuantity(quantity);
   const quantityValue = validation.ok ? validation.value : 0;
   const text = useMemo(
-    () => (quantityValue > 0 ? buildInquiryText(design, {quantity: quantityValue, note}, generatedAt) : ''),
-    [design, generatedAt, note, quantityValue],
+    () => (quantityValue > 0 ? buildInquiryText(design, {quantity: quantityValue, note}, generatedAt, prices.pricing) : ''),
+    [design, generatedAt, note, quantityValue, prices.pricing],
   );
   const signature = useMemo(() => designSignature(design), [design]);
-  const contentKey = useMemo(() => inquiryContentKey(design, quantity, note), [design, quantity, note]);
+  const contentKey = useMemo(() => inquiryContentKey(design, quantity, note, prices.pricing), [design, quantity, note, prices.pricing]);
   const valid = inputReady && validation.ok;
 
   const copy = async () => {
@@ -65,11 +67,11 @@ export default function ConsultPanel({design, modelReady, onExportPng, input, on
   };
   const stale = Boolean(lastCopiedKey) && lastCopiedKey !== contentKey;
   const channels = activeContactChannels();
-  const facts = merchantFacts('zh');
+  const facts = merchantFacts('zh', prices.pricing);
 
   return (
     <div className="consult-panel">
-      <CustomizationPriceNote />
+      <CustomizationPriceNote prices={prices}/>
       <section className="consult-block">
         <h3>你的搭配<span>方案参考码 DLCJ-{signature}</span></h3>
         <ul className="consult-highlights">
@@ -142,7 +144,7 @@ export default function ConsultPanel({design, modelReady, onExportPng, input, on
           <button className="button" disabled={!valid} onClick={() => {
             if (!inputReady || !validation.ok) return;
             const name = inquiryFileName(design, generatedAt, 'json');
-            const url = download(new Blob([buildInquiryJson(design, {quantity: validation.value, note}, generatedAt)], {type: 'application/json'}), name);
+            const url = download(new Blob([buildInquiryJson(design, {quantity: validation.value, note}, generatedAt, prices.pricing)], {type: 'application/json'}), name);
             setFileDownload({url, name, key: contentKey});
             setDownloaded('完整方案已生成，请确认浏览器下载，也可点击下方链接再次保存。');
           }}><FileJson size={16} />下载方案文件（JSON）</button>

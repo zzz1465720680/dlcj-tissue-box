@@ -25,7 +25,7 @@ function code(fn, expected) { assert.throws(fn, e => e instanceof DomainError &&
 function edited(color = '#416e63') { const d = initialDesign(); d.parts.body.color = color; return d; }
 function save(store, user, design = edited(), options = {}) { return store.saveDesign(user.id, { design, operationKey: key(), ...options }); }
 function grant(f, amountFen = 500, expiresAt = '2026-12-30T12:00:00.000Z') { return f.store.adminGrantCoupon(f.admin.id, { userId: f.user.id, amountFen, expiresAt, reason: '客户关怀', operationKey: key() }); }
-function order(f, options = {}) { return f.store.createOrder(f.user.id, { kind: 'standard', stockId: 'white-lime', quantity: 1, checkout, operationKey: key(), ...options }); }
+function order(f, options = {}) { return f.store.createOrder(f.user.id, { expectedPricingVersion: f.store.getPricing().version, expectedUnitPriceFen: options.kind === 'custom' ? f.store.getPricing().customFen : f.store.getPricing().standardFen, kind: 'standard', stockId: 'white-lime', quantity: 1, checkout, operationKey: key(), ...options }); }
 function readyPayment(f, o, shippingFen = 800) { const next = f.store.adminSetShippingQuote(f.admin.id, { orderId: o.id, shippingFen }); return f.store.acceptShippingQuote(f.user.id, { orderId: o.id, version: next.shippingVersion }); }
 function pay(f, o) { const ready = readyPayment(f, o); return f.store.internal.confirmPayment({ eventId: key(), orderId: o.id, amountFen: ready.totalFen, providerReference: key() }); }
 
@@ -39,7 +39,7 @@ test('verified unique mobile, explicit operator admin and persistent migrations'
   code(() => store.registerVerifiedUser({ phone: '+12025550123' }), 'INVALID_PHONE');
   code(() => store.bootstrapAdmin({ phone: '13800000009' }), 'VERIFIED_USER_REQUIRED');
   const saved = save(store, user); const second = createStore({ filename });
-  try { assert.equal(second.getDesign(user.id, saved.id).version, 1); assert.equal(second.db.prepare('SELECT COUNT(*) AS n FROM store_migrations').get().n, 2); } finally { second.close(); }
+  try { assert.equal(second.getDesign(user.id, saved.id).version, 1); assert.equal(second.db.prepare('SELECT COUNT(*) AS n FROM store_migrations').get().n, 3); } finally { second.close(); }
 });
 
 test('private designs, immutable versions, idempotency and immutable order snapshots', t => {
@@ -105,7 +105,7 @@ test('referral ignores name-only, initial/preset/trivial edits; one event per ne
 
 test('coupon earliest expiry, per-order cap for both prices, atomic reservation and cancellation idempotency', t => {
   const f = fixture(t); const late = grant(f, 3000, '2026-12-01T00:00:00.000Z'), early = grant(f, 500, '2026-10-05T00:00:00.000Z');
-  const input = { kind: 'standard', stockId: 'white-lime', checkout, quantity: 20, useCoupons: true, operationKey: key() };
+  const input = { expectedPricingVersion: f.store.getPricing().version, expectedUnitPriceFen: f.store.getPricing().standardFen, kind: 'standard', stockId: 'white-lime', checkout, quantity: 20, useCoupons: true, operationKey: key() };
   const first = f.store.createOrder(f.user.id, input); assert.equal(first.discountFen, 3000); assert.equal(first.goodsTotalFen, 198000);
   assert.deepEqual(f.store.createOrder(f.user.id, input), first); assert.equal(f.store.listOrders(f.user.id).length, 1);
   let coupons = f.store.listCoupons(f.user.id); assert.equal(coupons.find(c => c.id === early.id).reservedFen, 500); assert.equal(coupons.find(c => c.id === late.id).reservedFen, 2500);
@@ -119,7 +119,7 @@ test('coupon earliest expiry, per-order cap for both prices, atomic reservation 
 test('parallel SQLite connections cannot overspend coupon balances', async t => {
   const f = fixture(t); grant(f, 3000);
   const code = `import {parentPort,workerData} from 'node:worker_threads'; import {createStore} from ${JSON.stringify(new URL('./domain.mjs', import.meta.url).href)}; const s=createStore({filename:workerData.filename,now:()=>new Date('${BASE}')}); parentPort.postMessage({ready:true}); parentPort.once('message',()=>{try { parentPort.postMessage({order:s.createOrder(workerData.userId,workerData.request)}); } catch(e){parentPort.postMessage({error:e.message});} finally {s.close();}});`;
-  const workers = [1, 2].map(() => new Worker(new URL(`data:text/javascript,${encodeURIComponent(code)}`), { workerData: { filename: f.filename, userId: f.user.id, request: { kind: 'standard', stockId: 'white-lime', checkout, useCoupons: true, operationKey: key() } } }));
+  const workers = [1, 2].map(() => new Worker(new URL(`data:text/javascript,${encodeURIComponent(code)}`), { workerData: { filename: f.filename, userId: f.user.id, request: { expectedPricingVersion: f.store.getPricing().version, expectedUnitPriceFen: f.store.getPricing().standardFen, kind: 'standard', stockId: 'white-lime', checkout, useCoupons: true, operationKey: key() } } }));
   t.after(() => Promise.all(workers.map(w => w.terminate())));
   await Promise.all(workers.map(w => new Promise((resolve, reject) => { w.once('message', resolve); w.once('error', reject); })));
   const pending = workers.map(w => new Promise((resolve, reject) => { w.once('message', resolve); w.once('error', reject); })); workers.forEach(w => w.postMessage('go'));

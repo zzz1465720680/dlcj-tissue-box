@@ -2,7 +2,7 @@ export type Lang = 'zh' | 'en';
 export const resolveLang = (value?: string): Lang => value === 'en' ? 'en' : 'zh';
 
 const zh = {
-  meta: { title: '鼎立车眷 · 车载纸巾盒', description: '七款现有款式99元/件，自由定制159元/件。从喜欢的配色开始，搭配你的车载纸巾盒；专属图案、刺绣等特殊需求请私聊报价。' },
+  meta: { title: '鼎立车眷 · 车载纸巾盒', description: '七款现有款式与自由配色定制，价格以商品当前定价为准。从喜欢的配色开始，搭配你的车载纸巾盒；专属图案、刺绣等特殊需求请私聊报价。' },
   brand: '鼎立车眷', skip: '跳转到选款', navLabel: '页面导航', language: '语言',
   nav: ['选款式', '看细节', '自由定制'], customize: '开始定制',
   hero: { eyebrow: '鼎立车眷 · 车载纸巾盒', title: ['一件小物，', '随你心意。'], body: '从喜欢的配色开始，让车里的日常，也有自己的样子。', choose: '挑选款式', custom: '自由搭配', caption: '白瓷 · 青柠', alt: '白色皮革与青柠绿封边纸巾盒，棚拍风格精修图' },
@@ -26,7 +26,7 @@ const zh = {
     { title: '确认后制作', body: '把方案发给商家，确认材料、报价和交期。' },
   ], custom: '进入定制工坊', contact: '想先聊一聊？联系定制', questions: '定制前，你可能想了解', purchase: '价格、交期与购买方式', purchaseNote: '网站用于选款和整理方案，不在线收款。购买前请与商家确认：' },
   faq: [
-    { q: '99元和159元，有什么区别？', a: '页面展示的现有款式均为99元/件，包括菱格打孔款。自己搭配颜色与细节的自由定制为159元/件；加入自己的图案、刺绣等特殊需求，需要私聊确认工艺和报价。运费与交期另行确认。' },
+    { q: '现有款式和配色定制，有什么区别？', a: '页面展示的现有款式采用基础款价格，包括菱格打孔款。自己搭配颜色与细节采用配色定制价格，均以商品当前定价为准；加入自己的图案、刺绣等特殊需求，需要私聊确认工艺和报价。运费与交期另行确认。' },
     { q: '尺寸和抽纸适配，怎么确认？', a: '请量好车内放置位置和抽纸包装尺寸，发给商家核对。工坊里的 16 × 10.5 × 约 6 cm 是建模参考，成品尺寸以实测确认为准。' },
     { q: '颜色、材质和图案可以改吗？', a: '自由定制可以在工坊中调整主体、四个包角、抽纸口饰边和侧标。加入文字、图片或手绘可用于表达想法，专属图案与刺绣等特殊制作需私聊报价。实际材料、颜色和工艺，以与商家确认为准。' },
     { q: '搭配好了，怎么保存和发送？', a: '无需账号即可在本机搭配与保存草稿。在工坊点击“确认方案 · 咨询”，核对数量和备注，复制需求或下载方案，再主动发送给商家。手机慢网时也可以切换轻量预览。' },
@@ -36,7 +36,7 @@ const zh = {
 };
 
 const en = {
-  meta: { title: '鼎立车眷 · Car Tissue Box', description: 'Seven existing styles at CNY 99 per piece. Custom combinations at CNY 159. Personal artwork, embroidery and special work are quoted privately.' },
+  meta: { title: '鼎立车眷 · Car Tissue Box', description: 'Seven existing styles and custom colour combinations. See the current store prices. Personal artwork, embroidery and special work are quoted privately.' },
   brand: '鼎立车眷', skip: 'Skip to colourways', navLabel: 'Page navigation', language: 'Language',
   nav: ['Styles', 'Details', 'Customize'], customize: 'Customize',
   hero: { eyebrow: 'DINGLI CHEJUAN · CAR TISSUE BOX', title: ['A little detail.', 'Entirely you.'], body: 'Start with a colour you love. Make the everyday feel a little more your own.', choose: 'Explore styles', custom: 'Create your own', caption: 'Porcelain · Lime', alt: 'White leather tissue box with lime edging, retouched studio product image' },
@@ -60,7 +60,7 @@ const en = {
     { title: 'Confirm with the maker', body: 'Share your plan and agree on materials, price and lead time.' },
   ], custom: 'Open the design studio', contact: 'Prefer to talk first? Contact the maker', questions: 'Before you customize', purchase: 'Price, delivery and purchasing', purchaseNote: 'This site helps you design and prepare a request. It does not take payments. Confirm these details with the maker:' },
   faq: [
-    { q: 'What is the difference between CNY 99 and CNY 159?', a: 'All existing styles shown, including Diamond Perforation, are CNY 99 per piece. Your own colour and detail combinations are CNY 159 per piece. Personal artwork, embroidery and other special work are quoted privately. Confirm shipping and lead time separately.' },
+    { q: 'How do existing styles and custom combinations differ?', a: 'Existing styles, including Diamond Perforation, use the standard price. Your own colours and details use the custom combination price; see the current store prices. Personal artwork, embroidery and other special work are quoted privately. Confirm shipping and lead time separately.' },
     { q: 'How do I check the size and tissue-pack fit?', a: 'Measure the available space in your car and your tissue pack, then share both with the maker. The studio’s 16 × 10.5 × approximately 6 cm is a modelling reference, not a confirmed finished size.' },
     { q: 'Can I change the colours, materials and artwork?', a: 'Customize the body, four corners, opening trim and side label. Text, images and drawings express your ideas; personal artwork and embroidery production are quoted privately. Confirm available materials, colours and production methods with the maker.' },
     { q: 'How do I save and share my design?', a: 'No account is needed to design and keep a local draft. Use “确认方案 · 咨询” to review quantity and notes, copy or download the request, then send it to the maker. A lightweight preview is available for slower connections.' },

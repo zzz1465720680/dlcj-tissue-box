@@ -21,16 +21,18 @@ test('backup captures committed WAL designs, orders, outbox and private blobs; i
   store.db.exec('PRAGMA wal_autocheckpoint=0');
   const user = store.registerVerifiedUser({ phone: '+8613800000001' }).user;
   const design = store.saveDesign(user.id, { operationKey: 'fixture-save', design: initialDesign() });
-  const order = store.createOrder(user.id, { operationKey: 'fixture-order', kind: 'standard', stockId: 'ivory',
+  const order = store.createOrder(user.id, { expectedPricingVersion: store.getPricing().version, expectedUnitPriceFen: store.getPricing().standardFen, operationKey: 'fixture-order', kind: 'standard', stockId: 'ivory',
     checkout: { name: 'Synthetic', phone: '13800000001', address: 'Synthetic private address' }, useCoupons: false });
   createObjectStore({ db: store.db, store });
   store.db.prepare('INSERT INTO private_objects VALUES(?,?,?,?,?,?)').run('fixture-photo', user.id, 'image/webp', Buffer.from('private fixture bytes'), 'fixture-hash', 0);
   assert.ok(statSync(`${filename}-wal`).size > 0);
   const result = await createBackup({ filename, outputDir: root });
   assert.equal(result.integrity, 'ok');
+  if (process.platform !== 'win32') {
   assert.equal(statSync(result.directory).mode & 0o777, 0o700);
   assert.equal(statSync(join(result.directory, 'store.sqlite')).mode & 0o777, 0o600);
   assert.equal(statSync(join(result.directory, 'manifest.json')).mode & 0o777, 0o600);
+  } // Windows ACLs are not POSIX mode bits; integrity/restoration assertions still run.
   const copy = join(root, 'rehearsal.sqlite'); copyFileSync(join(result.directory, 'store.sqlite'), copy);
   const restored = createStore({ filename: copy });
   try {

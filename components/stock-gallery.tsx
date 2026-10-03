@@ -3,13 +3,16 @@
 import { useRef, useState, type KeyboardEvent, type TouchEvent } from 'react';
 import { ArrowUpRight, ChevronLeft, ChevronRight, ClipboardCopy, Minus, Plus } from 'lucide-react';
 import { copyText } from '@/lib/clipboard';
-import { STOCK_PRICE } from '@/lib/pricing';
+import {priceNumber} from '@/lib/pricing';
+import {useStorePricing} from '@/hooks/use-store-pricing';
+import StorePricingNote from './store-pricing-note';
 import type { Lang } from '@/lib/showcase-copy';
 import ContactOptions from './contact-options';
 
 type Style = { id: string; name: string; description: string; alt: string; colors: string[] };
 
 export default function StockGallery({ items, lang }: { items: Style[]; lang: Lang }) {
+  const prices = useStorePricing();
   const english = lang === 'en';
   const [index, setIndex] = useState(0);
   const [expanded, setExpanded] = useState(false);
@@ -53,8 +56,8 @@ export default function StockGallery({ items, lang }: { items: Style[]; lang: La
     if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.5) step(dx > 0 ? -1 : 1);
   };
   const inquiry = english
-    ? `DINGLI CHEJUAN · Existing style enquiry\nStyle: ${item.name}\nStyle ID: ${item.id}\nPrice: CNY ${STOCK_PRICE} per piece\nPlease confirm quantity, delivery time and shipping before purchasing.`
-    : `鼎立车眷 · 现有款式咨询\n款式：${item.name}\n款式编号：${item.id}\n单价：¥${STOCK_PRICE} / 件\n想了解这款，请协助确认数量、制作交期与运费。`;
+    ? `DINGLI CHEJUAN · Existing style enquiry\nStyle: ${item.name}\nStyle ID: ${item.id}\nPrice: ${prices.pricing ? 'CNY ' + priceNumber(prices.pricing.standardFen) + ' per piece' : 'awaiting store confirmation'}\nPlease confirm quantity, delivery time and shipping before purchasing.`
+    : `鼎立车眷 · 现有款式咨询\n款式：${item.name}\n款式编号：${item.id}\n单价：${prices.pricing ? '¥' + priceNumber(prices.pricing.standardFen) + ' / 件' : '待确认'}\n想了解这款，请协助确认数量、制作交期与运费。`;
   const copyInquiry = async () => {
     const requestedIndex = selection.current;
     setCopying(true);
@@ -96,7 +99,8 @@ export default function StockGallery({ items, lang }: { items: Style[]; lang: La
     </div>
 
     <div id={inquiryId} className="sc-stockInquiry" hidden={!inquiring}>
-      <div className="sc-stockInquiryHeading"><p><strong>{item.name}</strong><span>¥{STOCK_PRICE} / {english ? 'piece' : '件'}</span></p>
+      <div className="sc-stockInquiryHeading"><p><strong>{item.name}</strong><span>{prices.pricing && '¥'}{priceNumber(prices.pricing?.standardFen)} / {english ? 'piece' : '件'}</span></p>
+      <StorePricingNote {...prices}/>
         <button type="button" className="sc-stockCopy" onClick={copyInquiry} disabled={copying}><ClipboardCopy size={15} />{copying ? english ? 'Copying…' : '复制中…' : english ? 'Copy style enquiry' : '复制款式需求'}</button>
       </div>
       {notice && <p className="sc-stockNotice" role="status">{notice}</p>}

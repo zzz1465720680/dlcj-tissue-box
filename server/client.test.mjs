@@ -8,7 +8,8 @@ const dataModule=value=>'data:text/javascript;base64,'+Buffer.from(value).toStri
 async function loadClient(preview){
   const helper=`const __STORE_FRONTEND_PREVIEW__=${preview};\n`+compile(readFileSync(new URL('../lib/frontend-preview.ts',import.meta.url),'utf8'));
   const source=compile(readFileSync(new URL('../lib/store-client.ts',import.meta.url),'utf8'));
-  return import(dataModule(source.replace("'./frontend-preview'",JSON.stringify(dataModule(helper)))));
+  const pricing=compile(readFileSync(new URL('../lib/pricing.ts',import.meta.url),'utf8'));
+  return import(dataModule(source.replace("'./frontend-preview'",JSON.stringify(dataModule(helper))).replace("'./pricing'",JSON.stringify(dataModule(pricing)))));
 }
 const client=await loadClient(false);
 const oldFetch=globalThis.fetch;

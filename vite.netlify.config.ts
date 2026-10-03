@@ -2,12 +2,15 @@ import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {defineConfig} from 'vite';
 import react from '@vitejs/plugin-react';
+import {INITIAL_PRICING} from './lib/pricing';
 
 // Isolated browser-only build. The original Vinext/Cloudflare build stays intact.
 export default defineConfig(({mode}) => {
   const frontendPreview = mode === 'frontend-preview';
+  const apiPort = Number(process.env.STORE_DEV_API_PORT || 8788);
+  if (!Number.isInteger(apiPort) || apiPort < 1 || apiPort > 65535) throw new Error('Invalid local store API port');
   return {
-  define: {__STORE_FRONTEND_PREVIEW__: JSON.stringify(frontendPreview)},
+  define: {__STORE_FRONTEND_PREVIEW__: JSON.stringify(frontendPreview), __STORE_LOCAL_PRICING_PREVIEW__: JSON.stringify(mode !== 'production' && process.env.STORE_LOCAL_PRICING_PREVIEW === '1')},
   plugins: [react(), {
     name: 'netlify-static-metadata',
     transformIndexHtml(html) {
@@ -26,14 +29,21 @@ export default defineConfig(({mode}) => {
         designStorage: frontendPreview ? 'browser-local-only' : 'private-api-with-browser-local-recovery',
         authentication: frontendPreview ? 'disabled-in-preview' : 'phone-otp-provider-required',
         paymentEnabled: false,
-        stockPriceCny: 99,
-        customPriceCny: 159,
+        pricingSource: 'persistent-store-api',
+        pricingEndpoint: '/api/store/pricing',
+        ...(frontendPreview ? {previewReferencePrices: INITIAL_PRICING} : {}),
       }, null, 2)});
     },
   }],
   resolve: {alias: {'@': fileURLToPath(new URL('.', import.meta.url))}},
+  cacheDir: 'checks/pricing-vite-cache',
   build: {outDir: frontendPreview ? 'dist-netlify-preview' : 'dist-netlify', emptyOutDir: true, sourcemap: false},
-  server: {host: '0.0.0.0', proxy: {'/api/store': {target: 'http://127.0.0.1:8788', changeOrigin: false}}},
+  server: {
+    host: '127.0.0.1',
+    fs: {deny: ['.env', '.env.*', '*.{crt,pem}', '**/.git/**', '**/.store-data/**']},
+    watch: {ignored: ['**/dist/**', '**/dist-netlify/**', '**/dist-netlify-preview/**', '**/.store-data/**', '**/.wrangler/**', '**/checks/**']},
+    proxy: {'/api/store': {target: `http://127.0.0.1:${apiPort}`, changeOrigin: false}},
+  },
   preview: {host: '0.0.0.0'},
   };
 });

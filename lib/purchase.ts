@@ -1,7 +1,7 @@
 // 需求摘要（询价草案）的唯一生成逻辑：纯函数，不发起任何提交。
 // 复制、下载都只是把本机生成的文本/文件交给用户，不代表已经发送给商家。
 import {PARTS, PALETTE, PART_NAMES, type Design, type Material, type Part} from './design';
-import {CUSTOM_INQUIRY_PRICE_NOTE} from './pricing';
+import {customInquiryPriceNote, needsSpecialWork, priceNumber, type StorePricing} from './pricing';
 
 export const QUANTITY_MIN = 1;
 export const QUANTITY_MAX = 999;
@@ -120,9 +120,9 @@ function validateInquiry(draft: InquiryDraft) {
 }
 
 /** A change marker, not a security token or an order number. Includes quantity and notes. */
-export function inquiryContentKey(design: Design, quantity: string, note: string): string {
+export function inquiryContentKey(design: Design, quantity: string, note: string, pricing: StorePricing | null = null): string {
   const parsed = parseQuantity(quantity);
-  const content = JSON.stringify({design, quantity: parsed.ok ? parsed.value : quantity, note: note.trim()});
+  const content = JSON.stringify({design, quantity: parsed.ok ? parsed.value : quantity, note: note.trim(), pricingVersion: pricing?.version ?? null});
   let a = 0x811c9dc5, b = 0x9e3779b9;
   for (let index = 0; index < content.length; index++) {
     const char = content.charCodeAt(index);
@@ -144,7 +144,7 @@ const stamp = (when: Date): string => {
 
 const MERCHANT_LINE = '鼎立车眷';
 
-export function buildInquiryText(design: Design, draft: InquiryDraft, when: Date): string {
+export function buildInquiryText(design: Design, draft: InquiryDraft, when: Date, pricing: StorePricing | null = null): string {
   validateInquiry(draft);
   const summary = summarizeDesign(design);
   const signature = designSignature(design);
@@ -155,7 +155,8 @@ export function buildInquiryText(design: Design, draft: InquiryDraft, when: Date
     '',
     `设计名称：${design.name}`,
     `数量：${draft.quantity} 件`,
-    `价格说明：${CUSTOM_INQUIRY_PRICE_NOTE}`,
+    `价格说明：${customInquiryPriceNote(pricing)}`,
+    `方案商品金额：${needsSpecialWork(design) ? '特殊工艺单独报价' : pricing ? '¥' + priceNumber(pricing.customFen * draft.quantity) + '（不含运费；最终下单前确认）' : '待服务端确认'}`,
     `备注：${note || '（无）'}`,
     '',
     '【部位方案】',
@@ -186,7 +187,7 @@ export function buildInquiryText(design: Design, draft: InquiryDraft, when: Date
 }
 
 /** 完整方案文件：保留图片/笔迹原图，供商家制作与存档。 */
-export function buildInquiryJson(design: Design, draft: InquiryDraft, when: Date): string {
+export function buildInquiryJson(design: Design, draft: InquiryDraft, when: Date, pricing: StorePricing | null = null): string {
   validateInquiry(draft);
   const signature = designSignature(design);
   return JSON.stringify(
@@ -197,7 +198,7 @@ export function buildInquiryJson(design: Design, draft: InquiryDraft, when: Date
       generatedAt: when.toISOString(),
       sent: false,
       note: '本文件由客户在本机生成，尚未发送给商家；图片与笔迹原图完整保存在 design 字段内。',
-      request: {quantity: draft.quantity, note: draft.note.trim(), pricingNote: CUSTOM_INQUIRY_PRICE_NOTE},
+      request: {quantity: draft.quantity, note: draft.note.trim(), pricingNote: customInquiryPriceNote(pricing), pricingVersion: pricing?.version ?? null, goodsTotalFen: !needsSpecialWork(design) && pricing ? pricing.customFen * draft.quantity : null},
       summary: summarizeDesign(design),
       design,
     },

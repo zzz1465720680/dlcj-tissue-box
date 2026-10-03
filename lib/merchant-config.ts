@@ -1,3 +1,4 @@
+import {pricingLine, SPECIAL_WORK_NOTE, type StorePricing} from './pricing';
 // 商家经营信息与客服渠道的唯一配置入口。
 // 电话及微信由商家提供；2026-09-29确认现有款99、自由定制159，特殊工艺私聊报价。
 // 首页与咨询面板共用这些渠道。
@@ -48,7 +49,7 @@ export const MERCHANT_CONFIG: MerchantConfig = {
   },
   facts: {
     confirmed: [
-      {zh: '现有款式99元/件；自由定制159元/件。专属图案、刺绣等特殊工艺需私聊报价。', en: 'Existing styles are CNY 99 per piece; custom combinations are CNY 159. Personal artwork, embroidery and special work are quoted privately.'},
+      {zh: '现有款与配色定制价格以商品当前定价为准。专属图案、刺绣等特殊工艺需私聊报价。', en: 'Existing styles and custom combinations follow the current store pricing. Personal artwork, embroidery and special work are quoted privately.'},
       {zh: '常规款付款确认后1–2个自然日制作；自由定制在客户确认实物皮料和方案后5–7个自然日制作。周末计入，运输另计。', en: 'Standard production takes 1–2 calendar days after verified payment; custom production takes 5–7 calendar days after customer material/design confirmation. Weekends count; transit is additional.'},
       {zh: '首期仅提供细纹皮革。所有颜色按现有皮料近似匹配，制作前确认实物照片。可在付款前咨询。', en: 'Fine-grain leather only at launch. Colours are close-matched to available stock and confirmed against physical photos. Consultation is available before payment.'},
       {zh: '发货地：福建福州。', en: 'Ships from Fuzhou, Fujian.'},
@@ -62,8 +63,8 @@ export const MERCHANT_CONFIG: MerchantConfig = {
   },
 };
 
-export function merchantFacts(lang: 'zh' | 'en') {
-  return {confirmed: MERCHANT_CONFIG.facts.confirmed.map(item => item[lang]), pending: MERCHANT_CONFIG.facts.pending.map(item => item[lang])};
+export function merchantFacts(lang: 'zh' | 'en', pricing: StorePricing | null = null) {
+  return {confirmed: MERCHANT_CONFIG.facts.confirmed.map((item, index) => index === 0 ? pricingLine(lang, pricing) + ' ' + SPECIAL_WORK_NOTE[lang] : item[lang]), pending: MERCHANT_CONFIG.facts.pending.map(item => item[lang])};
 }
 
 export const activeContactChannels = (): ContactChannel[] =>

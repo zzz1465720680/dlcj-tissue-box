@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-html-link-for-pages -- This entry is a static browser app, without Next routing. */
 import {Component, type ReactNode} from 'react';
 import {createRoot} from 'react-dom/client';
-import {frontendPreview} from '../lib/frontend-preview';
+import {frontendPreview, localPricingPreview} from '../lib/frontend-preview';
 import '../app/globals.css';
 import '../app/showcase.css';
 import '../app/store.css';
@@ -65,7 +65,7 @@ async function start() {
   } else {
     page = <main style={{padding: '3rem'}}><h1>没有找到这个页面</h1><a href="/">返回首页</a></main>;
   }
-  createRoot(document.getElementById('root')!).render(<ErrorBoundary>{frontendPreview && <aside aria-label="测试预览说明" style={{padding: '12px 18px', background: '#fff3cd', color: '#513b00', borderBottom: '1px solid #e2c875', fontSize: 14, lineHeight: 1.65}}><strong>前端测试预览</strong> · 可浏览和本机定制，设计仅保存在当前浏览器。登录、云端订单、短信邮件和付款均未启用，请勿填写真实个人信息。</aside>}{page}</ErrorBoundary>);
+  createRoot(document.getElementById('root')!).render(<ErrorBoundary>{localPricingPreview && <aside aria-label="本地改价测试说明" style={{padding: '12px 18px', background: '#fff3cd', color: '#513b00', borderBottom: '1px solid #e2c875', fontSize: 14}}>本地合成数据测试 · 管理员 13800000003，顾客 13800000001；验证码只在启动终端显示。请勿输入真实资料，支付及真实通知关闭。</aside>}{frontendPreview && <aside aria-label="测试预览说明" style={{padding: '12px 18px', background: '#fff3cd', color: '#513b00', borderBottom: '1px solid #e2c875', fontSize: 14, lineHeight: 1.65}}><strong>前端测试预览</strong> · 可浏览和本机定制，设计仅保存在当前浏览器。登录、云端订单、短信邮件和付款均未启用，请勿填写真实个人信息。</aside>}{page}</ErrorBoundary>);
 }
 
 start().catch(error => {

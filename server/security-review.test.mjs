@@ -20,7 +20,7 @@ function grant(f, amountFen, expiresAt, operationKey) {
   return f.store.adminGrantCoupon(f.admin.id, { userId: f.alice.id, amountFen, expiresAt, reason: 'isolated test fixture', operationKey });
 }
 function order(f, overrides = {}) {
-  return f.store.createOrder(f.alice.id, { operationKey: 'create-order', kind: 'standard', stockId: 'ivory', checkout, useCoupons: true, ...overrides });
+  return f.store.createOrder(f.alice.id, { expectedPricingVersion: f.store.getPricing().version, expectedUnitPriceFen: overrides.kind === 'custom' ? f.store.getPricing().customFen : f.store.getPricing().standardFen, operationKey: 'create-order', kind: 'standard', stockId: 'ivory', checkout, useCoupons: true, ...overrides });
 }
 function pay(f, row, shippingFen = 0) {
   f.store.adminSetShippingQuote(f.admin.id, { orderId: row.id, shippingFen });

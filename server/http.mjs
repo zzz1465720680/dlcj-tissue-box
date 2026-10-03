@@ -73,6 +73,7 @@ export function createStoreServer({ store, origin = 'http://localhost:5173', sec
       auth.limit('http-ip', ip, 600, 60000);
       // All routes are explicit. No generic domain invocation; verified financial event methods are never exposed.
       if (req.method === 'GET' && path === `${PREFIX}/health`) return json(res, 200, { status: 'ok' });
+      if (req.method === 'GET' && path === `${PREFIX}/pricing`) return json(res, 200, { pricing: store.getPricing() });
       if (req.method === 'GET' && path === `${PREFIX}/session`) return json(res, 200, {
         user: auth.session(req), capabilities: { sms: providerSet.sms.available, orders: true, payment: false },
       });
@@ -101,6 +102,8 @@ export function createStoreServer({ store, origin = 'http://localhost:5173', sec
         return json(res, 200, { ok: true }, { 'set-cookie': auth.logout(req) });
       }
       if (mutation(req.method)) auth.limit('mutation-user', user.id, 200, 60000);
+      if (req.method === 'GET' && path === `${PREFIX}/admin/pricing`) return json(res, 200, { pricing: store.getPricing(), audit: store.listPricingAudit(user.id, listPage(url)) });
+      if (req.method === 'POST' && path === `${PREFIX}/admin/pricing`) return json(res, 200, { pricing: store.adminUpdatePricing(user.id, await body(req, 3000)) });
       if (req.method === 'POST' && path === `${PREFIX}/uploads`) return json(res, 201, objects.begin(user, await body(req, 3000)));
       let match;
       if (req.method === 'PUT' && (match = path.match(/^\/api\/store\/uploads\/([\w-]+)\/chunks\/(\d+)$/))) {
@@ -144,7 +147,8 @@ export function createStoreServer({ store, origin = 'http://localhost:5173', sec
         // Explicit whitelist prevents a client body from conveying paid status, totals, owner, role or provider events.
         const order = store.createOrder(user.id, { operationKey: input.operationKey, kind: input.kind, stockId: input.stockId,
           designId: input.designId, designVersion: input.designVersion, quantity: input.quantity,
-          checkout: input.checkout, useCoupons: input.useCoupons });
+          checkout: input.checkout, useCoupons: input.useCoupons,
+          expectedPricingVersion: input.expectedPricingVersion, expectedUnitPriceFen: input.expectedUnitPriceFen });
         return json(res, 201, { order });
       }
       if (req.method === 'GET' && (match = path.match(/^\/api\/store\/orders\/([\w-]+)$/))) return json(res, 200, { order: store.getOrder(user.id, match[1]) });
@@ -196,7 +200,7 @@ export function createStoreServer({ store, origin = 'http://localhost:5173', sec
       // Deliberately no URL, request headers, body, phone, code, session, or provider error.
       if (status >= 500) logger({ event: 'request_failed', requestId, code: known ? error.code : 'INTERNAL_ERROR' });
       if (!req.complete) { res.shouldKeepAlive = false; req.resume(); }
-      if (!res.headersSent && !res.destroyed) json(res, status, { error: known ? error.code : 'INTERNAL_ERROR', message: known ? error.message : '服务暂时不可用，请稍后重试。', requestId });
+      if (!res.headersSent && !res.destroyed) json(res, status, { error: known ? error.code : 'INTERNAL_ERROR', message: known ? error.message : '服务暂时不可用，请稍后重试。', requestId, ...(known && error.details?.pricing ? {pricing: error.details.pricing} : {}) });
     }
   });
   server.headersTimeout = 10000; server.requestTimeout = 30000; server.keepAliveTimeout = 5000; server.maxHeadersCount = 50;

@@ -39,7 +39,7 @@ for (const [route, selector, lang] of [['/', '.dc-homeHero', 'zh-CN'], ['/?lang=
     check('Static entry renders ' + route, () => {assert.ok(document.querySelector(selector)); assert.equal(document.documentElement.lang, lang); assert.ok(document.title); assert.ok(document.querySelector('meta[name="description"]').content);});
     check('Preview banner and zero service calls on ' + route, () => {assert.ok(document.querySelector('aside[aria-label="测试预览说明"]')); assert.equal(page.requests.length, 0);});
     if (selector === '.dc-homeHero') check('Brand product links retain language on ' + route, () => {const suffix = lang === 'en' ? '?lang=en' : ''; for (const target of ['/mats', '/tissue-box']) assert.ok(document.querySelector(`.dc-productCard[href="${target + suffix}"]`));});
-    if (selector === '.sh-home') check('Collection links retain checkout and language on ' + route, () => {assert.equal(document.querySelector('.sh-buy a').getAttribute('href'), '/checkout?style=white-lime'); assert.equal(document.querySelector('.sh-language').getAttribute('href'), lang === 'en' ? '/tissue-box' : '/tissue-box?lang=en'); assert.equal(document.querySelector('.sh-nav a[aria-current="page"]').pathname, '/tissue-box');});
+    if (selector === '.sh-home') check('Collection links retain checkout and language on ' + route, () => {assert.equal(document.querySelector('.sh-buy a').getAttribute('href').split('&')[0], '/checkout?style=white-lime'); assert.equal(document.querySelector('.sh-language').getAttribute('href'), lang === 'en' ? '/tissue-box' : '/tissue-box?lang=en'); assert.equal(document.querySelector('.sh-nav a[aria-current="page"]').pathname, '/tissue-box');});
   } finally {page.dom.window.close();}
 }
 const mats = await open('/mats');

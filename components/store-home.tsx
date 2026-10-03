@@ -4,7 +4,9 @@
 import { useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent, type TouchEvent } from 'react';
 import { ArrowRight, ArrowUpRight, ChevronLeft, ChevronRight, Pause, Play, Plus, X } from 'lucide-react';
 import ContactOptions from '@/components/contact-options';
-import { CUSTOM_PRICE, STOCK_PRICE, SPECIAL_WORK_NOTE } from '@/lib/pricing';
+import {checkoutPriceQuery, priceNumber, pricingLine, SPECIAL_WORK_NOTE} from '@/lib/pricing';
+import {useStorePricing} from '@/hooks/use-store-pricing';
+import StorePricingNote from './store-pricing-note';
 import { SHOWCASE_COPY, type Lang } from '@/lib/showcase-copy';
 
 const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
@@ -39,7 +41,7 @@ const HOME_COPY = {
     facts: [
       ['材质与颜色', '第一阶段提供细纹皮。屏幕配色用于接近现货的效果示意，实际颜色、皮料及工艺以实物确认结果为准。'],
       ['制作时间', '常规款在核实付款后 1–2 个自然日制作；自由定制在实际皮料与设计确认后 5–7 个自然日制作，均包含周末。运输时间另计。'],
-      ['费用与配送', '常规款 99 元/件，自由定制 159 元/件。专属图案、刺绣等特殊工艺另行报价。运费按地址另行确认，最终总价由商家核对。'],
+      ['费用与配送', '专属图案、刺绣等特殊工艺另行报价。运费按地址另行确认，最终总价由商家核对。'],
       ['尺寸与售后', '购买前核对放置位置、抽纸包装及成品尺寸，并确认修改、交付与售后约定。工坊尺寸仅作建模参考。'],
     ],
     language: 'English', languageNote: '',
@@ -60,7 +62,7 @@ const HOME_COPY = {
     facts: [
       ['Materials & colours', 'Fine-grain leather is offered in the first phase. Screen colours illustrate a close match to available stock. Confirm physical swatches, materials and production methods.'],
       ['Production time', 'Existing styles: 1–2 calendar days after payment is verified. Custom combinations: 5–7 calendar days after the actual leather and design are confirmed. Weekends are included; transit is additional.'],
-      ['Price & delivery', 'Existing styles: CNY 99 per piece. Custom combinations: CNY 159. Personal artwork, embroidery and special work are quoted separately. Shipping depends on the destination; confirm the final total with the maker.'],
+      ['Price & delivery', 'Personal artwork, embroidery and special work are quoted separately. Shipping depends on the destination; confirm the final total with the maker.'],
       ['Size & after-sales', 'Confirm your available space, tissue-pack dimensions, finished size, changes, delivery and after-sales terms before purchasing. Studio dimensions are for modelling reference only.'],
     ],
     language: '中文', languageNote: 'The design studio is currently in Chinese.',
@@ -68,6 +70,7 @@ const HOME_COPY = {
 };
 
 export default function StoreHome({ lang = 'zh' }: { lang?: Lang }) {
+  const prices = useStorePricing();
   const copy = HOME_COPY[lang];
   const styles = SHOWCASE_COPY[lang].colorways.items;
   const [index, setIndex] = useState(0);
@@ -167,16 +170,17 @@ export default function StoreHome({ lang = 'zh' }: { lang?: Lang }) {
               <h2>{item.name}</h2><p>{item.description}</p>
             </div>
             <div className="sh-buy">
-              <p className="sh-price"><strong><span>¥</span>{STOCK_PRICE}</strong><small>/ {copy.unit}</small></p>
-              <a className="sh-button" href={`/checkout?style=${item.id}`} aria-label={`${copy.select} · ${item.name}`}>{copy.select}<ArrowRight size={23} aria-hidden="true" /></a>
+              <p className="sh-price"><strong>{prices.pricing && <span>¥</span>}{priceNumber(prices.pricing?.standardFen)}</strong><small>/ {copy.unit}</small></p>
+              <a className="sh-button" href={`/checkout?style=${item.id}${checkoutPriceQuery(prices.pricing, 'standard')}`} aria-label={`${copy.select} · ${item.name}`}>{copy.select}<ArrowRight size={23} aria-hidden="true" /></a>
             </div>
           </div>
+          <StorePricingNote {...prices}/>
         </section>
         <section className="sh-custom" aria-labelledby="sh-custom-title">
           <div className="sh-customCopy">
             <div><p className="sh-eyebrow">{copy.custom}</p><h2 id="sh-custom-title">{copy.customTitle}</h2><p className="sh-customBody">{copy.customBody}</p></div>
-            <div className="sh-customActions"><p className="sh-price"><strong><span>¥</span>{CUSTOM_PRICE}</strong><small>/ {copy.unit}</small></p>
-              <a className="sh-button sh-buttonOutline" href="/customize">{copy.design}<ArrowUpRight size={23} aria-hidden="true" /></a>
+            <div className="sh-customActions"><p className="sh-price"><strong>{prices.pricing && <span>¥</span>}{priceNumber(prices.pricing?.customFen)}</strong><small>/ {copy.unit}</small></p>
+              <a className="sh-button sh-buttonOutline" href={'/customize?' + checkoutPriceQuery(prices.pricing, 'custom').slice(1)}>{copy.design}<ArrowUpRight size={23} aria-hidden="true" /></a>
             </div>
           </div>
           <div className="sh-customDemo">
@@ -209,7 +213,7 @@ export default function StoreHome({ lang = 'zh' }: { lang?: Lang }) {
         <section id="sh-terms" className="sh-information" hidden={information !== 'terms'} aria-labelledby="sh-terms-title">
           <div className="sh-informationHeading"><h2 id="sh-terms-title">{copy.terms}</h2><button type="button" onClick={() => { setInformation(null); document.querySelector<HTMLButtonElement>('[aria-controls="sh-terms"]')?.focus(); }} aria-label={`${copy.close} · ${copy.terms}`}><X size={18} aria-hidden="true" /></button></div>
           <p className="sh-termsIntro">{copy.termsIntro}</p>
-          <div className="sh-termsList">{copy.facts.map(([title, body]) => <details key={title}><summary>{title}<Plus size={16} aria-hidden="true" /></summary><p>{body}</p></details>)}</div>
+          <div className="sh-termsList">{copy.facts.map(([title, body], index) => <details key={title}><summary>{title}<Plus size={16} aria-hidden="true" /></summary><p>{index === 2 ? pricingLine(lang, prices.pricing) + ' ' + body : body}</p></details>)}</div>
         </section>
         {copy.languageNote && <p className="sh-languageNote">{copy.languageNote}</p>}
       </footer>

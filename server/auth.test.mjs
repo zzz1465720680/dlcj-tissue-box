@@ -11,7 +11,7 @@ const secret = 'test-only-secret-do-not-use-in-deployment-123456789';
 function fixture(t, options = {}) {
   let instant = Date.parse('2026-09-30T10:00:00Z');
   const store = createStore({ now: () => new Date(instant), filename: options.filename || ':memory:' });
-  t.after(() => store.close());
+  if (!options.manualClose) t.after(() => store.close());
   const sent = [];
   const sms = options.sms || { available: true, sendOtp: async message => { sent.push(message); } };
   const auth = createAuth({ db: store.db, store, secret, sms, now: () => instant, testMode: true });
@@ -63,10 +63,10 @@ test('session expiry/revocation and authoritative roles are checked each request
 });
 
 test('persistent auth rows survive reopening with same secret', async t => {
-  const dir = mkdtempSync(join(tmpdir(), 'dlcj-auth-')); t.after(() => rmSync(dir, { recursive: true, force: true }));
-  const filename = join(dir, 'store.sqlite'); const first = fixture(t, { filename });
+  const dir = mkdtempSync(join(tmpdir(), 'dlcj-auth-')); const opened = []; t.after(() => {for (const store of opened) store.close(); rmSync(dir, { recursive: true, force: true });});
+  const filename = join(dir, 'store.sqlite'); const first = fixture(t, { filename, manualClose: true }); opened.push(first.store);
   const result = verify(first, await request(first));
-  const second = fixture(t, { filename }); assert.equal(second.auth.session(cookieRequest(result)).id, result.user.id);
+  const second = fixture(t, { filename, manualClose: true }); opened.push(second.store); assert.equal(second.auth.session(cookieRequest(result)).id, result.user.id);
   second.auth.revokeAll(result.user.id); assert.equal(first.auth.session(cookieRequest(result)), null);
 });
 

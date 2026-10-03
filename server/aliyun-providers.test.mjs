@@ -100,7 +100,7 @@ function queue(t) {
   const store = createStore({ filename, now: () => new Date(time) });
   const other = createStore({ filename, now: () => new Date(time) });
   const user = store.registerVerifiedUser({ phone: '13800000001' }).user;
-  store.createOrder(user.id, { operationKey: 'test-order', kind: 'standard', stockId: 'white-lime', checkout: { name: '示例', phone: '13800000001', address: '示例地址' } });
+  store.createOrder(user.id, { expectedPricingVersion: store.getPricing().version, expectedUnitPriceFen: store.getPricing().standardFen, operationKey: 'test-order', kind: 'standard', stockId: 'white-lime', checkout: { name: '示例', phone: '13800000001', address: '示例地址' } });
   t.after(() => { store.close(); other.close(); rmSync(dir, { recursive: true, force: true }); });
   return { store, other, advance: () => { time += 86400000; } };
 }
@@ -154,7 +154,7 @@ test('outbox migration preserves existing queued notices and only the new migrat
   const store = createStore({ filename });
   try {
     const queued = store.internal.listPendingOutbox(); assert.equal(queued.length, 1); assert.equal(queued[0].id, 'legacy-notice');
-    assert.equal(queued[0].payload.orderRef, notice.orderRef); assert.equal(store.db.prepare('SELECT COUNT(*) AS n FROM store_migrations').get().n, 2);
+    assert.equal(queued[0].payload.orderRef, notice.orderRef); assert.equal(store.db.prepare('SELECT COUNT(*) AS n FROM store_migrations').get().n, 3);
   } finally { store.close(); }
 });
 

@@ -35,7 +35,7 @@ const button=(text)=>[...document.querySelectorAll('button')].find(b=>b.textCont
 const input=async(el,value)=>{await act(async()=>{Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set.call(el,value);el.dispatchEvent(new window.Event('input',{bubbles:true}));});await flush()};
 const close=async()=>{const dialog=document.querySelector('[role="dialog"]');const x=[...dialog.querySelectorAll('button')].find(b=>b.textContent.trim()==='Close');if(x)await click(x);else await act(async()=>document.dispatchEvent(new window.KeyboardEvent('keydown',{key:'Escape',bubbles:true})));await flush()};
 let saveCalls=0; const countedRequest=async(input,init)=>{if(init?.method==='POST')saveCalls++;return localDesignRequest(input,init)};
-let networkCalls=0;globalThis.fetch=async()=>{networkCalls++;throw new Error('No network expected in local storage')};
+let networkCalls=0;globalThis.fetch=async(url)=>{if(String(url)==='/api/store/pricing')return Response.json({pricing:{currency:'CNY',version:1,standardFen:9900,customFen:15900,updatedAt:'2026-10-03T00:00:00Z'}});networkCalls++;throw new Error('No private design network expected in local storage')};
 try{
  // IndexedDB adapter exercises real transaction semantics with the maintained IndexedDB polyfill.
  const design=initialDesign();design.name='QA adapter saved';design.parts.body.material='suede';

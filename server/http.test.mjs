@@ -19,6 +19,7 @@ async function fixture(t, { smsEnabled = true } = {}) {
   const base = `http://127.0.0.1:${app.server.address().port}/api/store`;
   t.after(async () => { app.server.closeAllConnections(); await new Promise(resolve => app.server.close(resolve)); store.close(); });
   async function call(path, { method = 'GET', data, bytes, cookie, headers = {} } = {}) {
+    if (path === '/orders' && method === 'POST' && data) data = {expectedPricingVersion: store.getPricing().version, expectedUnitPriceFen: data.kind === 'custom' ? store.getPricing().customFen : store.getPricing().standardFen, ...data};
     const response = await fetch(base + path, { method, headers: { ...(method !== 'GET' ? { origin } : {}),
       ...(data !== undefined ? { 'content-type': 'application/json' } : {}),
       ...(bytes ? { 'content-type': 'application/octet-stream' } : {}), ...(cookie ? { cookie } : {}), ...headers },
@@ -149,7 +150,7 @@ test('production config fails closed, and no production test-provider injection 
 
 test('email outbox worker uses only minimal persisted payload and retries failures without leaking error text', async t => {
   const f = await fixture(t); const customer = f.store.registerVerifiedUser({ phone: '+8613800000001' }).user;
-  f.store.createOrder(customer.id, { operationKey: 'outbox-test', kind: 'standard', stockId: 'white-lime', checkout: { name: '姓名', phone: '+8613800000001', address: '收货地址' } });
+  f.store.createOrder(customer.id, { expectedPricingVersion: f.store.getPricing().version, expectedUnitPriceFen: f.store.getPricing().standardFen, operationKey: 'outbox-test', kind: 'standard', stockId: 'white-lime', checkout: { name: '姓名', phone: '+8613800000001', address: '收货地址' } });
   const failed = await drainEmailOutbox({ store: f.store, email: { available: true, sendOrderNotice: async () => { throw new Error('private provider payload'); } } });
   assert.equal(failed.failed, 1); assert.equal(f.store.db.prepare('SELECT last_error FROM store_outbox').get().last_error, 'DELIVERY_FAILED');
   f.advance(60001); const delivered = [];

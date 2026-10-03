@@ -1,5 +1,6 @@
 import type {Design} from './design';
 import {frontendPreview} from './frontend-preview';
+import {validPricing, type StorePricing} from './pricing';
 
 export type StoreUser = {id: string; role: 'customer' | 'admin'; phoneMasked: string};
 export type StoreSession = {user: StoreUser | null; capabilities: {sms: boolean; orders: boolean; payment: false}};
@@ -7,14 +8,14 @@ export type SavedStoreDesign = {id: string; version: number; name: string; creat
 export type StoreCoupon = {id: string; userId: string; amountFen: number; availableFen: number; spendableFen: number; reservedFen: number; redeemedFen: number; expiresAt: string; source: string; status: 'available' | 'expired' | 'reserved' | 'redeemed' | 'revoked'};
 export type StoreAddress = {name: string; phone: string; province: string; city: string; district: string; detail: string};
 export type MaterialRecord = {version: number; note: string; photoRefs: string[]; createdAt: string};
-export type StoreOrder = {id: string; userId: string; kind: 'standard' | 'custom' | 'bespoke'; product: string; quantity: number; designId?: string; designVersion?: number; designSnapshot: Design | {type: 'stock'; stockId: string; product: string; material: string}; checkout: {name: string; phone: string; address: string}; status: string; currency: 'CNY'; unitPriceFen: number | null; goodsTotalFen: number | null; discountFen: number; goodsPayableFen: number | null; shippingFen: number | null; shippingState: string; shippingVersion: number; acceptedShippingVersion: number | null; totalFen: number | null; quoteVersion: number; acceptedQuoteVersion: number | null; materialVersion: number; acceptedMaterialVersion: number | null; materials: MaterialRecord[]; createdAt: string; updatedAt: string; paidAt: string | null; production: {startedAt: string | null; earliestAt: string | null; latestAt: string | null; calendarDays: number[]}; shipment: {carrier: string; tracking: string; dispatchedAt: string} | null; paymentEnabled: false};
+export type StoreOrder = {id: string; userId: string; kind: 'standard' | 'custom' | 'bespoke'; product: string; quantity: number; designId?: string; designVersion?: number; designSnapshot: Design | {type: 'stock'; stockId: string; product: string; material: string}; checkout: {name: string; phone: string; address: string}; status: string; currency: 'CNY'; pricingVersion?: number | null; unitPriceFen: number | null; goodsTotalFen: number | null; discountFen: number; goodsPayableFen: number | null; shippingFen: number | null; shippingState: string; shippingVersion: number; acceptedShippingVersion: number | null; totalFen: number | null; quoteVersion: number; acceptedQuoteVersion: number | null; materialVersion: number; acceptedMaterialVersion: number | null; materials: MaterialRecord[]; createdAt: string; updatedAt: string; paidAt: string | null; production: {startedAt: string | null; earliestAt: string | null; latestAt: string | null; calendarDays: number[]}; shipment: {carrier: string; tracking: string; dispatchedAt: string} | null; paymentEnabled: false};
 export type InvitationInfo = {inviteCode: string; rewardedInvites: number; rewardFen: number; validDays: number; perOrderCapFen: number};
 export type PublicDesign = {name: string; parts: Record<string, {color: string; material: string; perforated: boolean; edge: string; thread: string}>; label?: {enabled: boolean; color: string; ink: string}};
 export type GalleryItem = {id: string; version: number; design: PublicDesign};
 export type GalleryCandidate = {designId: string; version: number; published: boolean; design: PublicDesign};
 
 export class StoreApiError extends Error {
-  constructor(public code: string, message: string, public status = 0, public retryAfterSeconds?: number) {super(message); this.name = 'StoreApiError';}
+  constructor(public code: string, message: string, public status = 0, public retryAfterSeconds?: number, public pricing?: StorePricing) {super(message); this.name = 'StoreApiError';}
 }
 export const API_BASE = '/api/store';
 /** JSON transport only. Session cookies are HttpOnly and supplied by the browser. */
@@ -28,11 +29,16 @@ export async function storeRequest<T>(path: string, init: RequestInit = {}): Pro
   const result: unknown = await response.json();
   if (!response.ok) {
     const details = result && typeof result === 'object' ? result as Record<string, unknown> : {};
-    throw new StoreApiError(typeof details.error === 'string' ? details.error : 'REQUEST_FAILED', typeof details.message === 'string' ? details.message : '操作暂未完成，请稍后重试。', response.status, typeof details.retryAfterSeconds === 'number' ? details.retryAfterSeconds : Number(response.headers.get('retry-after')) || undefined);
+    throw new StoreApiError(typeof details.error === 'string' ? details.error : 'REQUEST_FAILED', typeof details.message === 'string' ? details.message : '操作暂未完成，请稍后重试。', response.status, typeof details.retryAfterSeconds === 'number' ? details.retryAfterSeconds : Number(response.headers.get('retry-after')) || undefined, validPricing(details.pricing) ? details.pricing : undefined);
   }
   return result as T;
 }
 export function storePost<T>(path: string, data: unknown, signal?: AbortSignal): Promise<T> {return storeRequest<T>(path, {method: 'POST', body: JSON.stringify(data), signal});}
+export async function readStorePricing(signal?: AbortSignal): Promise<StorePricing> {
+  const result = await storeRequest<{pricing: unknown}>('/pricing', {signal, cache: 'no-store'});
+  if (!validPricing(result.pricing)) throw new StoreApiError('INVALID_PRICING', '商品价格暂时无法确认，请重试。');
+  return result.pricing;
+}
 export function errorMessage(error: unknown): string {return error instanceof Error ? error.message : '暂时无法完成，请稍后重试。';}
 export function isUnauthorized(error: unknown): boolean {return error instanceof StoreApiError && error.status === 401;}
 export function safeReturnTo(raw?: string | null): string {

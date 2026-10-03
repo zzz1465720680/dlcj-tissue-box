@@ -9,19 +9,19 @@ import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { designSchema } from '../lib/schema.ts';
 import { PARTS, PRESETS, preset } from '../lib/design.ts';
+import { INITIAL_PRICING, MAX_UNIT_PRICE_FEN, needsSpecialWork } from '../lib/pricing.ts';
 
-export const PRICES = Object.freeze({ standard: 9900, custom: 15900 });
 export const STORE_POLICY = Object.freeze({ currency: 'CNY', couponCapFen: 3000, referralRewardFen: 500, referralValidDays: 90, newOrderMaterial: 'grain', shipping: 'manual_quote_required', paymentEnabled: false });
 export const STOCK_PRODUCTS = Object.freeze([
   { id: 'white-lime', name: '白瓷 · 青柠' }, { id: 'black-coral', name: '曜石 · 珊瑚红' }, { id: 'ivory', name: '奶油白' },
   { id: 'warm-grey', name: '暖灰' }, { id: 'diamond-ivory', name: '菱格打孔' }, { id: 'orange', name: '橙色' }, { id: 'yellow', name: '明黄' },
-].map(p => Object.freeze({ ...p, material: 'grain', unitPriceFen: PRICES.standard })));
+].map(p => Object.freeze({ ...p, material: 'grain' })));
 const DAY = 86_400_000;
 const stable = value => JSON.stringify(value, function (_key, item) { return item && typeof item === 'object' && !Array.isArray(item) ? Object.fromEntries(Object.entries(item).sort(([a], [b]) => a.localeCompare(b))) : item; });
 const hash = value => createHash('sha256').update(stable(value)).digest('hex');
 const addDays = (date, days) => new Date(Date.parse(date) + days * DAY).toISOString();
-export class DomainError extends Error { constructor(code, message, status = 400) { super(message); this.name = 'DomainError'; this.code = code; this.status = status; } }
-const fail = (code, message, status = 400) => { throw new DomainError(code, message, status); };
+export class DomainError extends Error { constructor(code, message, status = 400, details) { super(message); this.name = 'DomainError'; this.code = code; this.status = status; this.details = details; } }
+const fail = (code, message, status = 400, details) => { throw new DomainError(code, message, status, details); };
 function text(value, name, max = 200, min = 1) { if (typeof value !== 'string' || value.trim().length < min || value.length > max || /[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(value)) fail('INVALID_INPUT', `${name}无效`); return value.trim(); }
 function integer(value, name, min, max) { if (!Number.isSafeInteger(value) || value < min || value > max) fail('INVALID_INPUT', `${name}无效`); return value; }
 export function normalizePhone(value) { if (typeof value !== 'string') fail('INVALID_PHONE', '请填写中国大陆手机号'); const phone = value.replace(/[\s()-]/g, ''); const normalized = phone.startsWith('+86') ? phone : `+86${phone}`; if (!/^\+861[3-9]\d{9}$/.test(normalized)) fail('INVALID_PHONE', '请填写中国大陆手机号'); return normalized; }
@@ -55,7 +55,7 @@ function materialEditsFrom(design, base, minimumColorDistance) {
   return edits;
 }
 function materialEdits(design, minimumColorDistance) { return Math.min(...PRESETS.map((_p, i) => materialEditsFrom(design, preset(i), minimumColorDistance))); }
-function needsBespoke(design) { return PARTS.some(p => design.parts[p].art.length > 0) || Boolean(design.label.enabled && (design.label.image || design.label.text.trim() !== 'DLCJ')); }
+const needsBespoke = needsSpecialWork;
 function publicProjection(design) { return { version: 1, name: '精选配色', parts: Object.fromEntries(PARTS.map(p => { const { color, material, perforated, edge, thread } = design.parts[p]; return [p, { color, material, perforated, edge, thread, art: [] }]; })), label: { enabled: false, color: '#222c28', ink: '#eee9df', text: 'DLCJ' } }; }
 
 export function createStore({ filename = ':memory:', now = () => new Date(), antiAbuse = {}, quotas = {} } = {}) {
@@ -69,6 +69,7 @@ export function createStore({ filename = ':memory:', now = () => new Date(), ant
   db.exec('CREATE TABLE IF NOT EXISTS store_migrations (name TEXT PRIMARY KEY, applied_at TEXT NOT NULL)');
   const migrations = fileURLToPath(new URL('./migrations/', import.meta.url));
   for (const name of readdirSync(migrations).filter(name => name.endsWith('.sql')).sort()) transaction(() => { if (!one('SELECT name FROM store_migrations WHERE name=?', name)) { db.exec(readFileSync(`${migrations}/${name}`, 'utf8')); run('INSERT INTO store_migrations VALUES (?,?)', name, clock()); } });
+  transaction(() => run('INSERT OR IGNORE INTO store_pricing(id,version,standard_fen,custom_fen,updated_at) VALUES (1,?,?,?,?)', INITIAL_PRICING.version, INITIAL_PRICING.standardFen, INITIAL_PRICING.customFen, clock()));
   const abuse = { minimumColorDistance: 24, minimumChangedFields: 1, preventDuplicateDesigns: true, ...antiAbuse };
   const quota = { maxDesignBytes: 128 * 1024 * 1024, maxDesignVersions: 500, maxActiveDesigns: 100, ...quotas };
   for (const value of Object.values(quota)) integer(value, 'storage quota', 1, 1_000_000_000);
@@ -81,6 +82,32 @@ export function createStore({ filename = ':memory:', now = () => new Date(), ant
   function operation(actor, key, action, request, fn) {
     text(key, '操作编号', 160); const digest = hash(request);
     return transaction(() => { const previous = one('SELECT * FROM store_operations WHERE actor_id=? AND operation_key=?', actor, key); if (previous) { if (previous.action !== action || previous.request_hash !== digest) fail('IDEMPOTENCY_CONFLICT', '该操作编号已用于其他请求', 409); return JSON.parse(previous.response_json); } const result = fn(); run('INSERT INTO store_operations VALUES (?,?,?,?,?,?)', actor, key, action, digest, JSON.stringify(result), clock()); return result; });
+  }
+  function getPricing() {
+    const row = one('SELECT * FROM store_pricing WHERE id=1');
+    return { currency: 'CNY', version: row.version, standardFen: row.standard_fen, customFen: row.custom_fen, updatedAt: row.updated_at };
+  }
+  function adminUpdatePricing(adminId, request = {}) {
+    admin(adminId);
+    const standardFen = integer(request.standardFen, '现有款单价（分）', 1, MAX_UNIT_PRICE_FEN);
+    const customFen = integer(request.customFen, '配色定制单价（分）', 1, MAX_UNIT_PRICE_FEN);
+    const expectedVersion = integer(request.expectedVersion, '价格版本', 1, Number.MAX_SAFE_INTEGER - 1);
+    return operation(adminId, request.operationKey, 'pricing_update', { standardFen, customFen, expectedVersion }, () => {
+      const before = getPricing();
+      if (before.version !== expectedVersion) fail('PRICE_CHANGED', '商品价格已被更新，请核对最新价格后重新保存。', 409, { pricing: before });
+      if (before.standardFen === standardFen && before.customFen === customFen) return before;
+      run('UPDATE store_pricing SET standard_fen=?,custom_fen=?,version=version+1,updated_at=?,updated_by=? WHERE id=1', standardFen, customFen, clock(), adminId);
+      const after = getPricing();
+      audit(adminId, 'pricing_update', 'tissue-box', { before, after });
+      return after;
+    });
+  }
+  function listPricingAudit(adminId, options) {
+    admin(adminId); const { limit, offset } = page(options);
+    return all("SELECT a.*,u.phone FROM store_audit a LEFT JOIN store_users u ON u.id=a.actor_id WHERE a.action='pricing_update' ORDER BY a.created_at DESC,a.rowid DESC LIMIT ? OFFSET ?", limit, offset).map(row => ({
+      id: row.id, actorId: row.actor_id, actorLabel: row.phone ? `${row.phone.slice(0,6)}****${row.phone.slice(-4)}` : row.actor_id,
+      at: row.created_at, ...JSON.parse(row.detail_json),
+    }));
   }
   function registerVerifiedUser({ phone, inviteCode } = {}) {
     phone = normalizePhone(phone);
@@ -167,7 +194,7 @@ export function createStore({ filename = ':memory:', now = () => new Date(), ant
   function ownedOrder(userId, id) { rawUser(userId); const row = orderRow(id); if (row.user_id !== userId) fail('NOT_FOUND', '没有找到订单', 404); return row; }
   function orderView(row, summaryOnly = false) {
     const materials = all('SELECT * FROM store_material_confirmations WHERE order_id=? ORDER BY version DESC', row.id).map(m => ({ version: m.version, note: m.note, photoRefs: JSON.parse(m.photo_refs_json), createdAt: m.created_at }));
-    return { id: row.id, userId: row.user_id, kind: row.kind, product: row.product, quantity: row.quantity, designId: row.design_id, designVersion: row.design_version, ...(summaryOnly ? { summaryOnly: true } : { designSnapshot: JSON.parse(row.snapshot_json) }), checkout: JSON.parse(row.checkout_json), status: row.status, currency: 'CNY', unitPriceFen: row.unit_price_fen, goodsTotalFen: row.goods_total_fen, discountFen: row.discount_fen, goodsPayableFen: row.goods_total_fen === null ? null : row.goods_total_fen - row.discount_fen, shippingFen: row.shipping_fen, shippingState: row.shipping_state, shippingVersion: row.shipping_version, acceptedShippingVersion: row.accepted_shipping_version, totalFen: row.goods_total_fen === null || row.shipping_fen === null ? null : row.goods_total_fen - row.discount_fen + row.shipping_fen, quoteVersion: row.quote_version, acceptedQuoteVersion: row.accepted_quote_version, materialVersion: row.material_version, acceptedMaterialVersion: row.accepted_material_version, materials, createdAt: row.created_at, updatedAt: row.updated_at, paidAt: row.paid_at, goodsRefundedFen: row.goods_refunded_fen, shippingRefundedFen: row.shipping_refunded_fen, couponReturnedFen: row.coupon_returned_fen, production: { startedAt: row.production_started_at, earliestAt: row.production_earliest_at, latestAt: row.production_latest_at, calendarDays: row.kind === 'standard' ? [1, 2] : [5, 7] }, shipment: row.dispatched_at ? { carrier: row.carrier, tracking: row.tracking, dispatchedAt: row.dispatched_at } : null, paymentEnabled: false };
+    return { id: row.id, userId: row.user_id, kind: row.kind, product: row.product, quantity: row.quantity, designId: row.design_id, designVersion: row.design_version, ...(summaryOnly ? { summaryOnly: true } : { designSnapshot: JSON.parse(row.snapshot_json) }), checkout: JSON.parse(row.checkout_json), status: row.status, currency: 'CNY', pricingVersion: row.pricing_version, unitPriceFen: row.unit_price_fen, goodsTotalFen: row.goods_total_fen, discountFen: row.discount_fen, goodsPayableFen: row.goods_total_fen === null ? null : row.goods_total_fen - row.discount_fen, shippingFen: row.shipping_fen, shippingState: row.shipping_state, shippingVersion: row.shipping_version, acceptedShippingVersion: row.accepted_shipping_version, totalFen: row.goods_total_fen === null || row.shipping_fen === null ? null : row.goods_total_fen - row.discount_fen + row.shipping_fen, quoteVersion: row.quote_version, acceptedQuoteVersion: row.accepted_quote_version, materialVersion: row.material_version, acceptedMaterialVersion: row.accepted_material_version, materials, createdAt: row.created_at, updatedAt: row.updated_at, paidAt: row.paid_at, goodsRefundedFen: row.goods_refunded_fen, shippingRefundedFen: row.shipping_refunded_fen, couponReturnedFen: row.coupon_returned_fen, production: { startedAt: row.production_started_at, earliestAt: row.production_earliest_at, latestAt: row.production_latest_at, calendarDays: row.kind === 'standard' ? [1, 2] : [5, 7] }, shipment: row.dispatched_at ? { carrier: row.carrier, tracking: row.tracking, dispatchedAt: row.dispatched_at } : null, paymentEnabled: false };
   }
   const getOrder = (userId, id) => orderView(ownedOrder(userId, id));
   function getAdminOrder(adminId, id) { admin(adminId); return orderView(orderRow(id)); }
@@ -189,11 +216,18 @@ export function createStore({ filename = ':memory:', now = () => new Date(), ant
     if (request.useCoupons !== undefined && typeof request.useCoupons !== 'boolean') fail('INVALID_INPUT', '抵扣券选择无效');
     const checkout = { name: text(request.checkout?.name, '收货姓名', 80), phone: normalizePhone(request.checkout?.phone), address: text(request.checkout?.address, '收货地址', 500) };
     return operation(userId, request.operationKey, 'create_order', { ...request, checkout }, () => {
+      const pricing = getPricing();
       let kind = request.kind, snapshot, product, unitPrice, designId = null, designVersion = null;
-      if (kind === 'standard') { const stock = STOCK_PRODUCTS.find(p => p.id === request.stockId); if (!stock) fail('INVALID_PRODUCT', '请选择有效的现有款'); product = stock.name; unitPrice = PRICES.standard; snapshot = { type: 'stock', stockId: stock.id, product: stock.name, material: 'grain' }; }
-      else { const design = designRow(userId, request.designId, request.designVersion); const content = JSON.parse(design.content_json); if (PARTS.some(p => content.parts[p].material !== 'grain')) fail('MATERIAL_UNAVAILABLE', '第一阶段新订单仅支持细纹皮革；原设计可继续保存'); if (needsBespoke(content)) kind = 'bespoke'; snapshot = content; designId = design.design_id; designVersion = design.version; product = kind === 'custom' ? '自由定制' : '特殊需求待报价'; unitPrice = kind === 'custom' ? PRICES.custom : null; }
+      if (kind === 'standard') { const stock = STOCK_PRODUCTS.find(p => p.id === request.stockId); if (!stock) fail('INVALID_PRODUCT', '请选择有效的现有款'); product = stock.name; unitPrice = pricing.standardFen; snapshot = { type: 'stock', stockId: stock.id, product: stock.name, material: 'grain' }; }
+      else { const design = designRow(userId, request.designId, request.designVersion); const content = JSON.parse(design.content_json); if (PARTS.some(p => content.parts[p].material !== 'grain')) fail('MATERIAL_UNAVAILABLE', '第一阶段新订单仅支持细纹皮革；原设计可继续保存'); if (needsBespoke(content)) kind = 'bespoke'; snapshot = content; designId = design.design_id; designVersion = design.version; product = kind === 'custom' ? '自由定制' : '特殊需求待报价'; unitPrice = kind === 'custom' ? pricing.customFen : null; }
+      if (unitPrice !== null) {
+        if (request.expectedPricingVersion === undefined || request.expectedUnitPriceFen === undefined) fail('PRICE_CONFIRMATION_REQUIRED', '请先读取并确认当前商品价格，再保存订单。', 409, { pricing });
+        integer(request.expectedPricingVersion, '确认价格版本', 1, Number.MAX_SAFE_INTEGER);
+        integer(request.expectedUnitPriceFen, '确认商品单价', 1, MAX_UNIT_PRICE_FEN);
+        if (request.expectedPricingVersion !== pricing.version || request.expectedUnitPriceFen !== unitPrice) fail('PRICE_CHANGED', '商品价格已变化，请核对最新金额并重新确认。', 409, { pricing });
+      }
       const id = randomUUID(), at = clock(), goodsTotal = unitPrice === null ? null : unitPrice * quantity;
-      run('INSERT INTO store_orders(id,user_id,kind,product,quantity,design_id,design_version,snapshot_json,checkout_json,status,unit_price_fen,goods_total_fen,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)', id, userId, kind, product, quantity, designId, designVersion, JSON.stringify(snapshot), JSON.stringify(checkout), kind === 'bespoke' ? 'quote_pending' : 'awaiting_confirmation', unitPrice, goodsTotal, at, at);
+      run('INSERT INTO store_orders(id,user_id,kind,product,quantity,design_id,design_version,snapshot_json,checkout_json,status,unit_price_fen,goods_total_fen,pricing_version,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', id, userId, kind, product, quantity, designId, designVersion, JSON.stringify(snapshot), JSON.stringify(checkout), kind === 'bespoke' ? 'quote_pending' : 'awaiting_confirmation', unitPrice, goodsTotal, unitPrice === null ? null : pricing.version, at, at);
       if (request.useCoupons && goodsTotal !== null) { const discount = reserveCoupons(userId, id, goodsTotal); run('UPDATE store_orders SET discount_fen=? WHERE id=?', discount, id); }
       notifyOrder(orderRow(id), 'order_created'); return getOrder(userId, id);
     });
@@ -227,11 +261,11 @@ export function createStore({ filename = ':memory:', now = () => new Date(), ant
   }
   function adminSetQuote(adminId, { orderId, unitPriceFen } = {}) {
     admin(adminId); integer(unitPriceFen, '商品单价', 1, 1_000_000);
-    return transaction(() => { const order = orderRow(orderId); editableOrder(order); if (order.kind !== 'bespoke') fail('FIXED_PRICE', '现有款和自由定制价格由服务器固定', 409); if (order.accepted_quote_version !== null) fail('QUOTE_ACCEPTED', '已确认报价不可覆盖，请取消后重新建单', 409); run('UPDATE store_orders SET unit_price_fen=?,goods_total_fen=?,quote_version=quote_version+1,accepted_quote_version=NULL,updated_at=? WHERE id=?', unitPriceFen, unitPriceFen * order.quantity, clock(), orderId); refreshReadyStatus(orderId); audit(adminId, 'bespoke_quote', orderId, { unitPriceFen }); return getAdminOrder(adminId, orderId); });
+    return transaction(() => { const order = orderRow(orderId); editableOrder(order); if (order.kind !== 'bespoke') fail('FIXED_PRICE', '现有款和配色定制保留创建订单时的价格快照', 409); if (order.accepted_quote_version !== null) fail('QUOTE_ACCEPTED', '已确认报价不可覆盖，请取消后重新建单', 409); run('UPDATE store_orders SET unit_price_fen=?,goods_total_fen=?,quote_version=quote_version+1,accepted_quote_version=NULL,updated_at=? WHERE id=?', unitPriceFen, unitPriceFen * order.quantity, clock(), orderId); refreshReadyStatus(orderId); audit(adminId, 'bespoke_quote', orderId, { unitPriceFen }); return getAdminOrder(adminId, orderId); });
   }
   function acceptQuote(userId, request = {}) {
     rawUser(userId); integer(request.version, '报价版本', 1, 1000000); if (request.useCoupons !== undefined && typeof request.useCoupons !== 'boolean') fail('INVALID_INPUT', '抵扣券选择无效');
-    return operation(userId, request.operationKey, 'accept_quote', { orderId: request.orderId, version: request.version, useCoupons: Boolean(request.useCoupons) }, () => { const order = ownedOrder(userId, request.orderId); editableOrder(order); if (order.kind !== 'bespoke' || order.quote_version !== request.version || order.goods_total_fen === null) fail('STALE_VERSION', '请确认最新报价', 409); if (order.accepted_quote_version === request.version) return getOrder(userId, order.id); if (request.useCoupons) fail('COUPON_PRODUCT_INELIGIBLE', '抵扣券仅适用于99元现有款及159元自由定制'); const discount = 0; run('UPDATE store_orders SET accepted_quote_version=?,discount_fen=? WHERE id=?', request.version, discount, order.id); refreshReadyStatus(order.id); return getOrder(userId, order.id); });
+    return operation(userId, request.operationKey, 'accept_quote', { orderId: request.orderId, version: request.version, useCoupons: Boolean(request.useCoupons) }, () => { const order = ownedOrder(userId, request.orderId); editableOrder(order); if (order.kind !== 'bespoke' || order.quote_version !== request.version || order.goods_total_fen === null) fail('STALE_VERSION', '请确认最新报价', 409); if (order.accepted_quote_version === request.version) return getOrder(userId, order.id); if (request.useCoupons) fail('COUPON_PRODUCT_INELIGIBLE', '抵扣券仅适用于现有款及配色定制，特殊工艺报价不参与抵扣'); const discount = 0; run('UPDATE store_orders SET accepted_quote_version=?,discount_fen=? WHERE id=?', request.version, discount, order.id); refreshReadyStatus(order.id); return getOrder(userId, order.id); });
   }
   function proposeMaterial(adminId, { orderId, note, photoRefs } = {}) {
     admin(adminId); note = text(note, '材料说明', 2000); if (!Array.isArray(photoRefs) || photoRefs.length < 1 || photoRefs.length > 12 || photoRefs.some(ref => typeof ref !== 'string' || !/^[A-Za-z0-9_-]{16,128}$/.test(ref)) || new Set(photoRefs).size !== photoRefs.length) fail('INVALID_PHOTO_REFS', '请附上1至12张私有材料照片');
@@ -355,7 +389,7 @@ export function createStore({ filename = ':memory:', now = () => new Date(), ant
     });
   }
   return {
-    db, close: () => db.close(), getListCounts: userId => { rawUser(userId); return { designs: one('SELECT COUNT(*) AS n FROM store_designs WHERE user_id=? AND archived_at IS NULL', userId).n, orders: one('SELECT COUNT(*) AS n FROM store_orders WHERE user_id=?', userId).n, coupons: one('SELECT COUNT(*) AS n FROM store_coupons WHERE user_id=?', userId).n }; }, getAdminListCounts: adminId => { admin(adminId); return { orders: one('SELECT COUNT(*) AS n FROM store_orders').n, coupons: one('SELECT COUNT(*) AS n FROM store_coupons').n, designs: one('SELECT COUNT(*) AS n FROM store_gallery g JOIN store_designs d ON d.id=g.design_id WHERE g.consent=1 AND d.archived_at IS NULL').n }; }, getGalleryCount: () => one('SELECT COUNT(*) AS n FROM store_gallery g JOIN store_designs d ON d.id=g.design_id WHERE g.consent=1 AND g.published=1 AND d.archived_at IS NULL').n, policy: STORE_POLICY, stockProducts: STOCK_PRODUCTS,
+    db, close: () => db.close(), getListCounts: userId => { rawUser(userId); return { designs: one('SELECT COUNT(*) AS n FROM store_designs WHERE user_id=? AND archived_at IS NULL', userId).n, orders: one('SELECT COUNT(*) AS n FROM store_orders WHERE user_id=?', userId).n, coupons: one('SELECT COUNT(*) AS n FROM store_coupons WHERE user_id=?', userId).n }; }, getAdminListCounts: adminId => { admin(adminId); return { orders: one('SELECT COUNT(*) AS n FROM store_orders').n, coupons: one('SELECT COUNT(*) AS n FROM store_coupons').n, designs: one('SELECT COUNT(*) AS n FROM store_gallery g JOIN store_designs d ON d.id=g.design_id WHERE g.consent=1 AND d.archived_at IS NULL').n }; }, getGalleryCount: () => one('SELECT COUNT(*) AS n FROM store_gallery g JOIN store_designs d ON d.id=g.design_id WHERE g.consent=1 AND g.published=1 AND d.archived_at IS NULL').n, policy: STORE_POLICY, get stockProducts() { const price = getPricing().standardFen; return STOCK_PRODUCTS.map(p => ({...p, unitPriceFen: price})); }, getPricing, adminUpdatePricing, listPricingAudit,
     getUser, findUserByPhone: phone => { const user = one('SELECT * FROM store_users WHERE phone=?', normalizePhone(phone)); return user ? userView(user) : null; }, registerVerifiedUser, bootstrapAdmin,
     saveDesign, getDesign, listDesigns, archiveDesign, deleteDesign: archiveDesign, setGalleryConsent, publishGallery, listGallery, listGalleryCandidates, listAdminDesigns: listGalleryCandidates,
     listCoupons, getReferralSummary, adminGrantCoupon, adminRevokeCoupon, listAdminCoupons: (adminId, options) => { admin(adminId); const { limit, offset } = page(options); return all('SELECT * FROM store_coupons ORDER BY (revoked_at IS NOT NULL),(expires_at<=?),expires_at,id LIMIT ? OFFSET ?', clock(), limit, offset).map(couponView); },

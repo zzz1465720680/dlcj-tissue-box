@@ -53,7 +53,7 @@ export const FLOOR_MAT_COPY = {
   zh: {
     meta: { title: '亲情car · 脚垫系列｜鼎立车眷', description: '浏览亲情car脚垫的车内配色与纹理搭配参考。大图展示格纹、色彩与围边细节。' },
     eyebrow: '亲情car · 脚垫系列',
-    title: '脚下的细节，也合心意。',
+    title: '脚下的细节，随你心意。',
     intro: '先看看不同配色，在车里的样子。',
     gallery: '脚垫配色展示',
     carousel: '轮播',
@@ -68,7 +68,7 @@ export const FLOOR_MAT_COPY = {
     aboutLabel: 'COLOUR & TEXTURE / 配色与纹理',
     aboutTitle: '多一点，自己的喜欢。',
     aboutBody: '格纹的层次、纹理的变化，或是一抹喜欢的颜色。让脚下的搭配，也成为车内日常的一部分。',
-    availability: '当前为款式展示。车型适配、选材与定制服务将陆续开放。',
+    availability: '可体验四块及整套的三维配色搭配。车型适配、选材与制作细节请与商家确认。',
   },
   en: {
     meta: { title: 'QINQINGCAR floor mats｜DINGLI CHEJUAN', description: 'Explore floor-mat colour and texture references in a car interior. View patterns, colour accents and surround details in a large-photo gallery.' },
@@ -88,6 +88,6 @@ export const FLOOR_MAT_COPY = {
     aboutLabel: 'COLOUR & TEXTURE',
     aboutTitle: 'A little more your own.',
     aboutBody: 'A patterned surface, a different texture, or a touch of your favourite colour. Let the details underfoot become part of your everyday interior.',
-    availability: 'Styles are on display for now. Vehicle fitment, material selection and customization services will be introduced gradually.',
+    availability: 'Explore four individual mats or the full set in 3D. Confirm vehicle fitment, materials and production details with the maker.',
   },
 } as const;

@@ -58,6 +58,10 @@
 .dc-footer nav { display: flex; flex-wrap: wrap; gap: 28px; font-size: 12px; color: var(--dc-muted); }
 .dc-footer nav a { display: flex; align-items: center; min-height: 44px; }
 .dc-footer nav a:hover { color: var(--dc-ink); }
+.dc-contact { border-top: 1px solid var(--dc-line); padding-block: 8px 32px; }
+.dc-contact .dc-sectionHeading { margin-bottom: 22px; }
+.dc-contact .merchant-contact-card { background: #f7f9f4; border-radius: 10px; }
+.dc-contact .merchant-contact-note, .dc-contact .merchant-contact-status { font-size: 12px; }
 
 @media (max-width: 900px) {
   .dc-container { width: calc(100% - 56px); }

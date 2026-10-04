@@ -1,7 +1,7 @@
 'use client';
 /* eslint-disable @next/next/no-img-element -- Local responsive WebP photos are intentionally used without an image service. */
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import { FLOOR_MAT_COPY, type FloorMatSlide } from '@/lib/floor-mats/catalog';
 import type { Lang } from '@/lib/showcase-copy';
 
@@ -20,7 +20,7 @@ const getVisible = () => document.visibilityState !== 'hidden';
 const serverReducedMotion = () => false;
 const serverVisible = () => true;
 
-export default function PhotoCarousel({ items, lang }: { items: readonly FloorMatSlide[]; lang: Lang }) {
+export default function PhotoCarousel({ items, lang, onDesign }: { items: readonly FloorMatSlide[]; lang: Lang; onDesign?: () => void }) {
   const copy = FLOOR_MAT_COPY[lang];
   const [index, setIndex] = useState(0);
   // null follows the motion preference; a button press explicitly opts in/out.
@@ -64,7 +64,7 @@ export default function PhotoCarousel({ items, lang }: { items: readonly FloorMa
   }
 
   return (
-    <div ref={root} className="fm-carousel" role="region" aria-roledescription={copy.carousel} aria-label={copy.gallery}
+    <div ref={root} className="fm-carousel sh-carousel" role="region" aria-roledescription={copy.carousel} aria-label={copy.gallery}
       onPointerEnter={event => { if (event.pointerType === 'mouse') setHovered(true); }}
       onPointerLeave={() => setHovered(false)}
       onFocusCapture={() => setFocused(true)}
@@ -74,8 +74,8 @@ export default function PhotoCarousel({ items, lang }: { items: readonly FloorMa
         event.preventDefault();
         advance(event.key === 'ArrowLeft' ? -1 : 1);
       }}>
-      <p id="fm-keyboard-hint" className="dc-visuallyHidden">{copy.keyboard}</p>
-      <div className="fm-photoStage" tabIndex={0} aria-label={copy.gallery} aria-describedby="fm-keyboard-hint"
+      <p id="fm-keyboard-hint" className="sh-srOnly">{copy.keyboard}</p>
+      <div className="fm-photoStage sh-stage" tabIndex={0} aria-label={copy.gallery} aria-describedby="fm-keyboard-hint"
         onPointerDown={event => {
           if (!event.isPrimary || event.button !== 0 || (event.target as HTMLElement).closest('button')) return;
           gesture.current = { x: event.clientX, y: event.clientY, id: event.pointerId };
@@ -93,24 +93,23 @@ export default function PhotoCarousel({ items, lang }: { items: readonly FloorMa
         <img key={item.id} className="fm-photo" src={item.image} srcSet={item.imageSet}
           sizes="(max-width: 700px) 100vw, (max-width: 1336px) calc(100vw - 96px), 1240px"
           width="1536" height="864" alt={item.copy[lang].alt} fetchPriority="high" decoding="async" draggable={false} />
-        <button className="fm-arrow fm-arrow--previous" type="button" aria-label={copy.previous} onClick={() => advance(-1)}><ChevronLeft size={24} aria-hidden="true" /></button>
-        <button className="fm-arrow fm-arrow--next" type="button" aria-label={copy.next} onClick={() => advance(1)}><ChevronRight size={24} aria-hidden="true" /></button>
-      </div>
-      <div className="fm-captionRow">
-        <div className="fm-caption" aria-live={playing ? 'off' : 'polite'} aria-atomic="true"><h2>{item.copy[lang].name}</h2><p>{item.copy[lang].detail}</p></div>
-        <div className="fm-controls">
-          <span className="fm-count" aria-label={`${index + 1} / ${items.length}`}><strong>{String(index + 1).padStart(2, '0')}</strong><span aria-hidden="true"> / {String(items.length).padStart(2, '0')}</span></span>
-          <button type="button" className="fm-playToggle" aria-label={playing ? copy.pause : copy.play} onClick={() => {
-            setPaused(playing);
-            if (!playing) {
-              // An explicit Play press may resume while this control has focus.
-              setHovered(false);
-              setFocused(false);
-            }
-          }}>
-            {playing ? <Pause size={15} aria-hidden="true" /> : <Play size={15} aria-hidden="true" />}<span>{playing ? copy.pauseText : copy.playText}</span>
-          </button>
+        <button className="sh-arrow sh-arrowPrevious" type="button" aria-label={copy.previous} onClick={() => advance(-1)}><ChevronLeft size={22} aria-hidden="true" /></button>
+        <button className="sh-arrow sh-arrowNext" type="button" aria-label={copy.next} onClick={() => advance(1)}><ChevronRight size={22} aria-hidden="true" /></button>
+        <div className="sh-dots" role="group" aria-label={lang === 'zh' ? '选择脚垫配色' : 'Choose a floor-mat style'}>
+          {items.map((slide, i) => <button key={slide.id} type="button" aria-label={`${i + 1} · ${slide.copy[lang].name}`} aria-current={i === index ? 'true' : undefined} onClick={() => { setPaused(true); setIndex(i); }}><span /></button>)}
         </div>
+        <button type="button" className="sh-play" aria-label={playing ? copy.pause : copy.play} onClick={() => {
+          setPaused(playing);
+          if (!playing) { setHovered(false); setFocused(false); }
+        }}>{playing ? <Pause size={13} aria-hidden="true" /> : <Play size={13} aria-hidden="true" />}</button>
+      </div>
+      <div className="sh-productBar">
+        <div className="sh-productCopy" aria-live={playing ? 'off' : 'polite'} aria-atomic="true"><h2>{item.copy[lang].name}</h2><p>{item.copy[lang].detail}</p></div>
+        <div className="sh-buy">
+          <span className="fm-quote">{lang === 'zh' ? '按车型确认' : 'Confirm fitment'}</span>
+          <a className="sh-button" href="#mats-design" onClick={onDesign}>{lang === 'zh' ? '开始搭配' : 'Start designing'}<ArrowRight size={23} aria-hidden="true" /></a>
+        </div>
+        <span className="fm-count sh-srOnly" aria-label={`${index + 1} / ${items.length}`}><strong>{String(index + 1).padStart(2, '0')}</strong> / {String(items.length).padStart(2, '0')}</span>
       </div>
     </div>
   );

@@ -1,16 +1,19 @@
 'use client';
 
 /* eslint-disable @next/next/no-img-element -- Responsive local WebP photographs also support the static build. */
-import { useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent, type TouchEvent } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent, type TouchEvent } from 'react';
 import { ArrowRight, ArrowUpRight, ChevronLeft, ChevronRight, Pause, Play, Plus, X } from 'lucide-react';
 import ContactOptions from '@/components/contact-options';
 import SiteHeader from '@/components/brand/site-header';
+import {frontendPreview, netlifyPricing} from '@/lib/frontend-preview';
+import './tissue-designer.css';
 import {checkoutPriceQuery, priceNumber, pricingLine, SPECIAL_WORK_NOTE} from '@/lib/pricing';
 import {useStorePricing} from '@/hooks/use-store-pricing';
 import StorePricingNote from './store-pricing-note';
 import { SHOWCASE_COPY, type Lang } from '@/lib/showcase-copy';
 
 const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
+const InlineStudio = lazy(()=>import('./store-studio'));
 function subscribeMotion(callback: () => void) {
   const query = window.matchMedia(REDUCED_MOTION);
   query.addEventListener('change', callback);
@@ -70,7 +73,7 @@ const HOME_COPY = {
   },
 };
 
-export default function StoreHome({ lang = 'zh' }: { lang?: Lang }) {
+export default function StoreHome({ lang = 'zh', initialDesignOpen=false, lightPreview=false, localOnly=false, initialDesignId }: { lang?: Lang; initialDesignOpen?: boolean; lightPreview?: boolean; localOnly?: boolean; initialDesignId?: string }) {
   const prices = useStorePricing();
   const copy = HOME_COPY[lang];
   const styles = SHOWCASE_COPY[lang].colorways.items;
@@ -79,6 +82,7 @@ export default function StoreHome({ lang = 'zh' }: { lang?: Lang }) {
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const [information, setInformation] = useState<'contact' | 'terms' | null>(null);
+  const [designing, setDesigning] = useState(initialDesignOpen);
   const touch = useRef<{ x: number; y: number } | null>(null);
   const reducedMotion = useSyncExternalStore(subscribeMotion, getMotion, serverMotion);
   const visible = useSyncExternalStore(subscribeVisibility, getVisibility, serverVisibility);
@@ -166,11 +170,11 @@ export default function StoreHome({ lang = 'zh' }: { lang?: Lang }) {
           </div>
           <StorePricingNote {...prices}/>
         </section>
-        <section className="sh-custom" aria-labelledby="sh-custom-title">
+        {!designing && <section id="tissue-design" className="sh-custom" aria-labelledby="sh-custom-title">
           <div className="sh-customCopy">
             <div><p className="sh-eyebrow">{copy.custom}</p><h2 id="sh-custom-title">{copy.customTitle}</h2><p className="sh-customBody">{copy.customBody}</p></div>
             <div className="sh-customActions"><p className="sh-price"><strong>{prices.pricing && <span>¥</span>}{priceNumber(prices.pricing?.customFen)}</strong><small>/ {copy.unit}</small></p>
-              <a className="sh-button sh-buttonOutline" href={'/customize?' + checkoutPriceQuery(prices.pricing, 'custom').slice(1)}>{copy.design}<ArrowUpRight size={23} aria-hidden="true" /></a>
+              <a className="sh-button sh-buttonOutline" href="#tissue-design" onClick={()=>setDesigning(true)}>{copy.design}<ArrowUpRight size={23} aria-hidden="true" /></a>
             </div>
           </div>
           <div className="sh-customDemo">
@@ -186,6 +190,8 @@ export default function StoreHome({ lang = 'zh' }: { lang?: Lang }) {
             </div>
           </div>
         </section>
+        }
+        {designing && <section id="tissue-design" className="tb-designer" aria-labelledby="tb-designer-title"><div className="tb-designerHeading"><div><p className="sh-eyebrow">{copy.custom}</p><h2 id="tb-designer-title">{lang==='zh'?'设计你的纸巾盒':'Design your tissue box'}</h2></div><span>{lang==='zh'?'在当前页面搭配':'Design on this page'}</span></div><Suspense fallback={<p className="tb-designerLoading" role="status">{lang==='zh'?'正在打开纸巾盒工坊…':'Opening the design studio…'}</p>}><InlineStudio embedded lightPreview={lightPreview} localOnly={localOnly || frontendPreview || netlifyPricing} initialDesignId={frontendPreview || netlifyPricing ? undefined : initialDesignId} onBack={()=>{setDesigning(false);document.querySelector('#choose-style')?.scrollIntoView({behavior:'smooth',block:'start'});}}/></Suspense></section>}
         <p className="sh-specialNote">{SPECIAL_WORK_NOTE[lang]}</p>
       </main>
       <footer className="sh-footer">

@@ -9,7 +9,8 @@ import './site-header.css';
 type Section = 'home' | 'mats' | 'tissueBox' | 'customize';
 export default function SiteHeader({ lang, active, onNavigate }: { lang: Lang; active: Section; onNavigate?: MouseEventHandler<HTMLAnchorElement> }) {
   const copy = BRAND_COPY[lang];
-  const routes = { home: '/', mats: '/mats', tissueBox: '/tissue-box', customize: '/customize' } as const;
+  const routes = { home: '/', mats: '/mats', tissueBox: '/tissue-box' } as const;
+  const currentPath = active === 'customize' ? '/customize' : routes[active];
   return (
     <header className="dc-siteHeader">
       <nav className="dc-nav dc-headerContainer" aria-label={copy.navLabel}>
@@ -25,9 +26,9 @@ export default function SiteHeader({ lang, active, onNavigate }: { lang: Lang; a
           ))}
         </div>
         <div className="dc-language" role="group" aria-label={copy.language}>
-          <a href={routes[active]} hrefLang="zh-CN" aria-current={lang === 'zh' ? 'true' : undefined} onClick={onNavigate}>中</a>
+          <a href={currentPath} hrefLang="zh-CN" aria-current={lang === 'zh' ? 'true' : undefined} onClick={onNavigate}>中</a>
           <span aria-hidden="true">/</span>
-          <a href={`${routes[active]}?lang=en`} hrefLang="en" aria-current={lang === 'en' ? 'true' : undefined} onClick={onNavigate}>EN</a>
+          <a href={`${currentPath}?lang=en`} hrefLang="en" aria-current={lang === 'en' ? 'true' : undefined} onClick={onNavigate}>EN</a>
         </div>
       </nav>
     </header>

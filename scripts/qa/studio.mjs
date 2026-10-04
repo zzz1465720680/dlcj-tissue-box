@@ -31,7 +31,7 @@ const results=[];let root=createRoot(document.getElementById('root'));
 const record=(name,condition=true)=>{assert(condition,name);results.push(name)};
 const flush=()=>act(async()=>{await new Promise(resolve=>setTimeout(resolve,30))});
 const click=async el=>{assert(el,'button found');await act(async()=>el.click());await flush()};
-const button=(text)=>[...document.querySelectorAll('button')].find(b=>b.textContent.replace(/\s+/g,' ').trim()===text);
+const button=(text)=>[...document.querySelectorAll('button')].find(b=>b.textContent.replace(/\s+/g,' ').trim()===text||b.getAttribute('aria-label')===text);
 const input=async(el,value)=>{await act(async()=>{Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype,'value').set.call(el,value);el.dispatchEvent(new window.Event('input',{bubbles:true}));});await flush()};
 const close=async()=>{const dialog=document.querySelector('[role="dialog"]');const x=[...dialog.querySelectorAll('button')].find(b=>b.textContent.trim()==='Close');if(x)await click(x);else await act(async()=>document.dispatchEvent(new window.KeyboardEvent('keydown',{key:'Escape',bubbles:true})));await flush()};
 let saveCalls=0; const countedRequest=async(input,init)=>{if(init?.method==='POST')saveCalls++;return localDesignRequest(input,init)};
@@ -53,7 +53,7 @@ try{
  // Real component render in a DOM environment, using the intentionally supported light mode.
  await act(async()=>root.render(h(Studio,{lightPreview:true,localOnly:true,designRequest:countedRequest})));await flush();
  record('light preview renders usable studio',document.body.textContent.includes('设计你的纸巾盒'));
- record('editor returns to tissue-box collection',document.querySelector('.brand').getAttribute('href')==='/tissue-box'&&document.querySelector('.header-title a').getAttribute('href')==='/tissue-box');
+ record('editor returns to tissue-box collection',document.querySelector('.dc-logo').getAttribute('href')==='/'&&document.querySelector('.studio-toolbarTitle a').getAttribute('href')==='/tissue-box');
  record('custom 159 pricing visible',document.body.textContent.includes('159'));
  record('new material picker offers only grain',!!document.querySelector('button[aria-label="细纹皮革"]')&&!document.querySelector('button[aria-label="光面皮革"]')&&!document.querySelector('button[aria-label="绒面质感"]'));
  record('colour picker explains approximate stock match',document.body.textContent.includes('按现有皮料近似匹配'));
@@ -77,6 +77,13 @@ try{
  await click(button('确认方案 · 咨询'));record('inquiry quantity survives component reload',document.querySelector('#consultQuantity').value==='12');await close();
  const importData={type:'dlcj-inquiry-draft',version:1,design:{...initialDesign(),name:'QA imported inquiry'},request:{quantity:7,note:'QA note restored'}};const text=JSON.stringify(importData);const importer=document.querySelector('input[accept="application/json,.json"]');Object.defineProperty(importer,'files',{value:[{size:text.length,text:async()=>text}],configurable:true});await act(async()=>importer.dispatchEvent(new window.Event('change',{bubbles:true})));await flush();record('inquiry JSON imports editable design',document.querySelector('.stage-badge').textContent.includes('QA imported inquiry'));await click(button('确认方案 · 咨询'));record('inquiry JSON restores quantity and notes',document.querySelector('#consultQuantity').value==='7'&&document.querySelector('#consultNote').value==='QA note restored');await close();
  await act(async()=>root.unmount());root=createRoot(document.getElementById('root'));
+ let returnedToProducts=false;const beforeInline=await loadDraft();
+ await act(async()=>root.render(h(Studio,{lightPreview:true,localOnly:true,designRequest:countedRequest,embedded:true,onBack:()=>{returnedToProducts=true;}})));await flush();
+ record('inline studio has no duplicate site header or main',!document.querySelector('.dc-siteHeader')&&!document.querySelector('main')&&!!document.querySelector('section.studio-embedded'));
+ record('inline studio restores the existing local draft',document.querySelector('.stage-badge').textContent.includes(beforeInline.name));
+ await click(document.querySelector('button[aria-label="保存设计"]'));await input(document.querySelector('#designName'),'QA inline latest');await close();
+ await act(async()=>document.querySelector('.studio-toolbarTitle a[href="#choose-style"]').dispatchEvent(new window.MouseEvent('click',{bubbles:true,cancelable:true})));await flush();
+ const inlineDraft=await loadDraft();record('returning to products saves the draft before closing',returnedToProducts&&inlineDraft.name==='QA inline latest');
  record('no local-storage network calls during UI flows',networkCalls===0);
  await act(async()=>root.unmount());
  fs.writeFileSync(path.join(os.tmpdir(),'dlcj-studio-regression-results.json'),JSON.stringify({passed:results.length,tests:results,limitations:['JSDOM plus fake-indexeddb, not real-browser visual/WebGL verification']},null,2));

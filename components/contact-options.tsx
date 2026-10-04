@@ -5,7 +5,7 @@ import {ClipboardCopy, Phone} from 'lucide-react';
 import {activeContactChannels} from '@/lib/merchant-config';
 import {copyText} from '@/lib/clipboard';
 
-export default function ContactOptions({lang = 'zh'}: {lang?: 'zh' | 'en'}) {
+export default function ContactOptions({lang = 'zh', context='tissueBox'}: {lang?: 'zh' | 'en'; context?: 'tissueBox' | 'brand'}) {
   const [notice, setNotice] = useState('');
   const english = lang === 'en';
   const channels = activeContactChannels();
@@ -26,7 +26,7 @@ export default function ContactOptions({lang = 'zh'}: {lang?: 'zh' | 'en'}) {
           </a>}
       </div>)}
     </div>
-    <p className="merchant-contact-note">{english ? 'Mention “tissue box customization” and share your design, quantity and preferences. Confirm the quote before purchasing.' : '添加时请备注“纸巾盒定制”，发送方案、数量和需求。确认材料、报价与交期后再购买。'}</p>
+    <p className="merchant-contact-note">{context==='brand' ? (english ? 'Contact the maker to confirm fitment, materials, price and delivery.' : '直接联系商家，确认车型适配、实物材料、报价和交期。') : english ? 'Mention “tissue box customization” and share your design, quantity and preferences. Confirm the quote before purchasing.' : '添加时请备注“纸巾盒定制”，发送方案、数量和需求。确认材料、报价与交期后再购买。'}</p>
     <p className="merchant-contact-status" role="status" aria-live="polite">{notice}</p>
   </div>;
 }

@@ -1,0 +1,21 @@
+{
+  "provenance": "依据用户提供的面料照片，使用 AI 辅助整理的平铺重绘贴图；不是实物扫描。",
+  "scale": "展示用纹理尺度，未提供实测织纹周期。",
+  "assets": [
+    {
+      "id": "jacquard",
+      "file": "grey_jacquard.png",
+      "label": "灰色字母提花"
+    },
+    {
+      "id": "twill",
+      "file": "dark_twill.png",
+      "label": "深灰斜纹"
+    },
+    {
+      "id": "green",
+      "file": "green_houndstooth.png",
+      "label": "绿黑白千鸟格"
+    }
+  ]
+}

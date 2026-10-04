@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { ArrowDown, ArrowUpRight } from 'lucide-react';
 import SiteHeader from '@/components/brand/site-header';
 import SiteFooter from '@/components/brand/site-footer';
+import ContactOptions from '@/components/contact-options';
 import { BRAND_COPY, brandHref } from '@/lib/brand-copy';
 import { PRODUCT_LINES } from '@/lib/product-lines';
 import { resolveLang } from '@/lib/showcase-copy';
@@ -49,6 +50,7 @@ export default async function BrandHome({ searchParams }: PageProps) {
           <div><p className="dc-eyebrow">{copy.philosophyLabel}</p><h2 id="approach-title">{copy.philosophyTitle.map(line => <span key={line}>{line}</span>)}</h2></div>
           <p className="dc-philosophyBody">{copy.philosophyBody}</p>
         </section>
+        <section className="dc-contact dc-container" aria-labelledby="home-contact-title"><div className="dc-sectionHeading"><h2 id="home-contact-title">{lang==='zh'?'联系商家':'Contact the maker'}</h2><p>{lang==='zh'?'喜欢的搭配，直接聊一聊。':'Let’s talk about your combination.'}</p></div><ContactOptions lang={lang} context="brand"/></section>
       </main>
       <SiteFooter lang={lang} />
     </div>

@@ -39,17 +39,17 @@ for (const [route, selector, lang] of [['/', '.dc-homeHero', 'zh-CN'], ['/?lang=
     check('Static entry renders ' + route, () => {assert.ok(document.querySelector(selector)); assert.equal(document.documentElement.lang, lang); assert.ok(document.title); assert.ok(document.querySelector('meta[name="description"]').content);});
     check('Preview banner and zero service calls on ' + route, () => {assert.ok(document.querySelector('aside[aria-label="测试预览说明"]')); assert.equal(page.requests.length, 0);});
     if (selector === '.dc-homeHero') check('Brand product links retain language on ' + route, () => {const suffix = lang === 'en' ? '?lang=en' : ''; for (const target of ['/mats', '/tissue-box']) assert.ok(document.querySelector(`.dc-productCard[href="${target + suffix}"]`));});
-    if (selector === '.sh-home') check('Collection links retain checkout and language on ' + route, () => {assert.equal(document.querySelector('.sh-buy a').getAttribute('href').split('&')[0], '/checkout?style=white-lime'); assert.equal(document.querySelector('.sh-language').getAttribute('href'), lang === 'en' ? '/tissue-box' : '/tissue-box?lang=en'); assert.equal(document.querySelector('.sh-nav a[aria-current="page"]').pathname, '/tissue-box');});
+    if (selector === '.sh-home') check('Collection links retain checkout, language and inline design on ' + route, () => {assert.equal(document.querySelector('.sh-buy a').getAttribute('href').split('&')[0], '/checkout?style=white-lime'); assert.equal(document.querySelector('.sh-language').getAttribute('href'), lang === 'en' ? '/tissue-box' : '/tissue-box?lang=en'); assert.equal(document.querySelector('.dc-navLinks a[aria-current="page"]').pathname, '/tissue-box');assert.equal(document.querySelector('.sh-customActions a').getAttribute('href'),'#tissue-design');});
   } finally {page.dom.window.close();}
 }
 const mats = await open('/mats');
 try {
   const {document, window, intervals, settle} = mats;
-  check('Floor mats stay display-only with one responsive photo', () => {assert.equal(document.querySelectorAll('.fm-carousel img').length, 1); assert.equal(document.querySelectorAll('form, input, canvas, a[href^="/checkout"], a[href^="/customize"]').length, 0); for (const img of document.querySelectorAll('img')) assert.ok(fs.existsSync(path.join(repo, 'public', img.getAttribute('src'))));});
+  check('Floor-mat photography loads before the optional 3D designer', () => {assert.equal(document.querySelectorAll('.fm-carousel img').length, 1); assert.equal(document.querySelectorAll('form, input, canvas, a[href^="/checkout"], a[href^="/customize"]').length, 0);assert.equal(document.querySelector('.fm-carousel .sh-button').getAttribute('href'),'#mats-design');for (const img of document.querySelectorAll('img')) assert.ok(fs.existsSync(path.join(repo, 'public', img.getAttribute('src'))));});
   check('Six-second floor-mat autoplay', () => assert.equal([...intervals.values()][0].delay, 6000));
   intervals.values().next().value.fn(); await settle();
   check('Autoplay changes floor-mat photo', () => assert.equal(document.querySelector('.fm-count strong').textContent, '02'));
-  document.querySelector('.fm-arrow--next').click(); await settle();
+  document.querySelector('.fm-carousel .sh-arrowNext').click(); await settle();
   check('Manual navigation pauses autoplay', () => {assert.equal(document.querySelector('.fm-count strong').textContent, '03'); assert.equal(intervals.size, 0);});
   document.querySelector('.fm-photoStage').dispatchEvent(new window.KeyboardEvent('keydown', {key: 'ArrowLeft', bubbles: true})); await settle();
   check('Floor-mat keyboard navigation remains available', () => assert.equal(document.querySelector('.fm-count strong').textContent, '02'));

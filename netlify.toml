@@ -4,3 +4,8 @@
 
 [build.environment]
   NODE_VERSION = "24"
+  STORE_NETLIFY_PRICING = "1"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"

@@ -59,6 +59,7 @@ next-env.d.ts
 
 # Private local API data and uploads. Never publish.
 /.store-data/
+/.netlify/
 *.sqlite
 *.sqlite-shm
 *.sqlite-wal

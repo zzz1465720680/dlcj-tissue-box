@@ -3,7 +3,7 @@ import {frontendPreview} from './frontend-preview';
 import {validPricing, type StorePricing} from './pricing';
 
 export type StoreUser = {id: string; role: 'customer' | 'admin'; phoneMasked: string};
-export type StoreSession = {user: StoreUser | null; capabilities: {sms: boolean; orders: boolean; payment: false}};
+export type StoreSession = {user: StoreUser | null; capabilities: {sms: boolean; orders: boolean; payment: false; merchantPassword?: boolean; cloudDesigns?: boolean; gallery?: boolean; pricing?: boolean; mode?: 'netlify-pricing'}};
 export type SavedStoreDesign = {id: string; version: number; name: string; createdAt: string; updatedAt?: string; design: Design; galleryConsent: boolean; galleryPublished: boolean};
 export type StoreCoupon = {id: string; userId: string; amountFen: number; availableFen: number; spendableFen: number; reservedFen: number; redeemedFen: number; expiresAt: string; source: string; status: 'available' | 'expired' | 'reserved' | 'redeemed' | 'revoked'};
 export type StoreAddress = {name: string; phone: string; province: string; city: string; district: string; detail: string};

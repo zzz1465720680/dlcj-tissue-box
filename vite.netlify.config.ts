@@ -7,17 +7,18 @@ import {INITIAL_PRICING} from './lib/pricing';
 // Isolated browser-only build. The original Vinext/Cloudflare build stays intact.
 export default defineConfig(({mode}) => {
   const frontendPreview = mode === 'frontend-preview';
+  const netlifyPricing = process.env.STORE_NETLIFY_PRICING === '1' && !frontendPreview;
   const apiPort = Number(process.env.STORE_DEV_API_PORT || 8788);
   if (!Number.isInteger(apiPort) || apiPort < 1 || apiPort > 65535) throw new Error('Invalid local store API port');
   return {
-  define: {__STORE_FRONTEND_PREVIEW__: JSON.stringify(frontendPreview), __STORE_LOCAL_PRICING_PREVIEW__: JSON.stringify(mode !== 'production' && process.env.STORE_LOCAL_PRICING_PREVIEW === '1')},
+  define: {__STORE_FRONTEND_PREVIEW__: JSON.stringify(frontendPreview), __STORE_LOCAL_PRICING_PREVIEW__: JSON.stringify(mode !== 'production' && process.env.STORE_LOCAL_PRICING_PREVIEW === '1'), __STORE_NETLIFY_PRICING__: JSON.stringify(netlifyPricing)},
   plugins: [react(), {
     name: 'netlify-static-metadata',
     transformIndexHtml(html) {
       return frontendPreview ? html.replace('</head>', '<meta name="robots" content="noindex, nofollow" /></head>') : html;
     },
     generateBundle() {
-      this.emitFile({type: 'asset', fileName: '_redirects', source: ['/mats','/tissue-box','/customize','/model-review','/my','/login','/checkout','/admin','/gallery'].map(path => `${path} /index.html 200\n${path}/ /index.html 200\n`).join('')});
+      this.emitFile({type: 'asset', fileName: '_redirects', source: ['/mats','/tissue-box','/customize','/model-review','/my','/login','/checkout','/admin','/admin/login','/gallery'].map(path => `${path} /index.html 200\n${path}/ /index.html 200\n`).join('')});
       this.emitFile({type: 'asset', fileName: '_headers', source: '/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  Cache-Control: public, max-age=0, must-revalidate\n' + (frontendPreview ? '  X-Robots-Tag: noindex, nofollow\n' : '') + '/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n'});
       this.emitFile({type: 'asset', fileName: 'deployment-version.json', source: JSON.stringify({
         sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], {encoding: 'utf8'}).trim(),
@@ -26,10 +27,11 @@ export default defineConfig(({mode}) => {
         build: frontendPreview ? 'store-v2-frontend-test-preview' : 'store-v2-payment-deferred',
         frontendPreview,
         modelRevision: 9,
-        designStorage: frontendPreview ? 'browser-local-only' : 'private-api-with-browser-local-recovery',
-        authentication: frontendPreview ? 'disabled-in-preview' : 'phone-otp-provider-required',
+        designStorage: frontendPreview || netlifyPricing ? 'browser-local-only' : 'private-api-with-browser-local-recovery',
+        authentication: frontendPreview ? 'disabled-in-preview' : netlifyPricing ? 'merchant-password;customer-otp-disabled' : 'phone-otp-provider-required',
         paymentEnabled: false,
-        pricingSource: 'persistent-store-api',
+        pricingSource: netlifyPricing ? 'netlify-postgres' : 'persistent-store-api',
+        ...(netlifyPricing ? {customerAccountsEnabled:false,ordersEnabled:false,cloudDesignsEnabled:false,galleryEnabled:false} : {}),
         pricingEndpoint: '/api/store/pricing',
         ...(frontendPreview ? {previewReferencePrices: INITIAL_PRICING} : {}),
       }, null, 2)});

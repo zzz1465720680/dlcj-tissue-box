@@ -10,6 +10,7 @@ export default function SiteFooter({ lang }: { lang: Lang }) {
         <a href={brandHref('/', lang)}>{copy.home}</a>
         <a href={brandHref('/mats', lang)}>{copy.mats}</a>
         <a href={brandHref('/tissue-box', lang)}>{copy.tissueBox}</a>
+        <a href="/admin/login">{lang === 'zh' ? '商家管理' : 'Merchant login'}</a>
       </nav>
     </footer>
   );

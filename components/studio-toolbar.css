@@ -1,0 +1,16 @@
+.studio-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 72px; padding: 12px max(20px, calc((100% - 1240px) / 2)); border-bottom: 1px solid #e0e5dd; background: #fff; }
+.studio-toolbarTitle { display: flex; align-items: center; gap: 12px; color: #687067; font-size: 13px; }
+.studio-toolbarTitle strong { color: #263d33; font-weight: 500; }
+.studio-toolbarTitle > span { color: #c3c9c0; }
+.studio-toolbarAccount { margin-left: auto; }
+.studio-toolbarActions { display: flex; align-items: center; gap: 20px; }
+.studio-toolbarActions .text-button, .studio-toolbarActions .button { min-height: 44px; white-space: nowrap; }
+.studio-toolbarActions svg { flex-shrink: 0; }
+.studio .workspace { min-height: calc(100dvh - 156px); }
+@media (max-width: 800px) {
+  .studio-toolbar { flex-direction: column; align-items: stretch; gap: 8px; padding: 10px 20px 12px; }
+  .studio-toolbarTitle { min-height: 24px; font-size: 12px; }
+  .studio-toolbarActions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .studio-toolbarActions .text-button, .studio-toolbarActions .button { justify-content: center; gap: 5px; padding: 9px 6px; font-size: 12px; border: 1px solid #dce1d8; border-radius: 7px; }
+  .studio-toolbarActions .button.dark { border-color: #263d33; }
+}

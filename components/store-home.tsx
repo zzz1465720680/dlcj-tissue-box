@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent, type TouchEvent } from 'react';
 import { ArrowRight, ArrowUpRight, ChevronLeft, ChevronRight, Pause, Play, Plus, X } from 'lucide-react';
 import ContactOptions from '@/components/contact-options';
+import SiteHeader from '@/components/brand/site-header';
 import {checkoutPriceQuery, priceNumber, pricingLine, SPECIAL_WORK_NOTE} from '@/lib/pricing';
 import {useStorePricing} from '@/hooks/use-store-pricing';
 import StorePricingNote from './store-pricing-note';
@@ -120,20 +121,9 @@ export default function StoreHome({ lang = 'zh' }: { lang?: Lang }) {
     if (Math.abs(dx) >= 40 && Math.abs(dx) > Math.abs(dy) * 1.5) step(dx < 0 ? 1 : -1);
   }
 
-  return <div className="sh-home" lang={lang === 'en' ? 'en' : 'zh-CN'}>
+  return <><SiteHeader lang={lang} active="tissueBox" /><div className="sh-home" lang={lang === 'en' ? 'en' : 'zh-CN'}>
     <a className="sh-skip" href="#choose-style">{SHOWCASE_COPY[lang].skip}</a>
     <div className="sh-sheet">
-      <header className="sh-header">
-        <a className="sh-brand" href={lang === 'en' ? '/?lang=en' : '/'} aria-label="鼎立车眷">
-          <img src="/brand/dc-logo.svg" alt="" width={51} height={47} />
-          <span>鼎立车眷</span>
-        </a>
-        <nav className="sh-nav" aria-label={SHOWCASE_COPY[lang].navLabel}>
-          <a href={lang === 'en' ? '/tissue-box?lang=en' : '/tissue-box'} aria-current="page">{copy.tissueBox}</a>
-          <a href="/customize">{copy.design}</a>
-          <a href="/my">{copy.mine}</a>
-        </nav>
-      </header>
       <main className="sh-main">
         <div className="sh-intro"><h1>{copy.heading}</h1><p>{copy.collection}</p></div>
         <section id="choose-style" className="sh-carousel" aria-roledescription="carousel" aria-label={copy.carousel}
@@ -201,6 +191,8 @@ export default function StoreHome({ lang = 'zh' }: { lang?: Lang }) {
       <footer className="sh-footer">
         <div className="sh-footerRow"><p>{copy.imageNote}</p><nav aria-label={lang === 'en' ? 'More information' : '更多信息'}>
           <a href={lang === 'en' ? '/mats?lang=en' : '/mats'}>{copy.mats}</a>
+          <a href="/my">{copy.mine}</a>
+          <a href="/admin/login">{lang === 'zh' ? '商家管理' : 'Merchant login'}</a>
           <a href="/gallery">{copy.gallery}</a>
           <button type="button" aria-expanded={information === 'contact'} aria-controls="sh-contact" onClick={() => setInformation(current => current === 'contact' ? null : 'contact')}>{copy.contact}</button>
           <button type="button" aria-expanded={information === 'terms'} aria-controls="sh-terms" onClick={() => setInformation(current => current === 'terms' ? null : 'terms')}>{copy.terms}</button>
@@ -218,5 +210,5 @@ export default function StoreHome({ lang = 'zh' }: { lang?: Lang }) {
         {copy.languageNote && <p className="sh-languageNote">{copy.languageNote}</p>}
       </footer>
     </div>
-  </div>;
+  </div></>;
 }

@@ -49,6 +49,8 @@ test('Netlify pricing: durable save, audit, authorization, replay and restoratio
     assert.equal((await send(failing,'/admin/pricing',{cookie,data:{...payload,standardFen:1,expectedVersion:2,operationKey:'controlled-audit-failure-01'}})).status,503);
     const beforeRestart=(await (await send(handler,'/pricing')).json()).pricing;
     assert.deepEqual([beforeRestart.standardFen,beforeRestart.customFen,beforeRestart.version],[9901,15901,2]);
+    await pg.exec(migration);
+    assert.deepEqual((await (await send(handler,'/pricing')).json()).pricing,beforeRestart);
     assert.equal((await pg.query('SELECT count(*)::int AS n FROM dlcj_pricing_audit')).rows[0].n,1);
     await pg.close();pg=new PGlite(folder);handler=createNetlifyStore({db:pool(pg),env});
     assert.deepEqual((await (await send(handler,'/pricing')).json()).pricing,beforeRestart);

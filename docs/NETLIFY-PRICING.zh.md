@@ -11,6 +11,7 @@
 - 生产私有变量：`STORE_PUBLIC_ORIGIN` 为上述 HTTPS 网址；`STORE_ADMIN_EMAIL` 绑定经商家授权的单一邮箱，`STORE_ADMIN_USERNAME` 可指定独立登录名（省略时使用邮箱）；`STORE_ADMIN_PASSWORD_HASH` 为本机设置工具生成的密码验证摘要。变量均不使用 `VITE_` 前缀。
 - 本机执行 `node scripts/netlify-admin-setup.mjs 已授权邮箱`，由运营者在本机页面设置独立网站密码。工具只写入被忽略的 `.store-data/netlify-admin.env`，不打印密码或摘要。不要把这个文件放入发布目录、源码仓库或聊天。
 - 前端构建使用 `STORE_NETLIFY_PRICING=1`；Netlify 配置已包含此值。仅发布 `dist-netlify` 与打包的 `netlify/functions`。手动上传静态文件不能交付这里的后台。
+- 本项目的 Netlify 页面由 Vite 构建。若平台根据保留的 Next 依赖自动加入不适用的运行时，先执行已有 `build:netlify` 和函数打包，再使用 `netlify deploy --no-build` 发布。原生 Postgres 使用同一迁移初始化；迁移重复运行不会重设已保存价格或删除记录。
 
 管理员入口为 `/admin/login`，改价界面为 `/admin`。密码轮换会使原登录会话失效；登录尝试限流记录与会话保存在持久数据库中。价格使用整数分、版本校验、幂等操作号和同一事务内的修改记录。
 

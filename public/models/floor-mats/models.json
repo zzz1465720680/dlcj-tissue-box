@@ -2,7 +2,7 @@
   {
     "id": "01_driver",
     "title": "主驾脚垫",
-    "url": "/models/floor-mats/CarMat_Codex_Web.glb?v=53033c77ef26",
+    "url": "/models/floor-mats/CarMat_Codex_Web.glb?v=9b2ca4c91bc1",
     "features": {}
   },
   {
@@ -77,7 +77,7 @@
   {
     "id": "all",
     "title": "整套四块",
-    "url": "/models/floor-mats/CarMat_FourPiece_Set.glb?v=a76c26d83aa9",
+    "url": "/models/floor-mats/CarMat_FourPiece_Set.glb?v=a8f0edad3cc3",
     "features": {}
   }
 ]

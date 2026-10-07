@@ -5,7 +5,7 @@ import { ArrowRight, RotateCcw } from 'lucide-react';
 import type { Lang } from '@/lib/showcase-copy';
 
 const MODELS=[['01_driver','主驾脚垫'],['02_passenger','右上前排'],['03_transverse','横向连体'],['04_lower','下方双 U 口'],['all','整套四块']];
-const MATERIALS=[['Mat_Edge','包边','#ffcc00','edge'],['Mat_Accent','侧边皮革','#ffcc00','accent'],['Mat_Stitch','缝线','#f9e8b6','stitch'],['Mat_Embroidery','图案线色','#6c4621','embroidery']];
+const MATERIALS=[['Mat_Edge','包边','#ffcc00','edge'],['Mat_Accent','侧边皮革','#ffcc00','accent'],['Mat_Stitch','缝线','#f9e8b6','stitch'],['Mat_Embroidery','图案线色','#6c4621','embroidery'],['Mat_BrandEmbroidery','品牌刺绣线色','#4b4b43','brand']];
 
 export default function MatConfigurator({lang,started,onStart}: {lang:Lang;started:boolean;onStart:()=>void}) {
   const root=useRef<HTMLDivElement>(null);
@@ -42,7 +42,7 @@ export default function MatConfigurator({lang,started,onStart}: {lang:Lang;start
           <img className="fm3-fallback" src="/floor-mats/black-gray-grid-800.webp" width="800" height="450" alt="脚垫实拍替代展示"/>
           <canvas id="fm3-view" aria-label="脚垫三维预览，可拖动旋转与双指缩放"/>
           <div className="fm3-zoom" aria-label="缩放"><button type="button" data-zoom="in" aria-label="放大脚垫">＋</button><button type="button" data-zoom="out" aria-label="缩小脚垫">－</button></div>
-          <div className="fm3-views" role="group" aria-label="脚垫视角">{[['hero','整体'],['top','正面'],['long','缝线长边'],['upper','上端接点'],['detail','下端接点'],['notch','U 型开口'],['bottom','背面']].map(([view,label])=><button type="button" data-view={view} key={view} aria-pressed={view==='hero'}>{label}</button>)}</div>
+          <div className="fm3-views" role="group" aria-label="脚垫视角">{[['hero','整体'],['top','正面'],['long','缝线长边'],['brand','品牌刺绣'],['upper','上端接点'],['detail','下端接点'],['notch','U 型开口'],['bottom','背面']].map(([view,label])=><button type="button" data-view={view} key={view} aria-pressed={view==='hero'}>{label}</button>)}</div>
         </div>
         <div className="fm3-previewFooter"><p id="fm3-status" role="status" aria-live="polite">正在准备三维搭配…</p><button className="fm3-retry" type="button" onClick={()=>setAttempt(n=>n+1)}>重试三维预览</button><span>拖动旋转 · 滚轮或双指缩放</span></div>
       </div>

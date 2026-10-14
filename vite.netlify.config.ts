@@ -3,6 +3,46 @@ import {fileURLToPath} from 'node:url';
 import {defineConfig} from 'vite';
 import react from '@vitejs/plugin-react';
 import {INITIAL_PRICING} from './lib/pricing';
+import {BRAND_COPY} from './lib/brand-copy';
+import {SHOWCASE_COPY} from './lib/showcase-copy';
+import {FLOOR_MAT_COPY} from './lib/floor-mats/catalog';
+
+// Static share metadata (crawlers such as WeChat do not run JS). Brand: 鼎立车眷 only.
+const SITE_ORIGIN = 'https://dingli-tissue-box.netlify.app';
+const OG_IMAGE = SITE_ORIGIN + '/share/og-1200x630.jpg';
+const SHARE_PAGES: Record<string, {title: string; description: string}> = {
+  '/': BRAND_COPY.zh.meta,
+  '/tissue-box': SHOWCASE_COPY.zh.meta,
+  '/mats': FLOOR_MAT_COPY.zh.meta,
+  '/customize': {title: '自由定制 · 鼎立车眷', description: '在线搭配车载纸巾盒的主体、包角、封边与缝线配色，保存方案后加微信下单。'},
+};
+const esc = (v: string) => v.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+function shareHead(html: string, path: string) {
+  const {title, description} = SHARE_PAGES[path];
+  const url = SITE_ORIGIN + (path === '/' ? '/' : path);
+  const tags = [
+    `<meta property="og:type" content="website" />`,
+    `<meta property="og:site_name" content="鼎立车眷" />`,
+    `<meta property="og:title" content="${esc(title)}" />`,
+    `<meta property="og:description" content="${esc(description)}" />`,
+    `<meta property="og:url" content="${url}" />`,
+    `<meta property="og:image" content="${OG_IMAGE}" />`,
+    `<meta property="og:image:width" content="1200" />`,
+    `<meta property="og:image:height" content="630" />`,
+    `<meta property="og:image:alt" content="鼎立车眷" />`,
+    `<meta name="twitter:card" content="summary_large_image" />`,
+    `<meta name="twitter:title" content="${esc(title)}" />`,
+    `<meta name="twitter:description" content="${esc(description)}" />`,
+    `<meta name="twitter:image" content="${OG_IMAGE}" />`,
+    `<meta itemprop="name" content="${esc(title)}" />`,
+    `<meta itemprop="description" content="${esc(description)}" />`,
+    `<meta itemprop="image" content="${OG_IMAGE}" />`,
+  ].join('\n    ');
+  return html
+    .replace(/<title>[^<]*<\/title>/, `<title>${esc(title)}</title>`)
+    .replace(/<meta name="description" content="[^"]*" \/>/, `<meta name="description" content="${esc(description)}" />`)
+    .replace('</head>', `    ${tags}\n  </head>`);
+}
 
 // Isolated browser-only build. The original Vinext/Cloudflare build stays intact.
 export default defineConfig(({mode}) => {
@@ -15,10 +55,11 @@ export default defineConfig(({mode}) => {
   plugins: [react(), {
     name: 'netlify-static-metadata',
     transformIndexHtml(html) {
+      html = shareHead(html, '/');
       return frontendPreview ? html.replace('</head>', '<meta name="robots" content="noindex, nofollow" /></head>') : html;
     },
     generateBundle() {
-      this.emitFile({type: 'asset', fileName: '_redirects', source: ['/mats','/tissue-box','/customize','/model-review','/my','/login','/checkout','/admin','/admin/login','/gallery'].map(path => `${path} /index.html 200\n${path}/ /index.html 200\n`).join('')});
+      this.emitFile({type: 'asset', fileName: '_redirects', source: ['/mats','/tissue-box','/customize','/model-review','/my','/login','/checkout','/admin','/admin/login','/gallery'].map(path => {const target = SHARE_PAGES[path] ? `/share-pages${path}.html` : '/index.html'; return `${path} ${target} 200\n${path}/ ${target} 200\n`;}).join('')});
       this.emitFile({type: 'asset', fileName: '_headers', source: '/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  Cache-Control: public, max-age=0, must-revalidate\n' + (frontendPreview ? '  X-Robots-Tag: noindex, nofollow\n' : '') + '/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n'});
       this.emitFile({type: 'asset', fileName: 'deployment-version.json', source: JSON.stringify({
         sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], {encoding: 'utf8'}).trim(),
@@ -43,6 +84,10 @@ export default defineConfig(({mode}) => {
     async closeBundle() {
       const {rm} = await import('node:fs/promises');
       const out = fileURLToPath(new URL(frontendPreview ? './dist-netlify-preview/' : './dist-netlify/', import.meta.url));
+      const {readFile, writeFile, mkdir} = await import('node:fs/promises');
+      const home = await readFile(out + 'index.html', 'utf8');
+      await mkdir(out + 'share-pages', {recursive: true});
+      for (const path of Object.keys(SHARE_PAGES)) if (path !== '/') await writeFile(out + 'share-pages' + path + '.html', shareHead(home.replace(/\n\s*<meta (property="og:|name="twitter:|itemprop=")[^>]*>/g, ''), path));
       for (const rel of ['models/revision7', 'models/presentation-trial', 'models/tissuebox-v2.glb']) await rm(out + rel, {recursive: true, force: true});
     },
   }],

@@ -36,6 +36,15 @@ export default defineConfig(({mode}) => {
         ...(frontendPreview ? {previewReferencePrices: INITIAL_PRICING} : {}),
       }, null, 2)});
     },
+  }, {
+    // Unreferenced legacy/trial models stay in the repo for scripts but are not shipped.
+    name: 'netlify-drop-unused-models',
+    apply: 'build',
+    async closeBundle() {
+      const {rm} = await import('node:fs/promises');
+      const out = fileURLToPath(new URL(frontendPreview ? './dist-netlify-preview/' : './dist-netlify/', import.meta.url));
+      for (const rel of ['models/revision7', 'models/presentation-trial', 'models/tissuebox-v2.glb']) await rm(out + rel, {recursive: true, force: true});
+    },
   }],
   resolve: {alias: {'@': fileURLToPath(new URL('.', import.meta.url))}},
   cacheDir: 'checks/pricing-vite-cache',

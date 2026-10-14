@@ -1,9 +1,9 @@
 // External albedo tiles and procedural woven normals for the centre surface.
 // UV rectangles select matching repeat phases without editing source pixels.
 export const FABRIC_VARIANTS = Object.freeze({
- jacquard: {label:'灰色字母提花',file:'grey_jacquard.png',tile:[.036,.056],crop:[545/1254,248/1254,418/1254,638/1254],average:[.090959,.103774,.128457],motifs:[2,4],yarns:[64,96],roughness:.84},
- twill: {label:'深灰斜纹',file:'dark_twill.png',tile:[.032,.024],crop:[111/1254,111/1254,418/1254,314/1254],average:[.053442,.058840,.061700],motifs:[8,6],yarns:[128,96],roughness:.81},
- green: {label:'绿黑白千鸟格',file:'green_houndstooth.png',tile:[.0393,.0393],crop:[591/1254,257/1254,493/1254,518/1254],average:[.321936,.358011,.327304],motifs:[4,4],yarns:[64,64],roughness:.9}
+ jacquard: {label:'灰色字母提花',file:'grey_jacquard.webp',tile:[.036,.056],crop:[545/1254,248/1254,418/1254,638/1254],average:[.090959,.103774,.128457],motifs:[2,4],yarns:[64,96],roughness:.84},
+ twill: {label:'深灰斜纹',file:'dark_twill.webp',tile:[.032,.024],crop:[111/1254,111/1254,418/1254,314/1254],average:[.053442,.058840,.061700],motifs:[8,6],yarns:[128,96],roughness:.81},
+ green: {label:'绿黑白千鸟格',file:'green_houndstooth.webp',tile:[.0393,.0393],crop:[591/1254,257/1254,493/1254,518/1254],average:[.321936,.358011,.327304],motifs:[4,4],yarns:[64,64],roughness:.9}
 });
 const UV_TILE_METRES=.0393;
 
@@ -49,7 +49,7 @@ export function createFabricLibrary(THREE,{anisotropy=1,loadTexture,textureBaseU
   if(id==='houndstooth'||id==='plain')return null;
   const definition=FABRIC_VARIANTS[id];if(!definition)throw Error('未知面料');
   if(!cache.has(id))cache.set(id,(async()=>{
-   const url=textureBaseUrl?new URL(definition.file+'?v=fabric3',textureBaseUrl).href:new URL('./fabrics/'+definition.file+'?v=fabric3',import.meta.url).href;
+   const url=textureBaseUrl?new URL(definition.file+'?v=fabric4-webp',textureBaseUrl).href:new URL('./fabrics/'+definition.file+'?v=fabric3',import.meta.url).href;
    const map=configure(await readTexture(url),definition,true);
    const normalMap=configure(createWovenNormal(THREE,id,definition),definition,false);
    return {map,normalMap};

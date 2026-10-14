@@ -3,11 +3,14 @@ import assert from 'node:assert/strict';
 import { createStore } from './domain.mjs';
 import { initialDesign, preset } from '../lib/design.ts';
 import { createObjectStore } from './objects.mjs';
+// Order/coupon arithmetic fixtures keep the original 99/159 seed; the live default is in lib/pricing.ts.
+const LEGACY_PRICING = {version: 1, standardFen: 9900, customFen: 15900};
+
 
 // Independent review regressions. Providers, network services and production data are never used.
 function fixture(t) {
   let instant = Date.parse('2026-09-30T12:00:00Z');
-  const store = createStore({ now: () => new Date(instant) });
+  const store = createStore({ now: () => new Date(instant), initialPricing: LEGACY_PRICING });
   t.after(() => store.close());
   store.registerVerifiedUser({ phone: '13800000000' });
   const admin = store.bootstrapAdmin({ phone: '13800000000' });

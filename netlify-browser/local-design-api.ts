@@ -67,3 +67,36 @@ export const localDesignRequest: typeof fetch = async (input, init) => {
     return json({error: '浏览器未能读取或保存本机设计。当前设计仍在页面上，请下载方案文件备份，或检查浏览器存储空间和隐私设置。'}, 503);
   }
 };
+
+/**
+ * Netlify build: keep the browser copy (works offline / for large designs) and also save to
+ * /api/designs (Netlify Function + Netlify Postgres) so a design id can be reopened on another device.
+ */
+export const hybridDesignRequest: typeof fetch = async (input, init) => {
+  try {
+    const req = input instanceof Request ? new Request(input, init) : new Request(new URL(String(input), window.location.origin), init);
+    const url = new URL(req.url);
+    if (url.origin !== window.location.origin || url.pathname !== '/api/designs') return json({error: '不支持的存储请求。'}, 400);
+    if (req.method === 'POST') {
+      const text = await req.text();
+      let cloud: {id: string; date: string} | null = null;
+      try {
+        const r = await fetch('/api/designs', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: text, credentials: 'same-origin'});
+        if (r.ok) cloud = await r.json();
+      } catch { /* Offline: browser copy below still saves. */ }
+      if (!cloud) return localDesignRequest('/api/designs', {method: 'POST', body: text});
+      let raw: unknown; try {raw = JSON.parse(text);} catch {return json({error: '设计文件无法读取。'}, 400);}
+      const parsed = designSchema.safeParse(raw);
+      if (parsed.success) await transaction('readwrite', store => store.put({id: cloud!.id, date: cloud!.date, design: parsed.data})).catch(() => undefined);
+      return json({id: cloud.id, date: cloud.date, cloud: true});
+    }
+    if (req.method === 'GET' && url.searchParams.get('id') !== null) {
+      const local = await localDesignRequest(url.pathname + url.search);
+      if (local.status !== 404 && local.status !== 503) return local;
+      return fetch(url.pathname + url.search, {credentials: 'same-origin'});
+    }
+    return localDesignRequest(url.pathname + url.search, {method: req.method});
+  } catch {
+    return json({error: '设计未能保存。当前设计仍在页面上，请下载方案文件备份。'}, 503);
+  }
+};

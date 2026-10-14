@@ -165,7 +165,7 @@ export default function StoreHome({ lang = 'zh', initialDesignOpen=false, lightP
             </div>
             <div className="sh-buy">
               <p className="sh-price"><strong>{prices.pricing && <span>¥</span>}{priceNumber(prices.pricing?.standardFen)}</strong><small>/ {copy.unit}</small></p>
-              <a className="sh-button" href={`/checkout?style=${item.id}${checkoutPriceQuery(prices.pricing, 'standard')}`} aria-label={`${copy.select} · ${item.name}`}>{copy.select}<ArrowRight size={23} aria-hidden="true" /></a>
+              <a className="sh-button" href={`/checkout?style=${item.id}${checkoutPriceQuery(prices.pricing, 'standard')}`} aria-label={`${netlifyPricing && lang==='zh' ? '请加微信下单' : copy.select} · ${item.name}`}>{netlifyPricing && lang==='zh' ? '请加微信下单' : netlifyPricing ? 'Order via WeChat' : copy.select}<ArrowRight size={23} aria-hidden="true" /></a>
             </div>
           </div>
           <StorePricingNote {...prices}/>
@@ -191,7 +191,7 @@ export default function StoreHome({ lang = 'zh', initialDesignOpen=false, lightP
           </div>
         </section>
         }
-        {designing && <section id="tissue-design" className="tb-designer" aria-labelledby="tb-designer-title"><div className="tb-designerHeading"><div><p className="sh-eyebrow">{copy.custom}</p><h2 id="tb-designer-title">{lang==='zh'?'设计你的纸巾盒':'Design your tissue box'}</h2></div><span>{lang==='zh'?'在当前页面搭配':'Design on this page'}</span></div><Suspense fallback={<p className="tb-designerLoading" role="status">{lang==='zh'?'正在打开纸巾盒工坊…':'Opening the design studio…'}</p>}><InlineStudio embedded lightPreview={lightPreview} localOnly={localOnly || frontendPreview || netlifyPricing} initialDesignId={frontendPreview || netlifyPricing ? undefined : initialDesignId} onBack={()=>{setDesigning(false);document.querySelector('#choose-style')?.scrollIntoView({behavior:'smooth',block:'start'});}}/></Suspense></section>}
+        {designing && <section id="tissue-design" className="tb-designer" aria-labelledby="tb-designer-title"><div className="tb-designerHeading"><div><p className="sh-eyebrow">{copy.custom}</p><h2 id="tb-designer-title">{lang==='zh'?'设计你的纸巾盒':'Design your tissue box'}</h2></div><span>{lang==='zh'?'在当前页面搭配':'Design on this page'}</span></div><Suspense fallback={<p className="tb-designerLoading" role="status">{lang==='zh'?'正在打开纸巾盒工坊…':'Opening the design studio…'}</p>}><InlineStudio embedded lightPreview={lightPreview} localOnly={localOnly || frontendPreview || netlifyPricing} initialDesignId={frontendPreview ? undefined : initialDesignId} onBack={()=>{setDesigning(false);document.querySelector('#choose-style')?.scrollIntoView({behavior:'smooth',block:'start'});}}/></Suspense></section>}
         <p className="sh-specialNote">{SPECIAL_WORK_NOTE[lang]}</p>
       </main>
       <footer className="sh-footer">

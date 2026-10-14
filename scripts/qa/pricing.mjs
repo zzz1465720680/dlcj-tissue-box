@@ -60,19 +60,19 @@ async function address() {for (const [id,value] of [['name','合成测试客户'
 const update = values => store.adminUpdatePricing(admin.id, {standardFen: store.getPricing().standardFen, customFen: store.getPricing().customFen, expectedVersion: store.getPricing().version, operationKey: randomUUID(), ...values});
 async function check(name, run) {await run(); passes.push(name); console.log('PASS '+name);}
 try {
-  await check('Storefront initially reads the unchanged 99/159 from the actual API', async () => {
-    await mount(ui.Home, '/tissue-box'); await until(() => $('.sh-price').textContent.includes('99'));
-    assert.match(text(), /159/); const url = new URL($('.sh-buy a').href); assert.equal(url.searchParams.get('pricingVersion'), '1'); assert.equal(url.searchParams.get('unitPriceFen'), '9900');
+  await check('Storefront initially reads the current 139/199 from the actual API', async () => {
+    await mount(ui.Home, '/tissue-box'); await until(() => $('.sh-price').textContent.includes('139'));
+    assert.match(text(), /199/); const url = new URL($('.sh-buy a').href); assert.equal(url.searchParams.get('pricingVersion'), '1'); assert.equal(url.searchParams.get('unitPriceFen'), '13900');
     assert.equal(store.getPricing().standardFen, INITIAL_PRICING.standardFen);
   });
   await check('Existing admin page edits prices with cents, records actor, and retains values after remount', async () => {
     await mount(ui.Admin, '/admin', true); await until(() => button('商品定价')); await click(button('商品定价')); await until(() => $('#pricing-standard'));
-    assert.equal($('#pricing-standard').value,'99'); assert.equal($('#pricing-custom').value,'159');
+    assert.equal($('#pricing-standard').value,'139'); assert.equal($('#pricing-custom').value,'199');
     await input('#pricing-standard','109.01'); await input('#pricing-custom','169.99'); await click($('form input[type="checkbox"]')); await submit();
     await until(() => text().includes('商品价格已保存')); assert.equal(store.getPricing().standardFen,10901); assert.equal(store.getPricing().customFen,16999);
     assert.equal(store.listPricingAudit(admin.id)[0].actorId,admin.id);
     await mount(ui.Admin, '/admin', true); await until(() => button('商品定价')); await click(button('商品定价')); await until(() => $('#pricing-standard'));
-    assert.equal($('#pricing-standard').value,'109.01'); assert.match(text(), /99.*109.01/);
+    assert.equal($('#pricing-standard').value,'109.01'); assert.match(text(), /139.*109.01/);
   });
   await check('Refreshed storefront and inquiry exports show the database prices and quantity totals', async () => {
     await mount(ui.Home,'/tissue-box'); await until(() => $('.sh-price').textContent.includes('109.01')); assert.match(text(),/169.99/);

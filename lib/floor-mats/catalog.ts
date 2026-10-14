@@ -51,8 +51,8 @@ export const FLOOR_MAT_SLIDES: readonly FloorMatSlide[] = [
 
 export const FLOOR_MAT_COPY = {
   zh: {
-    meta: { title: '亲情car · 脚垫系列｜鼎立车眷', description: '浏览亲情car脚垫的车内配色与纹理搭配参考。大图展示格纹、色彩与围边细节。' },
-    eyebrow: '亲情car · 脚垫系列',
+    meta: { title: '脚垫系列｜鼎立车眷', description: '浏览鼎立车眷脚垫的车内配色与纹理搭配参考。大图展示格纹、色彩与围边细节。' },
+    eyebrow: '鼎立车眷 · 脚垫系列',
     title: '脚下的细节，随你心意。',
     intro: '先看看不同配色，在车里的样子。',
     gallery: '脚垫配色展示',
@@ -71,8 +71,8 @@ export const FLOOR_MAT_COPY = {
     availability: '可体验四块及整套的三维配色搭配。车型适配、选材与制作细节请与商家确认。',
   },
   en: {
-    meta: { title: 'QINQINGCAR floor mats｜DINGLI CHEJUAN', description: 'Explore floor-mat colour and texture references in a car interior. View patterns, colour accents and surround details in a large-photo gallery.' },
-    eyebrow: 'QINQINGCAR · FLOOR MATS',
+    meta: { title: 'Floor mats｜DINGLI CHEJUAN', description: 'Explore floor-mat colour and texture references in a car interior. View patterns, colour accents and surround details in a large-photo gallery.' },
+    eyebrow: 'DINGLI CHEJUAN · FLOOR MATS',
     title: 'Details that feel like you.',
     intro: 'See how different colours look in a car interior.',
     gallery: 'Floor-mat colour gallery',

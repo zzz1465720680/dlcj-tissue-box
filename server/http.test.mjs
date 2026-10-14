@@ -7,12 +7,15 @@ import { createStoreServer, loadConfig } from './http.mjs';
 import { initialDesign } from '../lib/design.ts';
 import { createProviders, drainEmailOutbox } from './providers.mjs';
 import { MAX_DESIGN_BYTES, CHUNK_BYTES } from './objects.mjs';
+// Order/coupon arithmetic fixtures keep the original 99/159 seed; the live default is in lib/pricing.ts.
+const LEGACY_PRICING = {version: 1, standardFen: 9900, customFen: 15900};
+
 
 const origin = 'http://localhost:5173';
 const secret = 'test-only-http-secret-do-not-use-production-123456789';
 async function fixture(t, { smsEnabled = true } = {}) {
   let instant = Date.parse('2026-09-30T12:00:00Z');
-  const store = createStore({ now: () => new Date(instant) }); const sent = [];
+  const store = createStore({ now: () => new Date(instant), initialPricing: LEGACY_PRICING }); const sent = [];
   const app = createStoreServer({ store, origin, secret, now: () => instant, testMode: true,
     providers: { sms: { available: smsEnabled, sendOtp: async value => { sent.push(value); } }, email: { available: false } } });
   await new Promise(resolve => app.server.listen(0, '127.0.0.1', resolve));
@@ -144,7 +147,7 @@ test('production config fails closed, and no production test-provider injection 
   assert.throws(() => loadConfig({ NODE_ENV: 'production', STORE_PUBLIC_ORIGIN: 'https://example.test', STORE_AUTH_SECRET: secret, STORE_DB_PATH: `${process.cwd()}/public/store.sqlite` }));
   const config = loadConfig({ NODE_ENV: 'production', STORE_PUBLIC_ORIGIN: 'https://example.test', STORE_AUTH_SECRET: secret, STORE_DB_PATH: '/tmp/private-store.sqlite' });
   assert.equal(config.host, '127.0.0.1'); assert.equal(config.port, 8788);
-  const store = createStore(); t.after(() => store.close());
+  const store = createStore({ initialPricing: LEGACY_PRICING }); t.after(() => store.close());
   assert.throws(() => createStoreServer({ store, origin: 'https://example.test', secret, production: true, providers: createProviders({}) }));
 });
 

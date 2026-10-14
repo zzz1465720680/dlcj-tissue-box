@@ -33,7 +33,7 @@ const update = (f, values = {}) => f.store.adminUpdatePricing(f.admin.id, {stand
 const orderInput = (f, values = {}) => ({kind: 'standard', stockId: 'ivory', quantity: 1, checkout, operationKey: key(), ...priceConfirmation(f.store.getPricing(), values.kind === 'custom' ? 'custom' : 'standard'), ...values});
 const code = (fn, expected) => assert.throws(fn, error => error.code === expected);
 
-test('new pricing starts at the existing 99/159; admin audit and write are atomic and idempotent', t => {
+test('new pricing starts at the current 139/199; admin audit and write are atomic and idempotent', t => {
   const f = fixture(t); const original = f.store.getPricing();
   assert.equal(original.standardFen, INITIAL_PRICING.standardFen); assert.equal(original.customFen, INITIAL_PRICING.customFen);
   const input = {standardFen: 10901, customFen: 16999, expectedVersion: original.version, operationKey: key()};

@@ -4,17 +4,17 @@
   "assets": [
     {
       "id": "jacquard",
-      "file": "grey_jacquard.png",
+      "file": "grey_jacquard.webp",
       "label": "灰色字母提花"
     },
     {
       "id": "twill",
-      "file": "dark_twill.png",
+      "file": "dark_twill.webp",
       "label": "深灰斜纹"
     },
     {
       "id": "green",
-      "file": "green_houndstooth.png",
+      "file": "green_houndstooth.webp",
       "label": "绿黑白千鸟格"
     }
   ]

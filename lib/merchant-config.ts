@@ -1,6 +1,6 @@
 import {pricingLine, SPECIAL_WORK_NOTE, type StorePricing} from './pricing';
 // 商家经营信息与客服渠道的唯一配置入口。
-// 电话及微信由商家提供；2026-09-29确认现有款99、自由定制159，特殊工艺私聊报价。
+// 电话及微信由商家提供；现行价：现有款139、自由定制199（以数据库定价为准），特殊工艺私聊报价。
 // 首页与咨询面板共用这些渠道。
 
 export type ContactKind = 'wechat' | 'phone' | 'link' | 'email';

@@ -7,13 +7,16 @@ import { Worker } from 'node:worker_threads';
 import { randomUUID } from 'node:crypto';
 import { createStore, DomainError, normalizePhone } from './domain.mjs';
 import { initialDesign, preset, PRESETS } from '../lib/design.ts';
+// Order/coupon arithmetic fixtures keep the original 99/159 seed; the live default is in lib/pricing.ts.
+const LEGACY_PRICING = {version: 1, standardFen: 9900, customFen: 15900};
+
 
 const BASE = '2026-09-30T12:00:00.000Z';
 const checkout = { name: '收货人', phone: '13812345678', address: '福建省厦门市测试路 12 号' };
 const key = () => randomUUID();
 function fixture(t, options = {}) {
   const folder = mkdtempSync(join(tmpdir(), 'dlcj-domain-')); let time = BASE;
-  const store = createStore({ filename: join(folder, 'store.sqlite'), now: () => new Date(time), ...options });
+  const store = createStore({ filename: join(folder, 'store.sqlite'), now: () => new Date(time), initialPricing: LEGACY_PRICING, ...options });
   const user = store.registerVerifiedUser({ phone: '13800000001' }).user;
   const other = store.registerVerifiedUser({ phone: '13800000002' }).user;
   store.registerVerifiedUser({ phone: '13800000003' });
@@ -38,7 +41,7 @@ test('verified unique mobile, explicit operator admin and persistent migrations'
   assert.equal(store.registerVerifiedUser({ phone: '13800000004', inviteCode: 'stale-cookie' }).user.role, 'customer');
   code(() => store.registerVerifiedUser({ phone: '+12025550123' }), 'INVALID_PHONE');
   code(() => store.bootstrapAdmin({ phone: '13800000009' }), 'VERIFIED_USER_REQUIRED');
-  const saved = save(store, user); const second = createStore({ filename });
+  const saved = save(store, user); const second = createStore({ filename, initialPricing: LEGACY_PRICING });
   try { assert.equal(second.getDesign(user.id, saved.id).version, 1); assert.equal(second.db.prepare('SELECT COUNT(*) AS n FROM store_migrations').get().n, 3); } finally { second.close(); }
 });
 

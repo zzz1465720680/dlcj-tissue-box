@@ -9,7 +9,7 @@ export type PricingAudit = {
 };
 // Seed a new database once; preview mode labels these as reference prices.
 export const INITIAL_PRICING: Readonly<StorePricing> = Object.freeze({
-  currency: 'CNY', version: 1, standardFen: 9900, customFen: 15900, updatedAt: null,
+  currency: 'CNY', version: 1, standardFen: 13900, customFen: 19900, updatedAt: null,
 });
 export const MAX_UNIT_PRICE_FEN = 1_000_000;
 export function validPricing(value: unknown): value is StorePricing {

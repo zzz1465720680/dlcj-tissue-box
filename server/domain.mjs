@@ -58,7 +58,7 @@ function materialEdits(design, minimumColorDistance) { return Math.min(...PRESET
 const needsBespoke = needsSpecialWork;
 function publicProjection(design) { return { version: 1, name: '精选配色', parts: Object.fromEntries(PARTS.map(p => { const { color, material, perforated, edge, thread } = design.parts[p]; return [p, { color, material, perforated, edge, thread, art: [] }]; })), label: { enabled: false, color: '#222c28', ink: '#eee9df', text: 'DLCJ' } }; }
 
-export function createStore({ filename = ':memory:', now = () => new Date(), antiAbuse = {}, quotas = {} } = {}) {
+export function createStore({ filename = ':memory:', now = () => new Date(), antiAbuse = {}, quotas = {}, initialPricing = INITIAL_PRICING } = {}) {
   if (filename !== ':memory:') mkdirSync(dirname(filename), { recursive: true, mode: 0o700 });
   const db = new DatabaseSync(filename); db.exec('PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000; PRAGMA journal_mode=WAL;');
   const clock = () => { const value = new Date(now()); if (!Number.isFinite(value.getTime())) throw new Error('Invalid store clock'); return value.toISOString(); };
@@ -69,7 +69,7 @@ export function createStore({ filename = ':memory:', now = () => new Date(), ant
   db.exec('CREATE TABLE IF NOT EXISTS store_migrations (name TEXT PRIMARY KEY, applied_at TEXT NOT NULL)');
   const migrations = fileURLToPath(new URL('./migrations/', import.meta.url));
   for (const name of readdirSync(migrations).filter(name => name.endsWith('.sql')).sort()) transaction(() => { if (!one('SELECT name FROM store_migrations WHERE name=?', name)) { db.exec(readFileSync(`${migrations}/${name}`, 'utf8')); run('INSERT INTO store_migrations VALUES (?,?)', name, clock()); } });
-  transaction(() => run('INSERT OR IGNORE INTO store_pricing(id,version,standard_fen,custom_fen,updated_at) VALUES (1,?,?,?,?)', INITIAL_PRICING.version, INITIAL_PRICING.standardFen, INITIAL_PRICING.customFen, clock()));
+  transaction(() => run('INSERT OR IGNORE INTO store_pricing(id,version,standard_fen,custom_fen,updated_at) VALUES (1,?,?,?,?)', initialPricing.version, initialPricing.standardFen, initialPricing.customFen, clock()));
   const abuse = { minimumColorDistance: 24, minimumChangedFields: 1, preventDuplicateDesigns: true, ...antiAbuse };
   const quota = { maxDesignBytes: 128 * 1024 * 1024, maxDesignVersions: 500, maxActiveDesigns: 100, ...quotas };
   for (const value of Object.values(quota)) integer(value, 'storage quota', 1, 1_000_000_000);

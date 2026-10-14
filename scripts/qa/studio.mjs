@@ -60,7 +60,7 @@ try{
  await click(document.querySelector('button[aria-label="保存设计"]'));
  record('local save disclosure visible',document.body.textContent.includes('仅保存在此设备的当前浏览器'));
  await input(document.querySelector('#designName'),'QA 本机保存');const saveButton=button('保存到我的设计');await act(async()=>{saveButton.click();saveButton.click()});await flush();record('rapid repeated save writes once',saveCalls===1);
- record('named save success UI',document.body.textContent.includes('已保存到当前浏览器'));
+ record('named save success UI',document.body.textContent.includes('已保存到本机'));
  await input(document.querySelector('#designName'),'QA 重命名');record('renaming clears old saved state',Boolean(button('保存到我的设计')));
  await click(button('保存到我的设计'));await close();
  await click(document.querySelector('button[aria-label="我的设计"]'));record('saved design appears in library',document.querySelector('.saved-list')?.textContent.includes('QA 重命名'));

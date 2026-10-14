@@ -11,8 +11,8 @@ export const PRODUCT_LINES = [
     width: 1536,
     height: 864,
     copy: {
-      zh: { label: '亲情car · 脚垫系列', title: '脚垫', body: '看看车内实景里的配色与纹理。', action: '浏览脚垫', alt: '灰色格纹上层垫与黑色围边在车内的搭配展示' },
-      en: { label: 'QINQINGCAR · FLOOR MATS', title: 'Floor mats', body: 'Explore colours and textures in a car interior.', action: 'Explore floor mats', alt: 'Gray patterned upper mat with a black surround, shown in a car interior' },
+      zh: { label: '鼎立车眷 · 脚垫系列', title: '脚垫', body: '看看车内实景里的配色与纹理。', action: '浏览脚垫', alt: '灰色格纹上层垫与黑色围边在车内的搭配展示' },
+      en: { label: 'DINGLI CHEJUAN · FLOOR MATS', title: 'Floor mats', body: 'Explore colours and textures in a car interior.', action: 'Explore floor mats', alt: 'Gray patterned upper mat with a black surround, shown in a car interior' },
     } satisfies Record<Lang, { label: string; title: string; body: string; action: string; alt: string }>,
   },
   {

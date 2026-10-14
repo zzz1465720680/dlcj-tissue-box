@@ -41,6 +41,9 @@ async function start() {
   } else if (path === '/login') {
     const {StoreLogin} = await import('../components/store-account');
     document.title = '手机号登录 · 鼎立车眷'; page = <StoreLogin/>;
+  } else if (path === '/checkout' && netlifyPricing) {
+    const {default: WechatOrder} = await import('../components/wechat-order');
+    document.title = '请加微信下单 · 鼎立车眷'; page = <WechatOrder/>;
   } else if (path === '/checkout') {
     const {default: Checkout} = await import('../components/store-checkout');
     document.title = '订单草稿 · 鼎立车眷'; page = <Checkout/>;

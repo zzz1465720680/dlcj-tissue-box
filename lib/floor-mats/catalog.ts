@@ -27,7 +27,7 @@ export const FLOOR_MAT_SLIDES: readonly FloorMatSlide[] = [
     { name: '黑棕格', detail: '棕色格纹 · 黑色围边', alt: '黑棕格配色参考，棕色格纹上层垫搭配黑色围边' },
     { name: 'Black & brown grid', detail: 'Brown pattern · Black surround', alt: 'Brown patterned upper mat with a black surround in a car interior' }),
   slide('orange-texture',
-    { name: '理想橙碳纤丝', detail: '橙色纹理 · 黑色围边', alt: '理想橙配色参考，橙色纹理上层垫搭配黑色围边' },
+    { name: '亮橙碳纤丝', detail: '橙色纹理 · 黑色围边', alt: '亮橙配色参考，橙色纹理上层垫搭配黑色围边' },
     { name: 'Orange texture', detail: 'Orange texture · Black surround', alt: 'Orange textured upper mat with a black surround in a car interior' }),
   slide('black-silver-grid',
     { name: '黑银格', detail: '银灰格纹 · 黑色围边', alt: '黑银格配色参考，银灰格纹上层垫搭配黑色围边' },

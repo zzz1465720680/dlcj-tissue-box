@@ -78,16 +78,16 @@ export async function createMatViewer(root) {
  for(const b of $$('[data-zoom]'))b.onclick=()=>{if(!product)return;const offset=camera.position.clone().sub(controls.target),distance=THREE.MathUtils.clamp(offset.length()*(b.dataset.zoom==='in'?.8:1.25),controls.minDistance,controls.maxDistance);camera.position.copy(controls.target).add(offset.normalize().multiplyScalar(distance));controls.update();};
  async function fabricChange() {
   const serial=++fabricSerial,id=$('#fm3-fabric').value,target=product,targets=[...fabricMaterials];
-  const message=$('#fm3-fabric-status'),label=FABRIC_VARIANTS[id]?.label||(id==='plain'?'素色织物':'黑白千鸟格');
-  delete root.dataset.fabricError;if(!targets.length){message.textContent='模型载入后应用所选面料。';return;}
+  const message=$('#fm3-fabric-status'),label=FABRIC_VARIANTS[id]?.label||(id==='plain'?'素色':'黑白千鸟格');
+  delete root.dataset.fabricError;if(!targets.length){message.textContent='模型载入后应用所选花色。';return;}
   root.dataset.fabricLoading='true';message.textContent=`正在应用${label}…`;
   try {
    const asset=await fabricLibrary.prepare(id);
    if(asset){for(const tex of [asset.map,asset.normalMap]){if(disposed)tex.dispose();else libraryTextures.add(tex);}}
    if(disposed||serial!==fabricSerial||target!==product)return;
    for(const m of targets)stableRendering.fabric(m,fabricLibrary.apply(m,id,asset));
-   root.dataset.fabric=id;delete root.dataset.fabricLoading;message.textContent=`当前面料：${label}`;
-  } catch {if(!disposed&&serial===fabricSerial&&target===product){root.dataset.fabricError='true';delete root.dataset.fabricLoading;message.textContent='面料载入失败，保留当前效果。请重试。';}}
+   root.dataset.fabric=id;delete root.dataset.fabricLoading;message.textContent=`当前花色：${label}`;
+  } catch {if(!disposed&&serial===fabricSerial&&target===product){root.dataset.fabricError='true';delete root.dataset.fabricLoading;message.textContent='花色载入失败，保留当前效果。请重试。';}}
  }
  function bottomChange() {
   if(!product)return;const grip=$('#fm3-bottom').value==='grip';

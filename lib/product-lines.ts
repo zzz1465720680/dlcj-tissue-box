@@ -23,7 +23,7 @@ export const PRODUCT_LINES = [
     width: 1536,
     height: 1024,
     copy: {
-      zh: { label: '鼎立车眷 · 纸巾盒系列', title: '纸巾盒', body: '现有款式与自由定制，找到喜欢的样子。', action: '浏览纸巾盒', alt: '白色皮纹车载纸巾盒，搭配浅绿色包角与封边' },
+      zh: { label: '鼎立车眷 · 纸巾盒系列', title: '纸巾盒', body: '现有款式与自由定制，找到喜欢的样子。', action: '浏览纸巾盒', alt: '白色车载纸巾盒，搭配浅绿色包角与封边' },
       en: { label: 'DINGLI CHEJUAN · TISSUE BOXES', title: 'Tissue boxes', body: 'Find a favourite style, or create your own.', action: 'Explore tissue boxes', alt: 'White leather-textured car tissue box with pale green corners and edging' },
     } satisfies Record<Lang, { label: string; title: string; body: string; action: string; alt: string }>,
   },

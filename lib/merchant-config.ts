@@ -50,8 +50,8 @@ export const MERCHANT_CONFIG: MerchantConfig = {
   facts: {
     confirmed: [
       {zh: '现有款与配色定制价格以商品当前定价为准。专属图案、刺绣等特殊工艺需私聊报价。', en: 'Existing styles and custom combinations follow the current store pricing. Personal artwork, embroidery and special work are quoted privately.'},
-      {zh: '常规款付款确认后1–2个自然日制作；自由定制在客户确认实物皮料和方案后5–7个自然日制作。周末计入，运输另计。', en: 'Standard production takes 1–2 calendar days after verified payment; custom production takes 5–7 calendar days after customer material/design confirmation. Weekends count; transit is additional.'},
-      {zh: '首期仅提供细纹皮革。所有颜色按现有皮料近似匹配，制作前确认实物照片。可在付款前咨询。', en: 'Fine-grain leather only at launch. Colours are close-matched to available stock and confirmed against physical photos. Consultation is available before payment.'},
+      {zh: '常规款付款确认后1–2个自然日制作；自由定制在客户确认选材和方案后5–7个自然日制作。周末计入，运输另计。', en: 'Standard production takes 1–2 calendar days after verified payment; custom production takes 5–7 calendar days after customer material/design confirmation. Weekends count; transit is additional.'},
+      {zh: '所有颜色按现有选材近似匹配，制作前确认实物照片。可在付款前咨询。', en: 'Colours are close-matched to available stock and confirmed against physical photos. Consultation is available before payment.'},
       {zh: '发货地：福建福州。', en: 'Ships from Fuzhou, Fujian.'},
     ],
     pending: [

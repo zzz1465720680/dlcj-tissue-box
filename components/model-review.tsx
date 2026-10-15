@@ -4,7 +4,7 @@ import ProductView,{ProductHandle} from './product-view';
 import {initialDesign} from '@/lib/design';
 import {Switch} from '@/components/ui/switch';
 
-const views=[['hero','整体','白皮蓝边基准款，长 16 cm、宽 10.5 cm、高约 6 cm。'],['short','窄端','上下包角之间露出主体皮料，主体接合使用内缝。'],['corner','包角与弧边','连续包角跨过侧高；两段弧边保留贴合油边与外轮廓针脚。'],['tip','布标侧端头','查看已确认的包角端头、清晰针脚与固定孔位。'],['overlap','顶部搭接','两条口沿在端部收拢，上下部分搭接，下层露边并保留抽纸通道。'],['top','顶部','查看抽纸口及四个包角的顶部折合。'],['bottom','底部','主体连续折到底部，没有独立窄端盖。'],['grain','皮纹近景','40 mm 物理周期的细密浅纹，采用柔和半哑光。']] as const;
+const views=[['hero','整体','白皮蓝边基准款，长 16 cm、宽 10.5 cm、高约 6 cm。'],['short','窄端','上下包角之间露出主体材质，主体接合使用内缝。'],['corner','包角与弧边','连续包角跨过侧高；两段弧边保留贴合油边与外轮廓针脚。'],['tip','布标侧端头','查看已确认的包角端头、清晰针脚与固定孔位。'],['overlap','顶部搭接','两条口沿在端部收拢，上下部分搭接，下层露边并保留抽纸通道。'],['top','顶部','查看抽纸口及四个包角的顶部折合。'],['bottom','底部','主体连续折到底部，没有独立窄端盖。'],['grain','皮纹近景','40 mm 物理周期的细密浅纹，采用柔和半哑光。']] as const;
 export default function ModelReview(){
   const [view,setView]=useState<string>('hero'),[design,setDesign]=useState(()=>{const d=initialDesign();d.label.enabled=true;return d;}),[ready,setReady]=useState(false);
   const handle=useRef<ProductHandle|null>(null);

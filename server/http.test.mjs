@@ -108,12 +108,12 @@ test('material photos are decoded, re-encoded and private; customers cannot crea
   const saved = (await f.upload(customer.cookie, Buffer.from(JSON.stringify(initialDesign())))).result.json.design;
   const order = (await f.call('/orders', { method: 'POST', cookie: customer.cookie, data: { operationKey: crypto.randomUUID(), kind: 'custom', designId: saved.id, designVersion: saved.version,
     checkout: { name: '测试', phone: '+8613800000001', address: '测试地址' } } })).json.order;
-  const material = await f.call(`/admin/orders/${order.id}/material`, { method: 'POST', cookie: admin.cookie, data: { note: '确认本版细纹皮革', photoRefs: [object.id] } });
+  const material = await f.call(`/admin/orders/${order.id}/material`, { method: 'POST', cookie: admin.cookie, data: { note: '确认本版细纹款', photoRefs: [object.id] } });
   assert.equal(material.status, 200);
   assert.equal((await f.call(`/objects/${object.id}`, { cookie: customer.cookie })).status, 200);
   const outsider = await f.login('+8613800000003'); assert.equal((await f.call(`/objects/${object.id}`, { cookie: outsider.cookie })).status, 404);
   const accepted = await f.call(`/orders/${order.id}/material/accept`, { method: 'POST', cookie: customer.cookie, data: { version: 1 } }); assert.equal(accepted.status, 200);
-  const newer = await f.call(`/admin/orders/${order.id}/material`, { method: 'POST', cookie: admin.cookie, data: { note: '更新后的细纹皮革', photoRefs: [object.id] } }); assert.equal(newer.json.order.acceptedMaterialVersion, null);
+  const newer = await f.call(`/admin/orders/${order.id}/material`, { method: 'POST', cookie: admin.cookie, data: { note: '更新后的细纹款', photoRefs: [object.id] } }); assert.equal(newer.json.order.acceptedMaterialVersion, null);
   assert.equal((await f.call(`/orders/${order.id}/material/accept`, { method: 'POST', cookie: customer.cookie, data: { version: 1 } })).status, 409);
   assert.equal((await f.call(`/admin/orders/${order.id}/production`, { method: 'POST', cookie: admin.cookie, data: {} })).status, 409);
   assert.equal((await f.upload(admin.cookie, Buffer.from('not an image'), 'material-photo')).result.status, 400);

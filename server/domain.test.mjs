@@ -170,7 +170,7 @@ test('customer cancellation and refunds preserve ordinary expiry; coupons never 
 test('custom latest material consent and verified payment are both required before production, then dispatch', t => {
   const f = fixture(t), saved = save(f.store, f.user), o = order(f, { kind: 'custom', designId: saved.id });
   const photo1 = randomUUID(), photo2 = randomUUID();
-  const first = f.store.proposeMaterial(f.admin.id, { orderId: o.id, note: '细纹皮料实物照片', photoRefs: [photo1] });
+  const first = f.store.proposeMaterial(f.admin.id, { orderId: o.id, note: '细纹款实物照片', photoRefs: [photo1] });
   assert.equal(f.store.canReadMaterialPhoto(f.user.id, photo1), true); assert.equal(f.store.canReadMaterialPhoto(f.other.id, photo1), false);
   f.store.acceptMaterial(f.user.id, { orderId: o.id, version: first.materialVersion });
   code(() => f.store.startProduction(f.admin.id, { orderId: o.id }), 'PRODUCTION_NOT_READY');

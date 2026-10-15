@@ -55,8 +55,8 @@ try{
  record('light preview renders usable studio',document.body.textContent.includes('设计你的纸巾盒'));
  record('editor returns to tissue-box collection',document.querySelector('.dc-logo').getAttribute('href')==='/'&&document.querySelector('.studio-toolbarTitle a').getAttribute('href')==='/tissue-box');
  record('custom 159 pricing visible',document.body.textContent.includes('159'));
- record('new material picker offers only grain',!!document.querySelector('button[aria-label="细纹皮革"]')&&!document.querySelector('button[aria-label="光面皮革"]')&&!document.querySelector('button[aria-label="绒面质感"]'));
- record('colour picker explains approximate stock match',document.body.textContent.includes('按现有皮料近似匹配'));
+ record('new material picker offers only grain',!!document.querySelector('button[aria-label="细纹"]')&&!document.querySelector('button[aria-label="光面款"]')&&!document.querySelector('button[aria-label="绒面质感"]'));
+ record('colour picker explains approximate stock match',document.body.textContent.includes('按现有选材近似匹配'));
  await click(document.querySelector('button[aria-label="保存设计"]'));
  record('local save disclosure visible',document.body.textContent.includes('仅保存在此设备的当前浏览器'));
  await input(document.querySelector('#designName'),'QA 本机保存');const saveButton=button('保存到我的设计');await act(async()=>{saveButton.click();saveButton.click()});await flush();record('rapid repeated save writes once',saveCalls===1);

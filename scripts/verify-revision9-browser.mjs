@@ -20,14 +20,14 @@ try{
   assert.equal(await page.locator('.model-error').count(),0);
   await page.screenshot({path:output('website-ivory.png')});
   await page.getByRole('button',{name:'四角',exact:true}).click();
-  const hole=page.getByRole('switch',{name:'皮料打孔',exact:true});
+  const hole=page.getByRole('switch',{name:'打孔',exact:true});
   if(await hole.getAttribute('aria-checked')==='true')await hole.click();
   await page.waitForTimeout(350);
   await page.locator('.product-canvas').screenshot({path:output('website-holes-off.png')});
   await hole.click();assert.equal(await hole.getAttribute('aria-checked'),'true');
   await page.waitForTimeout(500);
   await page.locator('.product-canvas').screenshot({path:output('website-holes-on.png')});
-  for(const material of ['光面皮革','绒面质感','细纹皮革']){
+  for(const material of ['细纹']){
     await page.getByRole('button',{name:material,exact:true}).click();await page.waitForTimeout(200);
   }
   const resource=async()=>{

@@ -39,7 +39,7 @@ export function createFabricLibrary(THREE,{anisotropy=1,loadTexture,textureBaseU
   texture.userData.fabricLibraryOwned=true;texture.needsUpdate=true;return texture;
  }
  function capture(material){
-  if(material.name!=='Mat_MainFabric')throw Error('面料只能用于中间区域');
+  if(material.name!=='Mat_MainFabric')throw Error('材质只能用于中间区域');
   if(!snapshots.has(material))snapshots.set(material,{
    map:material.map,normalMap:material.normalMap,roughnessMap:material.roughnessMap,
    roughness:material.roughness,color:material.color.clone(),normalScale:material.normalScale.clone()
@@ -47,7 +47,7 @@ export function createFabricLibrary(THREE,{anisotropy=1,loadTexture,textureBaseU
  }
  async function prepare(id){
   if(id==='houndstooth'||id==='plain')return null;
-  const definition=FABRIC_VARIANTS[id];if(!definition)throw Error('未知面料');
+  const definition=FABRIC_VARIANTS[id];if(!definition)throw Error('未知材质');
   if(!cache.has(id))cache.set(id,(async()=>{
    const url=textureBaseUrl?new URL(definition.file+'?v=fabric4-webp',textureBaseUrl).href:new URL('./fabrics/'+definition.file+'?v=fabric3',import.meta.url).href;
    const map=configure(await readTexture(url),definition,true);
@@ -59,11 +59,11 @@ export function createFabricLibrary(THREE,{anisotropy=1,loadTexture,textureBaseU
  function apply(material,id,asset){
   capture(material);const original=snapshots.get(material),definition=FABRIC_VARIANTS[id];
   if(definition){
-   if(!asset)throw Error('面料贴图尚未载入');
+   if(!asset)throw Error('材质贴图尚未载入');
    material.map=asset.map;material.normalMap=asset.normalMap;material.roughnessMap=null;
    material.color.set('#ffffff');material.roughness=definition.roughness;material.normalScale.set(.75,.75);
   }else{
-   if(id!=='houndstooth'&&id!=='plain')throw Error('未知面料');
+   if(id!=='houndstooth'&&id!=='plain')throw Error('未知材质');
    material.map=id==='plain'?null:original.map;material.normalMap=original.normalMap;
    material.roughnessMap=original.roughnessMap;material.roughness=original.roughness;
    material.normalScale.copy(original.normalScale);material.color.copy(original.color);

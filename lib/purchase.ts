@@ -8,8 +8,8 @@ export const QUANTITY_MAX = 999;
 export const NOTE_MAX = 300;
 
 export const MATERIAL_NAMES: Record<Material, string> = {
-  grain: '细纹皮革',
-  smooth: '光面皮革',
+  grain: '细纹款',
+  smooth: '光面款',
   suede: '绒面质感',
 };
 

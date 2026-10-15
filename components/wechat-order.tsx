@@ -12,9 +12,14 @@ export default function WechatOrder() {
   const fen = Number(params.get('unitPriceFen'));
   const price = Number.isSafeInteger(fen) && fen > 0 ? '¥' + (fen / 100).toFixed(fen % 100 ? 2 : 0) : null;
   const designId = params.get('design');
+  const SOURCES: Record<string, string> = {douyin: '抖音', xiaohongshu: '小红书', xianyu: '闲鱼', bilibili: 'B站', weibo: '微博', shipinhao: '视频号', zhihu: '知乎', wechat: '微信'};
+  let source: string | null = null;
+  try { source = typeof window === 'undefined' ? null : window.localStorage.getItem('dlcj_src'); } catch { source = null; }
+  const sourceLabel = source ? SOURCES[source] ?? source : null;
   const hasWechat = activeContactChannels().some(channel => channel.kind === 'wechat');
   return <StoreShell title="请加微信下单" eyebrow="下单方式" description="网站暂不在线下单或收款。请添加商家微信，发送款式或方案，确认材料、价格、运费与交期后再付款。">
     {(style || designId) && <p className="store-lead">你选择的：<strong>{style ? style.name : '自由定制方案'}</strong>{price && <> · 单价 <strong>{price}</strong>（以商家确认为准）</>}{designId && <> · 方案编号 <code>{designId}</code></>}</p>}
+    {sourceLabel && <p className="store-lead">加微信时请说一声：我是从<strong>{sourceLabel}</strong>看到的。</p>}
     {hasWechat ? <ContactOptions/> : <p className="store-lead">商家微信尚未配置，请通过此前联系的商家账号下单。</p>}
   </StoreShell>;
 }

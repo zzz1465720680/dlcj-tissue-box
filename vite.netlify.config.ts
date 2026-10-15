@@ -37,6 +37,9 @@ function shareHead(html: string, path: string) {
     `<meta itemprop="name" content="${esc(title)}" />`,
     `<meta itemprop="description" content="${esc(description)}" />`,
     `<meta itemprop="image" content="${OG_IMAGE}" />`,
+    `<link rel="canonical" href="${url}" />`,
+    `<meta name="keywords" content="鼎立车眷,车载纸巾盒,汽车纸巾盒,定制纸巾盒,汽车脚垫,定制脚垫,汽车内饰,福州" />`,
+    ...(path === '/' ? [`<script type="application/ld+json">${JSON.stringify({'@context': 'https://schema.org', '@type': 'Organization', name: '鼎立车眷', alternateName: 'DINGLI CHEJUAN', url: SITE_ORIGIN + '/', logo: OG_IMAGE, telephone: '+86-13859235588', address: {'@type': 'PostalAddress', addressLocality: '福州', addressRegion: '福建', addressCountry: 'CN'}})}</script>`] : []),
   ].join('\n    ');
   return html
     .replace(/<title>[^<]*<\/title>/, `<title>${esc(title)}</title>`)
@@ -61,6 +64,8 @@ export default defineConfig(({mode}) => {
     generateBundle() {
       this.emitFile({type: 'asset', fileName: '_redirects', source: ['/mats','/tissue-box','/customize','/model-review','/my','/login','/checkout','/admin','/admin/login','/gallery'].map(path => {const target = SHARE_PAGES[path] ? `/share-pages${path}.html` : '/index.html'; return `${path} ${target} 200\n${path}/ ${target} 200\n`;}).join('')});
       this.emitFile({type: 'asset', fileName: '_headers', source: '/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  Cache-Control: public, max-age=0, must-revalidate\n' + (frontendPreview ? '  X-Robots-Tag: noindex, nofollow\n' : '') + '/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n'});
+      this.emitFile({type: 'asset', fileName: 'robots.txt', source: frontendPreview ? 'User-agent: *\nDisallow: /\n' : `User-agent: *\nDisallow: /admin\nDisallow: /my\nDisallow: /login\nDisallow: /checkout\nDisallow: /model-review\nDisallow: /api/\nSitemap: ${SITE_ORIGIN}/sitemap.xml\n`});
+      this.emitFile({type: 'asset', fileName: 'sitemap.xml', source: '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + Object.keys(SHARE_PAGES).map(path => `  <url><loc>${SITE_ORIGIN}${path}</loc><changefreq>weekly</changefreq><priority>${path === '/' ? '1.0' : '0.8'}</priority></url>\n`).join('') + '</urlset>\n'});
       this.emitFile({type: 'asset', fileName: 'deployment-version.json', source: JSON.stringify({
         sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], {encoding: 'utf8'}).trim(),
         sourceWorkingTreeDirty: execFileSync('git', ['status', '--porcelain', '--untracked-files=no'], {encoding: 'utf8'}).trim().length > 0,
@@ -87,7 +92,7 @@ export default defineConfig(({mode}) => {
       const {readFile, writeFile, mkdir} = await import('node:fs/promises');
       const home = await readFile(out + 'index.html', 'utf8');
       await mkdir(out + 'share-pages', {recursive: true});
-      for (const path of Object.keys(SHARE_PAGES)) if (path !== '/') await writeFile(out + 'share-pages' + path + '.html', shareHead(home.replace(/\n\s*<meta (property="og:|name="twitter:|itemprop=")[^>]*>/g, ''), path));
+      for (const path of Object.keys(SHARE_PAGES)) if (path !== '/') await writeFile(out + 'share-pages' + path + '.html', shareHead(home.replace(/\n\s*<meta (property="og:|name="twitter:|itemprop="|name="keywords")[^>]*>/g, '').replace(/\n\s*<link rel="canonical"[^>]*>/g, '').replace(/\n\s*<script type="application\/ld\+json">.*?<\/script>/g, ''), path));
       for (const rel of ['models/revision7', 'models/presentation-trial', 'models/tissuebox-v2.glb']) await rm(out + rel, {recursive: true, force: true});
     },
   }],

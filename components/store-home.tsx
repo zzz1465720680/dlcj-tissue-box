@@ -37,9 +37,9 @@ const HOME_COPY = {
     help: '使用左右方向键切换款式，Home 跳到第一款，End 跳到最后一款。触控屏可左右滑动。',
     custom: '自由定制', customTitle: '喜欢的颜色，自己搭配。',
     customBody: '从主体、包角到封边与缝线，搭配属于你的纸巾盒。',
-    photoLabel: '实物照片 · AI 精修', palette: '从一抹喜欢的颜色开始',
+    photoLabel: '实物照片', palette: '从一抹喜欢的颜色开始',
     paletteNote: '配色为接近现货的示意，以实物色卡确认为准', body: '主体', corners: '包角', trim: '封边与缝线',
-    dark: '曜石黑', coral: '珊瑚红', imageNote: '产品图经 AI 精修，颜色与细节以实物为准',
+    dark: '曜石黑', coral: '珊瑚红', imageNote: '颜色与细节以实物为准',
     contact: '联系我们', terms: '购买须知', close: '收起',
     termsIntro: '选款或整理方案后，与商家核对选材、需求与交付信息。',
     facts: [
@@ -58,9 +58,9 @@ const HOME_COPY = {
     help: 'Use the left and right arrows to change styles, Home for the first and End for the last. Swipe on touch screens.',
     custom: 'CUSTOM COMBINATIONS', customTitle: 'Your colours. Your combination.',
     customBody: 'Choose colours for the body, corners, edging and stitching. Make it your own.',
-    photoLabel: 'Product photograph · AI-retouched', palette: 'Start with a colour you love',
+    photoLabel: 'Product photograph', palette: 'Start with a colour you love',
     paletteNote: 'Approximate available colours. Confirm physical swatches.', body: 'Body', corners: 'Corners', trim: 'Edging & stitching',
-    dark: 'Obsidian', coral: 'Coral', imageNote: 'AI-retouched product photographs. Physical colours and details may vary.',
+    dark: 'Obsidian', coral: 'Coral', imageNote: 'Physical colours and details may vary.',
     contact: 'Contact us', terms: 'Before you buy', close: 'Close',
     termsIntro: 'Choose a style or prepare your design, then confirm the physical leather, requirements and delivery with the maker.',
     facts: [

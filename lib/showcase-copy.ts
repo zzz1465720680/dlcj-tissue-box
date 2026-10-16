@@ -5,8 +5,8 @@ const zh = {
   meta: { title: '鼎立车眷 · 车载纸巾盒', description: '七款现有款式与自由配色定制，价格以商品当前定价为准。从喜欢的配色开始，搭配你的车载纸巾盒；专属图案、刺绣等特殊需求请私聊报价。' },
   brand: '鼎立车眷', skip: '跳转到选款', navLabel: '页面导航', language: '语言',
   nav: ['选款式', '看细节', '自由定制'], customize: '开始定制',
-  hero: { eyebrow: '鼎立车眷 · 车载纸巾盒', title: ['一件小物，', '随你心意。'], body: '从喜欢的配色开始，让车里的日常，也有自己的样子。', choose: '挑选款式', custom: '自由搭配', caption: '白瓷 · 青柠', alt: '白色主体与青柠绿封边纸巾盒，棚拍风格精修图' },
-  colorways: { label: '01 / 选现有款', title: '先选一个，喜欢的样子。', intro: '以下款式，统一价格。', choose: '咨询这款', note: '产品图经 AI 精修，颜色与细节以实物为准。', items: [
+  hero: { eyebrow: '鼎立车眷 · 车载纸巾盒', title: ['一件小物，', '随你心意。'], body: '从喜欢的配色开始，让车里的日常，也有自己的样子。', choose: '挑选款式', custom: '自由搭配', caption: '白瓷 · 青柠', alt: '白色主体与青柠绿封边纸巾盒，棚拍风格产品图' },
+  colorways: { label: '01 / 选现有款', title: '先选一个，喜欢的样子。', intro: '以下款式，统一价格。', choose: '咨询这款', note: '颜色与细节以实物为准。', items: [
     { id: 'white-lime', name: '白瓷 · 青柠', description: '柔白主体，一抹清新绿。', colors: ['#eeede5', '#91c866'], alt: '白瓷青柠纸巾盒：白色主体、打孔包角与青柠绿封边' },
     { id: 'black-coral', name: '曜石 · 珊瑚红', description: '深色主体，珊瑚红勾边。', colors: ['#282b2a', '#e96469'], alt: '曜石珊瑚红纸巾盒：黑色主体、打孔包角与红色封边' },
     { id: 'ivory', name: '奶油白', description: '同色缝线，干净而柔和。', colors: ['#e9e5da', '#d5d0c2'], alt: '奶油白纸巾盒：象牙白主体、无孔包角与同色缝线' },
@@ -39,8 +39,8 @@ const en = {
   meta: { title: '鼎立车眷 · Car Tissue Box', description: 'Seven existing styles and custom colour combinations. See the current store prices. Personal artwork, embroidery and special work are quoted privately.' },
   brand: '鼎立车眷', skip: 'Skip to colourways', navLabel: 'Page navigation', language: 'Language',
   nav: ['Styles', 'Details', 'Customize'], customize: 'Customize',
-  hero: { eyebrow: 'DINGLI CHEJUAN · CAR TISSUE BOX', title: ['A little detail.', 'Entirely you.'], body: 'Start with a colour you love. Make the everyday feel a little more your own.', choose: 'Explore styles', custom: 'Create your own', caption: 'Porcelain · Lime', alt: 'White leather tissue box with lime edging, retouched studio product image' },
-  colorways: { label: '01 / EXISTING STYLES', title: 'Find a style you love.', intro: 'One price for every style shown.', choose: 'Enquire about this style', note: 'Product images are AI-retouched. Confirm colours and details against the physical product.', items: [
+  hero: { eyebrow: 'DINGLI CHEJUAN · CAR TISSUE BOX', title: ['A little detail.', 'Entirely you.'], body: 'Start with a colour you love. Make the everyday feel a little more your own.', choose: 'Explore styles', custom: 'Create your own', caption: 'Porcelain · Lime', alt: 'White leather tissue box with lime edging, studio product image' },
+  colorways: { label: '01 / EXISTING STYLES', title: 'Find a style you love.', intro: 'One price for every style shown.', choose: 'Enquire about this style', note: 'Confirm colours and details against the physical product.', items: [
     { id: 'white-lime', name: 'Porcelain · Lime', description: 'Soft white, a fresh line of green.', colors: ['#eeede5', '#91c866'], alt: 'White tissue box with perforated white corners and lime edging' },
     { id: 'black-coral', name: 'Obsidian · Coral', description: 'Dark leather, outlined in coral.', colors: ['#282b2a', '#e96469'], alt: 'Black tissue box with perforated corners and coral-red edging' },
     { id: 'ivory', name: 'Soft Ivory', description: 'Tonal stitching, quietly simple.', colors: ['#e9e5da', '#d5d0c2'], alt: 'Ivory tissue box with unperforated corners and matching stitching' },

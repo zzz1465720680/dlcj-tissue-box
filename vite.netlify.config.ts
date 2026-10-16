@@ -47,6 +47,31 @@ function shareHead(html: string, path: string) {
     .replace('</head>', `    ${tags}\n  </head>`);
 }
 
+// Large public/ files are not content-hashed, so they get a 7-day browser cache (not
+// `immutable`): an in-place replacement can stay stale for returning visitors up to 7 days.
+// Changed 3D models/textures are referenced with ?v=<sha256> so code updates bust that cache.
+// Netlify applies the most specific matching rule, so these override the `/*` rule.
+const LONG_CACHE_PATHS = ['/models/*', '/materials/*', '/products/*', '/floor-mats/*', '/showcase/*', '/presets/*', '/references/*', '/share/*', '/brand/*'];
+
+// public/ files that no customer-facing page (/, /tissue-box, /customize, /mats) loads.
+// They stay in the repo (sources, scripts, internal review) but are removed from dist-netlify.
+const NOT_SHIPPED = [
+  // Unreferenced legacy/trial models.
+  'models/revision7', 'models/presentation-trial', 'models/tissuebox-v2.glb',
+  // Approved meshopt r9 asset and PNG leather maps: the site loads the Draco/WebP derivatives
+  // made by scripts/shrink-web-assets.mjs. perforation-*.png are not referenced by any code.
+  'models/revision9/tissuebox-r9.glb', 'models/leather-normal.png', 'models/leather-roughness.png',
+  'models/perforation-mask.png', 'models/perforation-rim.png',
+  // Blender reference renders for the internal /model-review page (its two <img> will 404 on
+  // Netlify; the page's 3D view still works). ~16 MB.
+  'model-review',
+  // Full-size reference photos (~15 MB). The studio's 实物参考 dialog uses white-1280/pattern-1280.webp.
+  'references/white.jpg', 'references/pattern.jpg', 'references/blue.jpg', 'references/black.jpg',
+  'references/detail-reference.jpg', 'references/end-reference.jpg',
+  // Logo source raster (dc-logo.svg embeds a small tinted copy), docs, unused product photo.
+  'brand/dc-mark-source.png', 'brand/README.md', 'showcase/ASSETS.md', 'products/black-coral-in-car.webp',
+];
+
 // Isolated browser-only build. The original Vinext/Cloudflare build stays intact.
 export default defineConfig(({mode}) => {
   const frontendPreview = mode === 'frontend-preview';
@@ -63,7 +88,7 @@ export default defineConfig(({mode}) => {
     },
     generateBundle() {
       this.emitFile({type: 'asset', fileName: '_redirects', source: ['/mats','/tissue-box','/customize','/model-review','/my','/login','/checkout','/admin','/admin/login','/gallery'].map(path => {const target = SHARE_PAGES[path] ? `/share-pages${path}.html` : '/index.html'; return `${path} ${target} 200\n${path}/ ${target} 200\n`;}).join('')});
-      this.emitFile({type: 'asset', fileName: '_headers', source: '/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  Cache-Control: public, max-age=0, must-revalidate\n' + (frontendPreview ? '  X-Robots-Tag: noindex, nofollow\n' : '') + '/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n'});
+      this.emitFile({type: 'asset', fileName: '_headers', source: '/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  Cache-Control: public, max-age=0, must-revalidate\n' + (frontendPreview ? '  X-Robots-Tag: noindex, nofollow\n' : '') + '/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n' + LONG_CACHE_PATHS.map(path => `${path}\n  Cache-Control: public, max-age=604800\n`).join('')});
       this.emitFile({type: 'asset', fileName: 'robots.txt', source: frontendPreview ? 'User-agent: *\nDisallow: /\n' : `User-agent: *\nDisallow: /admin\nDisallow: /my\nDisallow: /login\nDisallow: /checkout\nDisallow: /model-review\nDisallow: /api/\nSitemap: ${SITE_ORIGIN}/sitemap.xml\n`});
       this.emitFile({type: 'asset', fileName: 'sitemap.xml', source: '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + Object.keys(SHARE_PAGES).map(path => `  <url><loc>${SITE_ORIGIN}${path}</loc><changefreq>weekly</changefreq><priority>${path === '/' ? '1.0' : '0.8'}</priority></url>\n`).join('') + '</urlset>\n'});
       this.emitFile({type: 'asset', fileName: 'deployment-version.json', source: JSON.stringify({
@@ -83,7 +108,7 @@ export default defineConfig(({mode}) => {
       }, null, 2)});
     },
   }, {
-    // Unreferenced legacy/trial models stay in the repo for scripts but are not shipped.
+    // Unreferenced/internal-only public files stay in the repo but are not shipped (NOT_SHIPPED).
     name: 'netlify-drop-unused-models',
     apply: 'build',
     async closeBundle() {
@@ -93,7 +118,7 @@ export default defineConfig(({mode}) => {
       const home = await readFile(out + 'index.html', 'utf8');
       await mkdir(out + 'share-pages', {recursive: true});
       for (const path of Object.keys(SHARE_PAGES)) if (path !== '/') await writeFile(out + 'share-pages' + path + '.html', shareHead(home.replace(/\n\s*<meta (property="og:|name="twitter:|itemprop="|name="keywords")[^>]*>/g, '').replace(/\n\s*<link rel="canonical"[^>]*>/g, '').replace(/\n\s*<script type="application\/ld\+json">.*?<\/script>/g, ''), path));
-      for (const rel of ['models/revision7', 'models/presentation-trial', 'models/tissuebox-v2.glb']) await rm(out + rel, {recursive: true, force: true});
+      for (const rel of NOT_SHIPPED) await rm(out + rel, {recursive: true, force: true});
     },
   }],
   resolve: {alias: {'@': fileURLToPath(new URL('.', import.meta.url))}},

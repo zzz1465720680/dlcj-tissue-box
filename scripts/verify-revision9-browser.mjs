@@ -49,7 +49,7 @@ try{
   const download=await pending;await download.saveAs(output('website-export.png'));
   await page.getByAltText('当前方案多角度效果图').waitFor({state:'visible'});
   await page.keyboard.press('Escape');
-  assert(requests.some(u=>u.endsWith('tissuebox-r9.glb')));
+  assert(requests.some(u=>/tissuebox-r9(\.draco)?\.glb(\?|$)/.test(u)));
   assert.equal(new Set(requests.filter(u=>u.endsWith('.rgba32f.bin'))).size,4);
   assert.deepEqual(errors,[]);
   report.desktop={revision:9,loadedAssets:[...new Set(requests)],before,after,errors,holesToggled:true,materialsSwitched:true,rotationChecked:true,exportDownloaded:true};

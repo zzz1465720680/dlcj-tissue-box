@@ -86,8 +86,10 @@ export function loadProductAssets(){
   if(!promise){
     const loader=new THREE.TextureLoader();
     promise=Promise.all([
-      import('three/addons/libs/meshopt_decoder.module.js').then(({MeshoptDecoder})=>new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync('/models/revision9/tissuebox-r9.glb')),
-      loader.loadAsync('/models/leather-normal.png'),loader.loadAsync('/models/leather-roughness.png'),
+      // Draco derivative of the approved meshopt asset (scripts/shrink-web-assets.mjs): ~3.8 MB instead of ~10.3 MB.
+      // Decoder files are served locally from /models/floor-mats/draco/ (shared with the floor-mat viewer).
+      import('three/addons/loaders/DRACOLoader.js').then(({DRACOLoader})=>{const draco=new DRACOLoader().setDecoderPath('/models/floor-mats/draco/');return new GLTFLoader().setDRACOLoader(draco).loadAsync('/models/revision9/tissuebox-r9.draco.glb?v=ff6087114f0f').finally(()=>draco.dispose());}),
+      loader.loadAsync('/models/leather-normal-2048.webp?v=379bc52901ad'),loader.loadAsync('/models/leather-roughness-2048.webp?v=e20110c538bf'),
       loadContactMaps(loader),loadFixedCenters(),
     ]).then(([g,normal,roughness,occlusion,fixedCenters])=>{
       for(const texture of [normal,roughness]){texture.flipY=false;texture.wrapS=texture.wrapT=THREE.RepeatWrapping;texture.colorSpace=THREE.NoColorSpace;texture.anisotropy=8;texture.channel=1;}

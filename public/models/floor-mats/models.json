@@ -2,13 +2,13 @@
   {
     "id": "01_driver",
     "title": "主驾脚垫",
-    "url": "/models/floor-mats/CarMat_Codex_Web.glb?v=d409b3eefd98",
+    "url": "/models/floor-mats/CarMat_Codex_Web.glb?v=e54580b44184",
     "features": {}
   },
   {
     "id": "02_passenger",
     "title": "右上前排脚垫",
-    "url": "/models/floor-mats/CarMat_02_passenger.glb?v=2294a8d9daba",
+    "url": "/models/floor-mats/CarMat_02_passenger.glb?v=81049f3a0547",
     "features": {
       "upper": [
         0.19676290753704256,
@@ -31,7 +31,7 @@
   {
     "id": "03_transverse",
     "title": "横向连体脚垫",
-    "url": "/models/floor-mats/CarMat_03_transverse.glb?v=0ba3c4e319a6",
+    "url": "/models/floor-mats/CarMat_03_transverse.glb?v=a0601ab67bfd",
     "features": {
       "notch": [
         -0.16907983156064083,
@@ -54,7 +54,7 @@
   {
     "id": "04_lower",
     "title": "下方双 U 口脚垫",
-    "url": "/models/floor-mats/CarMat_04_lower.glb?v=850845b03617",
+    "url": "/models/floor-mats/CarMat_04_lower.glb?v=ef48593467d5",
     "features": {
       "notch": [
         -0.20006639565212875,
@@ -77,7 +77,7 @@
   {
     "id": "all",
     "title": "整套四块",
-    "url": "/models/floor-mats/CarMat_FourPiece_Set.glb?v=dafd50be45dc",
+    "url": "/models/floor-mats/CarMat_FourPiece_Set.glb?v=afd4abd1727e",
     "features": {}
   }
 ]
